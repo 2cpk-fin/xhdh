@@ -30,8 +30,12 @@ public class User {
     private String password;
 
     private LocalDateTime createdAt;
+<<<<<<< HEAD
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
 
+=======
+    
+>>>>>>> f799b133e8047048b41cd608a1464ff029257fd3
 }

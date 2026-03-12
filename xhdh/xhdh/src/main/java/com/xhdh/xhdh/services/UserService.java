@@ -24,10 +24,10 @@ public class UserService {
         if(userRepository.existsByEmail(request.email())){
             throw new EmailAlreadyExistsException("This email is already taken by someone else");
         }
-        String realpassword = passwordEncoder.encode(request.password());
+        String hashedpassword = passwordEncoder.encode(request.password());
         User user = User.builder() /*open builder constructor*/
                     .username(request.username())
-                    .password(realpassword)
+                    .password(hashedpassword)
                     .email(request.email())
                     .createdAt(LocalDateTime.now())
                     .build(); /*activate the construction*/
