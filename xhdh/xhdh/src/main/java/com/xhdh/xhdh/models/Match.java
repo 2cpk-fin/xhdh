@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,30 +18,36 @@ public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "left_id", nullable = false)
+    @JoinColumn(name = "left_university_id", nullable = false)
     private University leftUniversity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "right_id", nullable = false)
+    @JoinColumn(name = "right_university_id", nullable = false)
     private University rightUniversity;
 
-    private long leftVotes;
+    private long totalLeftVotes;
 
-    private long rightVotes;
+    private long totalRightVotes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id",  nullable = false)
-    private Tag tag;
+    @JoinColumn(name = "winner_id", nullable = false)
+    private University winner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loser_id", nullable = false)
+    private University loser;
+
+    private long totalVotes;
+
+    private long totalWinningVotes;
+
+    private long totalLosingVotes;
 
     private LocalDateTime startTime;
 
     private LocalDateTime endTime;
-
-
 }

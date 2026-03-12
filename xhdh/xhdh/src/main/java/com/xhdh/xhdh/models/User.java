@@ -19,6 +19,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
 
     @NotBlank(message = "Username is required")
     private String username;
@@ -30,12 +32,5 @@ public class User {
     private String password;
 
     private LocalDateTime createdAt;
-<<<<<<< HEAD
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Match> matches = new ArrayList<>();
-
-=======
-    
->>>>>>> f799b133e8047048b41cd608a1464ff029257fd3
 }

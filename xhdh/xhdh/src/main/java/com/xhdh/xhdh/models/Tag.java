@@ -16,10 +16,9 @@ public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vote> votes =  new ArrayList<>();
 
     @NotBlank(message = "Name is required")
     private String name;
-
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Match> matches =  new ArrayList<>();
 }

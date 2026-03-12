@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MatchRequest {
-    private String universityId;
+    private Integer universityId;
     private String tag;
 }
