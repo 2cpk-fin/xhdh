@@ -17,12 +17,29 @@ public class Match {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private long userId;
-    private int leftId;
-    private int rightId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "left_id", nullable = false)
+    private University leftUniversity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "right_id", nullable = false)
+    private University rightUniversity;
+
     private long leftVotes;
+
     private long rightVotes;
-    private int tagId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id",  nullable = false)
+    private Tag tag;
+
     private LocalDateTime startTime;
+
     private LocalDateTime endTime;
+
+
 }

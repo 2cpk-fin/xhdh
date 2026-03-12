@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Entity
@@ -11,6 +13,6 @@ import lombok.Setter;
 public class UniversityTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int university_id;
-    private byte tag_id;
+    private int universityId;
+    private byte tagId;
 }
