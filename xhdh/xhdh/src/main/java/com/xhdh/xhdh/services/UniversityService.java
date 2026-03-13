@@ -29,6 +29,7 @@ public class UniversityService {
 
     public ResponseEntity<UniversityResponse> getUniversityByName(String universityName) {
         University university = universityRepository.findByName(universityName);
+
         return new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
     }
 

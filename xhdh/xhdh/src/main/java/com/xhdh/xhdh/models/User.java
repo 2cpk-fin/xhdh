@@ -50,9 +50,4 @@ public class User implements UserDetails{
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
     
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Match> matches = new ArrayList<>();
-
-    
 }
