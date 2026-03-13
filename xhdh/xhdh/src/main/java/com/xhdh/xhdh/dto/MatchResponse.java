@@ -7,13 +7,15 @@ import java.time.LocalDateTime;
 
 @Getter
 public class MatchResponse {
-    private int universityId;
-    private String universityName;
-    private String tag;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private final long totalVotes;
+    private final String status;
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
 
     public MatchResponse(Match match) {
-
+        totalVotes = match.getTotalVotes();
+        status = match.getStatus();
+        startTime = match.getStartTime();
+        endTime = match.getEndTime();
     }
 }
