@@ -4,9 +4,7 @@ import com.xhdh.xhdh.dto.TagResponse;
 import com.xhdh.xhdh.services.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,5 +17,10 @@ public class TagController {
     @GetMapping
     public List<ResponseEntity<TagResponse>> getAllTags() {
         return tagService.showAllTags();
+    }
+
+    @GetMapping(path = "/{universityName}")
+    public List<ResponseEntity<TagResponse>> getAllTagsInUniversity(@PathVariable @RequestParam String universityName) {
+        return tagService.showAllTagsInUniversity(universityName);
     }
 }

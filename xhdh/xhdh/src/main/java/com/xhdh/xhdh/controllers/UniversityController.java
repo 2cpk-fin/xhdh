@@ -4,10 +4,7 @@ import com.xhdh.xhdh.dto.UniversityResponse;
 import com.xhdh.xhdh.services.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +27,10 @@ public class UniversityController {
     @GetMapping(path = "/{abbreviation}")
     public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@RequestParam String abbreviation){
         return universityService.getUniversityByAbbreviation(abbreviation);
+    }
+
+    @GetMapping(path = "/{tagName}")
+    public List<ResponseEntity<UniversityResponse>> findUniversityByTagName(@PathVariable @RequestParam String tagName){
+        return universityService.getAllUniversitiesByTag(tagName);
     }
 }

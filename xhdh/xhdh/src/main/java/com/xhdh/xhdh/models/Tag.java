@@ -21,4 +21,7 @@ public class Tag {
 
     @NotBlank(message = "Name is required")
     private String name;
+
+    @ManyToMany(mappedBy = "tags")
+    List<University> universities = new ArrayList<>();
 }

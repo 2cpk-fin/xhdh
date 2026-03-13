@@ -1,6 +1,7 @@
 package com.xhdh.xhdh.services;
 
 import com.xhdh.xhdh.dto.UniversityResponse;
+import com.xhdh.xhdh.models.Tag;
 import com.xhdh.xhdh.models.University;
 import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +36,19 @@ public class UniversityService {
     public ResponseEntity<UniversityResponse> getUniversityByAbbreviation(String universityAbbreviation) {
         University university = universityRepository.findByAbbreviation(universityAbbreviation);
         return new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
+    }
+
+    public List<ResponseEntity<UniversityResponse>> getAllUniversitiesByTag(String tagName) {
+        List<University> universityList = universityRepository.findAll();
+        List<ResponseEntity<UniversityResponse>> universityResponseList = new ArrayList<>();
+
+        for (University university : universityList) {
+            for (Tag tag : university.getTags()) {
+                if (tag.getName().equals(tagName)) {
+                    universityResponseList.add(new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK));
+                }
+            }
+        }
+        return universityResponseList;
     }
 }

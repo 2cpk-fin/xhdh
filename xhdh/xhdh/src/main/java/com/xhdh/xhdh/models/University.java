@@ -40,7 +40,7 @@ public class University {
 
     @ManyToMany
     @JoinTable(
-            name = "university-tag",
+            name = "university_tags",
             joinColumns = @JoinColumn(name = "university_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
