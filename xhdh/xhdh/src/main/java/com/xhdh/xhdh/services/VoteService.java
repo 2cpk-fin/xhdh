@@ -1,6 +1,7 @@
 package com.xhdh.xhdh.services;
-
+/* 
 import com.xhdh.xhdh.dto.VoteRequest;
+*/
 import com.xhdh.xhdh.dto.VoteResponse;
 import com.xhdh.xhdh.models.Vote;
 import com.xhdh.xhdh.repositories.VoteRepository;
@@ -38,9 +39,9 @@ public class VoteService {
         }
         return new ResponseEntity<>(voteResponses, HttpStatus.OK);
     }
-
+    /* 
     public ResponseEntity<VoteResponse> createVote(VoteRequest voteRequest) {
         Vote newVote = new Vote();
     }
-
+    */
 }
