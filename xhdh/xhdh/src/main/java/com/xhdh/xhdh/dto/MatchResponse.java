@@ -13,6 +13,7 @@ public class MatchResponse {
     private final int loserId;
     private final String loserName;
     private final long loserVotes;
+    private final long totalVotes;
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
 
@@ -24,6 +25,7 @@ public class MatchResponse {
         this.loserId = match.getLoser().getId();
         this.loserName = match.getLoser().getName();
         this.loserVotes = match.getTotalLosingVotes();
+        this.totalVotes = match.getTotalVotes();
         this.startTime = match.getStartTime();
         this.endTime = match.getEndTime();
     }
