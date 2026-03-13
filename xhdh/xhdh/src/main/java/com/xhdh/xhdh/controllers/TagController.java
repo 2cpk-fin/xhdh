@@ -15,12 +15,12 @@ public class TagController {
     private final TagService tagService;
 
     @GetMapping
-    public List<ResponseEntity<TagResponse>> getAllTags() {
+    public ResponseEntity<List<TagResponse>> getAllTags() {
         return tagService.showAllTags();
     }
 
     @GetMapping(path = "/{universityName}")
-    public List<ResponseEntity<TagResponse>> getAllTagsInUniversity(@PathVariable @RequestParam String universityName) {
+    public ResponseEntity<List<TagResponse>> getAllTagsInUniversity(@PathVariable @RequestParam String universityName) {
         return tagService.showAllTagsInUniversity(universityName);
     }
 }

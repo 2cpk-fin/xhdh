@@ -1,8 +1,7 @@
 package com.xhdh.xhdh.models;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -32,4 +31,5 @@ public class Vote {
     private Match match;
 
     private LocalDateTime voteAt;
+
 }

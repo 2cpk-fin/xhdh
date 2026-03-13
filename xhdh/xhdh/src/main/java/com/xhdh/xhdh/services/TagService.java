@@ -17,25 +17,26 @@ import java.util.List;
 public class TagService {
     private final TagRepository tagRepository;
 
-    public List<ResponseEntity<TagResponse>> showAllTags() {
-        List<Tag> tags = tagRepository.findAll();
-        List<ResponseEntity<TagResponse>> tagResponses = new ArrayList<>();
-        for (Tag tag : tags) {
-            tagResponses.add(new ResponseEntity<>(new TagResponse(tag), HttpStatus.OK));
+    public ResponseEntity<List<TagResponse>> showAllTags() {
+        List<TagResponse> tagResponses = new ArrayList<>();
+
+        for (Tag tag : tagRepository.findAll()) {
+            tagResponses.add(new TagResponse(tag));
         }
-        return tagResponses;
+        return new ResponseEntity<>(tagResponses, HttpStatus.OK);
     }
 
-    public List<ResponseEntity<TagResponse>> showAllTagsInUniversity(String universityName) {
-        List<Tag> tags = tagRepository.findAll();
-        List<ResponseEntity<TagResponse>> tagResponses = new ArrayList<>();
-        for (Tag tag : tags) {
+    public ResponseEntity<List<TagResponse>> showAllTagsInUniversity(String universityName) {
+        List<TagResponse> tagResponses = new ArrayList<>();
+
+        for (Tag tag : tagRepository.findAll()) {
             for (University university : tag.getUniversities()) {
                 if (university.getName().equals(universityName)) {
-                    tagResponses.add(new ResponseEntity<>(new TagResponse(tag), HttpStatus.OK));
+                    tagResponses.add(new TagResponse(tag));
                 }
+
             }
         }
-        return tagResponses;
+        return new ResponseEntity<>(tagResponses, HttpStatus.OK);
     }
 }

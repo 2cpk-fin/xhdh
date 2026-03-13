@@ -17,15 +17,14 @@ import java.util.List;
 public class UniversityService {
     private final UniversityRepository universityRepository;
 
-    public List<ResponseEntity<UniversityResponse>> getUniversityList() {
-        List<University> universityList = universityRepository.findAll();
-        List<ResponseEntity<UniversityResponse>> universityResponseList = new ArrayList<>();
+    public ResponseEntity<List<UniversityResponse>> getUniversityList() {
+        List<UniversityResponse> universityResponseList = new ArrayList<>();
 
-        for (University university : universityList) {
-            ResponseEntity<UniversityResponse> universityResponse = new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
+        for (University university : universityRepository.findAll()) {
+            UniversityResponse universityResponse = new UniversityResponse(university);
             universityResponseList.add(universityResponse);
         }
-        return universityResponseList;
+        return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
     }
 
     public ResponseEntity<UniversityResponse> getUniversityByName(String universityName) {
@@ -38,17 +37,16 @@ public class UniversityService {
         return new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
     }
 
-    public List<ResponseEntity<UniversityResponse>> getAllUniversitiesByTag(String tagName) {
-        List<University> universityList = universityRepository.findAll();
-        List<ResponseEntity<UniversityResponse>> universityResponseList = new ArrayList<>();
+    public ResponseEntity<List<UniversityResponse>> getAllUniversitiesByTag(String tagName) {
+        List<UniversityResponse> universityResponseList = new ArrayList<>();
 
-        for (University university : universityList) {
+        for (University university : universityRepository.findAll()) {
             for (Tag tag : university.getTags()) {
                 if (tag.getName().equals(tagName)) {
-                    universityResponseList.add(new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK));
+                    universityResponseList.add(new UniversityResponse(university));
                 }
             }
         }
-        return universityResponseList;
+        return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
     }
 }
