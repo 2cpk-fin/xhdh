@@ -1,7 +1,9 @@
 package com.xhdh.xhdh.repositories;
 
-import com.xhdh.xhdh.models.University;
+import com.xhdh.xhdh.models.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface TagRepository extends JpaRepository<University,Integer> {
+@Repository
+public interface TagRepository extends JpaRepository<Tag, Integer> {
 }
