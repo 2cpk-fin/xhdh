@@ -2,7 +2,12 @@ package com.xhdh.xhdh.models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +20,7 @@ import lombok.*;
 @Builder/*lets you use the builder constructor */
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User implements UserDetails{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -30,12 +35,19 @@ public class User {
     private String password;
 
     private LocalDateTime createdAt;
-<<<<<<< HEAD
 
+    @Override
+    public String getUsername(){
+        return this.email;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+    
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
 
-=======
     
->>>>>>> f799b133e8047048b41cd608a1464ff029257fd3
 }
