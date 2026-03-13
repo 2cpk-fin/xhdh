@@ -16,9 +16,4 @@ import org.springframework.stereotype.Service;
 public class MatchService {
     private final MatchRepository matchRepository;
 
-    public MatchResponse createMatch(MatchRequest matchRequest) {
-        int universityId = matchRequest.getUniversityId();
-        String tag = matchRequest.getTag();
-        DataFormatReaders.Match match = new DataFormatReaders.Match();
-    }
 }
