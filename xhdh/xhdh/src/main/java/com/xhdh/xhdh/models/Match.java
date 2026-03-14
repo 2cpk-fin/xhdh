@@ -20,7 +20,7 @@ public class Match {
     private long id;
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
-    
+    private User user;
     private String status;
 
     @ManyToOne(fetch = FetchType.LAZY)

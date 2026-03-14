@@ -3,6 +3,8 @@ package com.xhdh.xhdh.exceptions;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.security.core.AuthenticationException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,6 +29,17 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleUnknownUser(AuthenticationException ex, HttpServletRequest request){
+        ErrorResponse error = new ErrorResponse(
+            LocalDateTime.now(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "Unauthorized",
+            "Invalid email or password",
+            request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleArguments(MethodArgumentNotValidException ex,HttpServletRequest request){
         String message = Optional.ofNullable(ex.getBindingResult().getFieldError())
