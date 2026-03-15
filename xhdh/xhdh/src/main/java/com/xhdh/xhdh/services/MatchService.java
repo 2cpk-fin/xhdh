@@ -5,6 +5,8 @@ import com.xhdh.xhdh.models.Match;
 import com.xhdh.xhdh.dto.FinishedMatchResponse;
 import com.xhdh.xhdh.dto.MatchResponse;
 import com.xhdh.xhdh.repositories.MatchRepository;
+import com.xhdh.xhdh.repositories.UniversityRepository;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -21,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MatchService {
     private final MatchRepository matchRepository;
+    private final UniversityRepository universityRepository;
 
     public ResponseEntity<List<MatchResponse>> getAllMatches() {
         List<MatchResponse> matchResponses = new ArrayList<>();
@@ -57,4 +60,5 @@ public class MatchService {
         }
         return new ResponseEntity<>(finishedMatchResponses, HttpStatus.OK);
     }
+
 }

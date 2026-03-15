@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-g
 @Service
 @RequiredArgsConstructor
 public class VoteService {
