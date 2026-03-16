@@ -1,12 +1,11 @@
 package com.xhdh.xhdh.services;
 
-import com.xhdh.xhdh.dto.PendingMatchResponse;
+import com.xhdh.xhdh.dto.MatchParticipantResponse;
 import com.xhdh.xhdh.models.Match;
-import com.xhdh.xhdh.dto.FinishedMatchResponse;
 import com.xhdh.xhdh.dto.MatchResponse;
+import com.xhdh.xhdh.models.MatchParticipant;
+import com.xhdh.xhdh.repositories.MatchParticipantRepository;
 import com.xhdh.xhdh.repositories.MatchRepository;
-import com.xhdh.xhdh.repositories.UniversityRepository;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -23,42 +22,57 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MatchService {
     private final MatchRepository matchRepository;
-    private final UniversityRepository universityRepository;
+
+    private final MatchParticipantRepository matchParticipantRepository;
+
+    private MatchResponse buildMatchResponse(Match match) {
+        MatchResponse matchResponse;
+        matchResponse = MatchResponse.builder()
+                .matchTitle(match.getTitle())
+                .status(match.getStatus())
+                .participants(buildParticipants(match))
+                .startTime(match.getStartTime())
+                .endTime(match.getEndTime())
+                .build();
+        return matchResponse;
+    }
+
+    private List<MatchParticipantResponse> buildParticipants(Match match) {
+        List<MatchParticipantResponse> participantsResponse = new ArrayList<>();
+        for (MatchParticipant participant : match.getParticipants()) {
+            participantsResponse.add(new MatchParticipantResponse(participant));
+        }
+        return participantsResponse;
+    }
 
     public ResponseEntity<List<MatchResponse>> getAllMatches() {
         List<MatchResponse> matchResponses = new ArrayList<>();
-
         for (Match match : matchRepository.findAll()) {
-            if (match.getStatus().equals("pending")) {
-                matchResponses.add(new PendingMatchResponse(match));
-            }
-            else if (match.getStatus().equals("finished")) {
-                matchResponses.add(new FinishedMatchResponse(match));
-            }
+            MatchResponse matchResponse = buildMatchResponse(match);
+            matchResponses.add(matchResponse);
         }
         return new ResponseEntity<>(matchResponses, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<PendingMatchResponse>> getAllPendingMatches() {
-        List<PendingMatchResponse> pendingMatchResponses = new ArrayList<>();
-
+    public ResponseEntity<List<MatchResponse>> getAllPendingMatches() {
+        List<MatchResponse> pendingMatchResponses = new ArrayList<>();
         for (Match match : matchRepository.findAll()) {
             if (match.getStatus().equals("pending")) {
-                pendingMatchResponses.add(new PendingMatchResponse(match));
+                MatchResponse matchResponse = buildMatchResponse(match);
+                pendingMatchResponses.add(matchResponse);
             }
         }
         return new ResponseEntity<>(pendingMatchResponses, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<FinishedMatchResponse>> getAllFinishedMatches() {
-        List<FinishedMatchResponse> finishedMatchResponses = new ArrayList<>();
-
+    public ResponseEntity<List<MatchResponse>> getAllFinishedMatches() {
+        List<MatchResponse> finishedMatchResponses = new ArrayList<>();
         for (Match match : matchRepository.findAll()) {
             if (match.getStatus().equals("finished")) {
-                finishedMatchResponses.add(new FinishedMatchResponse(match));
+                MatchResponse matchResponse = buildMatchResponse(match);
+                finishedMatchResponses.add(matchResponse);
             }
         }
         return new ResponseEntity<>(finishedMatchResponses, HttpStatus.OK);
     }
-
 }

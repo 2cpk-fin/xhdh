@@ -1,21 +1,17 @@
 package com.xhdh.xhdh.dto;
 
-import com.xhdh.xhdh.models.Match;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
+@Builder
 public class MatchResponse {
-    private final long totalVotes;
+    private final String title;
     private final String status;
+    private final List<MatchParticipantResponse> participants;
     private final LocalDateTime startTime;
     private final LocalDateTime endTime;
-
-    public MatchResponse(Match match) {
-        totalVotes = match.getTotalVotes();
-        status = match.getStatus();
-        startTime = match.getStartTime();
-        endTime = match.getEndTime();
-    }
 }
