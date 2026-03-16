@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "matches")
+@Table(name = "matches")    
 @NotBlank
 public class Match {
     @Id
