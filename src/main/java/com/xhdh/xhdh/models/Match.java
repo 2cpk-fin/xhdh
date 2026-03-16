@@ -18,36 +18,16 @@ public class Match {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
-    private User user;
+
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MatchParticipant> participants = new ArrayList<>();
+
+    private String title;
+
     private String status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "left_university_id", nullable = false)
-    private University leftUniversity;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "right_university_id", nullable = false)
-    private University rightUniversity;
-
-    private long totalLeftVotes;
-
-    private long totalRightVotes;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "winner_id", nullable = false)
-    private University winner;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "loser_id", nullable = false)
-    private University loser;
-
-    private long totalVotes;
-
-    private long totalWinningVotes;
-
-    private long totalLosingVotes;
 
     private LocalDateTime startTime;
 

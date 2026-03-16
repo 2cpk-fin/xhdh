@@ -14,7 +14,7 @@ public class VoteResponse {
     private final String universityAbbreviation;
     private final String tagName;
     private final long matchId;
-    private final String matchName;
+    private final String matchTitle;
     private final LocalDateTime voteAt;
 
     public VoteResponse(Vote vote) {
@@ -23,7 +23,7 @@ public class VoteResponse {
         this.universityAbbreviation = vote.getUniversity().getAbbreviation();
         this.tagName = vote.getTag().getName();
         this.matchId = vote.getMatch().getId();
-        this.matchName = vote.getMatch().getLeftUniversity().getName() + " VS " + vote.getMatch().getRightUniversity().getName();
+        this.matchTitle = vote.getMatch().getTitle();
         this.voteAt = LocalDateTime.now();
     }
 }

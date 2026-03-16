@@ -1,8 +1,6 @@
 package com.xhdh.xhdh.controllers;
 
-import com.xhdh.xhdh.dto.FinishedMatchResponse;
 import com.xhdh.xhdh.dto.MatchResponse;
-import com.xhdh.xhdh.dto.PendingMatchResponse;
 import com.xhdh.xhdh.services.MatchService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,12 +24,12 @@ public class MatchController {
     }
 
     @GetMapping(path = "/pending")
-    public ResponseEntity<List<PendingMatchResponse>> getPendingMatches() {
+    public ResponseEntity<List<MatchResponse>> getPendingMatches() {
         return matchService.getAllPendingMatches();
     }
 
     @GetMapping(path = "/finished")
-    public ResponseEntity<List<FinishedMatchResponse>> getFinishedMatches() {
+    public ResponseEntity<List<MatchResponse>> getFinishedMatches() {
         return matchService.getAllFinishedMatches();
     }
 }
