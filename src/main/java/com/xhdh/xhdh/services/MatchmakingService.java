@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.dto.MatchmakingResponse;
+import com.xhdh.xhdh.dto.MatchResponseDTO;
+import com.xhdh.xhdh.dto.UniversityDTO;
 import com.xhdh.xhdh.exceptions.NotEnoughUniException;
 import com.xhdh.xhdh.models.Match;
 import com.xhdh.xhdh.models.MatchParticipant;
@@ -26,10 +27,11 @@ public class MatchmakingService {
     private final MatchRepository matchRepository;
     private final MatchParticipantRepository matchParticipantRepository;
     
-    public MatchmakingResponse startNewDuel(User user, boolean isScheduled){
+    public MatchResponseDTO startNewDuel(User user, boolean isScheduled){
         University uA = universityRepository.findRandom();
-
+        System.out.println("University A: " + uA.getAbbreviation());
         List<University> candidates = universityRepository.findAllOpponentsWithSharedTag(uA.getId());
+        System.out.println("Candidates found: " + candidates.size());
         candidates.removeIf(u -> u.getId() == uA.getId()); // Remove self from candidates
         if (candidates.isEmpty()){
             throw new NotEnoughUniException("Not enough universities to match");
@@ -42,7 +44,7 @@ public class MatchmakingService {
         match.setTitle(uA.getAbbreviation() + " vs " + uB.getAbbreviation());
         match.setStatus("pending");
         match.setStartTime(LocalDateTime.now());
-        match.setEndTime(null); // Will be set when match ends
+        match.setEndTime(LocalDateTime.now().plusDays(7)); // Will be set when match ends
         Match savedMatch = matchRepository.save(match);
         
         // Create match participants
@@ -60,7 +62,15 @@ public class MatchmakingService {
         participantB.setRank(0);
         matchParticipantRepository.save(participantB);
         
-        return new MatchmakingResponse(uA, uB);
+        return new MatchResponseDTO(
+            savedMatch.getId(),
+            savedMatch.getTitle(),
+            savedMatch.getStatus(),
+            savedMatch.getStartTime(),
+            savedMatch.getEndTime(),
+            new UniversityDTO((long) uA.getId(), uA.getName(), uA.getAbbreviation(), uA.getElo()),
+            new UniversityDTO((long) uB.getId(), uB.getName(), uB.getAbbreviation(), uB.getElo())
+        );
     }
     private University selectWeightedOpponent(University uA, List<University> candidates) {
         double totalWeight = 0;

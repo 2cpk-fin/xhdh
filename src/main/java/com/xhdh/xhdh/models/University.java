@@ -8,6 +8,8 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Getter
 @Setter
 @Entity
@@ -21,6 +23,7 @@ public class University {
     private List<Vote> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("university")
     private List<MatchParticipant> participants = new ArrayList<>();
 
     @NotBlank(message = "Name is required")
