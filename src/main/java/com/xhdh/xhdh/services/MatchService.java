@@ -28,7 +28,7 @@ public class MatchService {
     private MatchResponse buildMatchResponse(Match match) {
         MatchResponse matchResponse;
         matchResponse = MatchResponse.builder()
-                .matchTitle(match.getTitle())
+                .title(match.getTitle())
                 .status(match.getStatus())
                 .participants(buildParticipants(match))
                 .startTime(match.getStartTime())

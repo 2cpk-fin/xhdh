@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.controllers;
 
-import com.xhdh.xhdh.dto.MatchParticipantResponse;
 import com.xhdh.xhdh.dto.MatchResponse;
+import com.xhdh.xhdh.dto.MatchmakingResponse;
 import com.xhdh.xhdh.models.User;
 import com.xhdh.xhdh.repositories.UserRepository;
 import com.xhdh.xhdh.services.MatchService;
@@ -27,14 +27,12 @@ public class MatchController {
     private final MatchmakingService matchmakingService;
     
     @PostMapping(path = "/start")
-    public ResponseEntity<MatchParticipantResponse> startMatch(Principal principal){
+    public ResponseEntity<MatchmakingResponse> startMatch(Principal principal){
         String userEmail = principal.getName(); 
         User user = userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-        
-    return ResponseEntity.ok(matchmakingService.startNewDuel(user,false));
+    return ResponseEntity.ok(matchmakingService.startNewDuel(user, false));
     }
-
     @GetMapping
     public ResponseEntity<List<MatchResponse>> getMatches() {
         return matchService.getAllMatches();

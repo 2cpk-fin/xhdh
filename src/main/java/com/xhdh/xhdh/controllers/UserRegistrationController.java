@@ -24,5 +24,4 @@ public class UserRegistrationController {
     public ResponseEntity<String> userRegistering(@Valid @RequestBody RegisterRequest request){
         return userService.handleRegistration(request);
     }
-    
 }

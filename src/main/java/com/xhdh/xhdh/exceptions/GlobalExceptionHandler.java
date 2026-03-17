@@ -29,6 +29,18 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(NotEnoughUniException.class)
+    public ResponseEntity<ErrorResponse> handleNotEnoughUni(NotEnoughUniException ex, HttpServletRequest request){
+        ErrorResponse error = new ErrorResponse(    
+            LocalDateTime.now(),
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+            "Not enough university",
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleUnknownUser(AuthenticationException ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
