@@ -1,14 +1,13 @@
 package com.xhdh.xhdh.controllers;
 
+import com.xhdh.xhdh.dto.MatchRequest;
 import com.xhdh.xhdh.dto.MatchResponse;
 import com.xhdh.xhdh.services.MatchService;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +30,10 @@ public class MatchController {
     @GetMapping(path = "/finished")
     public ResponseEntity<List<MatchResponse>> getFinishedMatches() {
         return matchService.getAllFinishedMatches();
+    }
+
+    @PostMapping
+    public ResponseEntity<MatchResponse> createMatch(@RequestBody MatchRequest matchRequest) {
+        return matchService.createMatch(matchRequest);
     }
 }

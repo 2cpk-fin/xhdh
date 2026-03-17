@@ -93,6 +93,7 @@ public class MatchService {
             participant.setMatch(newMatch);
             University university = universityRepository.findByName(universityRequest.getName());
             participant.setUniversity(university);
+            participants.add(participant);
         }
         newMatch.setTitle(matchRequest.getTitle());
         newMatch.setStatus(Status.valueOf("NOT_STARTED"));
