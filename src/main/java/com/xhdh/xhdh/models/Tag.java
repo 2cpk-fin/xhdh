@@ -1,7 +1,6 @@
 package com.xhdh.xhdh.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,12 +14,13 @@ import java.util.List;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
+
+    @Column(nullable = false, unique = true)
+    private String name;
+
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vote> votes =  new ArrayList<>();
-
-    @NotBlank(message = "Name is required")
-    private String name;
 
     @ManyToMany(mappedBy = "tags")
     List<University> universities = new ArrayList<>();
