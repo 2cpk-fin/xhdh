@@ -17,22 +17,22 @@ public class UniversityController {
     private final UniversityService universityService;
 
     @GetMapping
-    public ResponseEntity<List<UniversityResponse>> findAll(){
+    public ResponseEntity<List<UniversityResponse>> getUniversityList(){
         return universityService.getUniversityList();
     }
 
     @GetMapping(path = "/name/{name}")
-    public ResponseEntity<UniversityResponse> findUniversityByName(@PathVariable @RequestParam String name){
+    public ResponseEntity<UniversityResponse> getUniversityByName(@PathVariable @RequestParam String name){
         return universityService.getUniversityByName(name);
     }
 
     @GetMapping(path = "/abbreviation/{abbreviation}")
-    public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@PathVariable String abbreviation){
+    public ResponseEntity<UniversityResponse> getUniversityByAbbreviation(@PathVariable String abbreviation){
         return universityService.getUniversityByAbbreviation(abbreviation);
     }
 
-    @GetMapping(path = "/tag/{tagName}")
-    public ResponseEntity<List<UniversityResponse>> findUniversityByTagName(@PathVariable @RequestParam String tagName){
-        return universityService.getAllUniversitiesByTag(tagName);
+    @GetMapping(path = "/tags/{universityName}")
+    public ResponseEntity<List<String>> showAllTagsInUniversity(@PathVariable String universityName){
+        return universityService.showAllTagsInUniversity(universityName);
     }
 }

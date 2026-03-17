@@ -3,6 +3,7 @@ package com.xhdh.xhdh.services;
 import com.xhdh.xhdh.dto.UniversityResponse;
 import com.xhdh.xhdh.models.Tag;
 import com.xhdh.xhdh.models.University;
+import com.xhdh.xhdh.repositories.TagRepository;
 import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UniversityService {
+    private final TagRepository tagRepository;
+
     private final UniversityRepository universityRepository;
 
     public ResponseEntity<List<UniversityResponse>> getUniversityList() {
@@ -29,25 +32,23 @@ public class UniversityService {
 
     public ResponseEntity<UniversityResponse> getUniversityByName(String universityName) {
         University university = universityRepository.findByName(universityName);
-
-        return new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
+        UniversityResponse universityResponse = new UniversityResponse(university);
+        return new ResponseEntity<>(universityResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<UniversityResponse> getUniversityByAbbreviation(String universityAbbreviation) {
         University university = universityRepository.findByAbbreviation(universityAbbreviation);
-        return new ResponseEntity<>(new UniversityResponse(university), HttpStatus.OK);
+        UniversityResponse universityResponse = new UniversityResponse(university);
+        return new ResponseEntity<>(universityResponse, HttpStatus.OK);
     }
 
-    public ResponseEntity<List<UniversityResponse>> getAllUniversitiesByTag(String tagName) {
-        List<University> universities = universityRepository.findAllByTagName(tagName);
-        if (universities == null || universities.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<List<String>> showAllTagsInUniversity(String universityName) {
+        List<String> tags = new ArrayList<>();
+
+        for (Tag tag : tagRepository.findAllByUniversityName(universityName)) {
+            tags.add(tag.getName());
         }
-        List<UniversityResponse> universityResponseList = new ArrayList<>();
-        for (University university : universities) {
-            UniversityResponse response = new UniversityResponse(university);
-            universityResponseList.add(response);
-        }
-        return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
+
+        return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 }
