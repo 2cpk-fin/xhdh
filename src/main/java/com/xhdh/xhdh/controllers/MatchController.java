@@ -19,14 +19,14 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/matches")
+@RequestMapping(path = "/matches")
 @RequiredArgsConstructor
 public class MatchController {
     private final MatchService matchService;
     private final UserRepository userRepository;
     private final MatchmakingService matchmakingService;
     
-    @PostMapping(path = "/start")
+    @PostMapping(path = "/solo/start")
     public ResponseEntity<MatchmakingResponse> startMatch(Principal principal){
         String userEmail = principal.getName(); 
         User user = userRepository.findByEmail(userEmail)
@@ -38,12 +38,12 @@ public class MatchController {
         return matchService.getAllMatches();
     }
 
-    @GetMapping(path = "/pending")
+    @GetMapping(path = "/all/pending")
     public ResponseEntity<List<MatchResponse>> getPendingMatches() {
         return matchService.getAllPendingMatches();
     }
 
-    @GetMapping(path = "/finished")
+    @GetMapping(path = "/all/finished")
     public ResponseEntity<List<MatchResponse>> getFinishedMatches() {
         return matchService.getAllFinishedMatches();
     }

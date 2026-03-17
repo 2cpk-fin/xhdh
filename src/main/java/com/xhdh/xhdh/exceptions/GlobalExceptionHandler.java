@@ -66,7 +66,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-
+/* 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
@@ -76,5 +76,6 @@ public class GlobalExceptionHandler {
             "Something went wrong", 
             request.getRequestURI() );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-}
+
+    }*/
 }

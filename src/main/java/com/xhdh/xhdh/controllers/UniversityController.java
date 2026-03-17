@@ -1,6 +1,7 @@
 package com.xhdh.xhdh.controllers;
 
 import com.xhdh.xhdh.dto.UniversityResponse;
+import com.xhdh.xhdh.dto.UniversityRequest;
 import com.xhdh.xhdh.services.UniversityService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,17 +22,22 @@ public class UniversityController {
         return universityService.getUniversityList();
     }
 
-    @GetMapping(path = "/{name}")
+    @PostMapping(path = "/match/create")
+    public ResponseEntity<UniversityResponse> createUniversity(@RequestBody UniversityRequest universityRequest){
+        return universityService.createUniversity(universityRequest);
+    }
+
+    @GetMapping(path = "/name/{name}")
     public ResponseEntity<UniversityResponse> findUniversityByName(@PathVariable @RequestParam String name){
         return universityService.getUniversityByName(name);
     }
 
-    @GetMapping(path = "/{abbreviation}")
+    @GetMapping(path = "/abbreviation/{abbreviation}")
     public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@PathVariable @RequestParam String abbreviation){
         return universityService.getUniversityByAbbreviation(abbreviation);
     }
 
-    @GetMapping(path = "/{tagName}")
+    @GetMapping(path = "/tags/{tagName}")
     public ResponseEntity<List<UniversityResponse>> findUniversityByTagName(@PathVariable @RequestParam String tagName){
         return universityService.getAllUniversitiesByTag(tagName);
     }
