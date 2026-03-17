@@ -39,14 +39,14 @@ public class UniversityService {
     }
 
     public ResponseEntity<List<UniversityResponse>> getAllUniversitiesByTag(String tagName) {
+        List<University> universities = universityRepository.findAllByTagName(tagName);
+        if (universities == null || universities.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         List<UniversityResponse> universityResponseList = new ArrayList<>();
-
-        for (University university : universityRepository.findAll()) {
-            for (Tag tag : university.getTags()) {
-                if (tag.getName().equals(tagName)) {
-                    universityResponseList.add(new UniversityResponse(university));
-                }
-            }
+        for (University university : universities) {
+            UniversityResponse response = new UniversityResponse(university);
+            universityResponseList.add(response);
         }
         return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
     }

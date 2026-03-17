@@ -15,12 +15,12 @@ import java.util.List;
 public class VoteController {
     private final VoteService voteService;
 
-    @GetMapping(path = "/{username}")
+    @GetMapping(path = "/user/{username}")
     public ResponseEntity<List<VoteResponse>> findAllUserVotes(@PathVariable String username) {
         return voteService.findAllUserVotes(username);
     }
 
-    @GetMapping(path = "/{university}")
+    @GetMapping(path = "/university/{university}")
     public ResponseEntity<List<VoteResponse>> findAllUniversityVotes(@PathVariable String university) {
         return voteService.findAllUniversityVotes(university);
     }

@@ -21,17 +21,17 @@ public class UniversityController {
         return universityService.getUniversityList();
     }
 
-    @GetMapping(path = "/{name}")
+    @GetMapping(path = "/name/{name}")
     public ResponseEntity<UniversityResponse> findUniversityByName(@PathVariable @RequestParam String name){
         return universityService.getUniversityByName(name);
     }
 
-    @GetMapping(path = "/{abbreviation}")
-    public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@PathVariable @RequestParam String abbreviation){
+    @GetMapping(path = "/abbreviation/{abbreviation}")
+    public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@PathVariable String abbreviation){
         return universityService.getUniversityByAbbreviation(abbreviation);
     }
 
-    @GetMapping(path = "/{tagName}")
+    @GetMapping(path = "/tag/{tagName}")
     public ResponseEntity<List<UniversityResponse>> findUniversityByTagName(@PathVariable @RequestParam String tagName){
         return universityService.getAllUniversitiesByTag(tagName);
     }

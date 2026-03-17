@@ -13,6 +13,5 @@ public class UniversityResponse {
         this.name = university.getName();
         this.abbreviation = university.getAbbreviation();
         this.elo = university.getElo();
-
     }
 }
