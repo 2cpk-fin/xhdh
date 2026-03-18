@@ -1,5 +1,6 @@
 package com.xhdh.xhdh.services;
 
+import com.xhdh.xhdh.dto.UniversityRequest;
 import com.xhdh.xhdh.dto.UniversityResponse;
 import com.xhdh.xhdh.models.Tag;
 import com.xhdh.xhdh.models.University;
@@ -42,5 +43,15 @@ public class UniversityService {
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<UniversityResponse> createUniversity(UniversityRequest universityRequest) {
+        University university = new University();
+        university.setName(universityRequest.name());
+        university.setAbbreviation(universityRequest.abbreviation());
+        university.setElo(universityRequest.elo());
+
+        University savedUniversity = universityRepository.save(university);
+        return new ResponseEntity<>(new UniversityResponse(savedUniversity), HttpStatus.CREATED);
     }
 }

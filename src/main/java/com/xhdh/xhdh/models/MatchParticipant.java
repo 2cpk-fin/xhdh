@@ -1,5 +1,7 @@
 package com.xhdh.xhdh.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,9 +26,11 @@ public class MatchParticipant {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
+    @JsonIgnoreProperties("participants")
     private Match match;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", nullable = false)
+    @JsonIgnoreProperties("participants")
     private University university;
 }
