@@ -37,6 +37,11 @@ public class MatchController {
         return new ResponseEntity<>(matchService.getAllMatches(), HttpStatus.OK);
     }
 
+    @GetMapping(path = "/all/not-started")
+    public ResponseEntity<List<MatchResponse>> getMatchesNotStarted() {
+        return new ResponseEntity<>(matchService.getAllNotStartedMatches(), HttpStatus.OK);
+    }
+
     @GetMapping(path = "/all/pending")
     public ResponseEntity<List<MatchResponse>> getPendingMatches() {
         return new ResponseEntity<>(matchService.getAllPendingMatches(), HttpStatus.OK);
@@ -50,5 +55,15 @@ public class MatchController {
     @PostMapping
     public ResponseEntity<MatchResponse> createMatch(@RequestBody MatchRequest matchRequest) {
         return new ResponseEntity<>(matchService.createMatch(matchRequest), HttpStatus.CREATED);
+    }
+
+    @PutMapping(path = "/id/{id}")
+    public ResponseEntity<MatchResponse> updateMatch(@PathVariable long id, @RequestBody MatchRequest matchRequest) {
+        return new ResponseEntity<>(matchService.updateMatchById(id, matchRequest), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "id/{id}")
+    public ResponseEntity<String> deleteMatchById(@PathVariable long id) {
+        return new ResponseEntity<>(matchService.deleteMatchById(id), HttpStatus.OK);
     }
 }

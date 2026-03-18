@@ -7,7 +7,8 @@ import lombok.Setter;
 @Setter
 public class VoteRequest {
     private long userId;
+
     private long universityId;
-    private long tagId;
+
     private long matchId;
 }

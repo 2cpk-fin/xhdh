@@ -13,8 +13,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,49 +31,7 @@ public class MatchService {
 
     private final UniversityRepository universityRepository;
 
-    private MatchResponse buildMatchResponse(Match match) {
-        return MatchResponse.builder()
-                .title(match.getTitle())
-                .status(String.valueOf(match.getStatus()))
-                .participants(buildParticipantResponses(match))
-                .startTime(match.getStartTime())
-                .endTime(match.getEndTime())
-                .build();
-    }
-
-    private List<MatchParticipantResponse> buildParticipantResponses(Match match) {
-        return match.getParticipants()
-                .stream()
-                .map(MatchParticipantResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    public List<MatchResponse> getAllMatches() {
-        return matchRepository.findAll()
-                .stream()
-                .map(this::buildMatchResponse)
-                .collect(Collectors.toList());
-    }
-
-    public List<MatchResponse> getAllPendingMatches() {
-        return matchRepository.findAll()
-                .stream()
-                .filter(match -> "PENDING".equals(String.valueOf(match.getStatus())))
-                .map(this::buildMatchResponse)
-                .collect(Collectors.toList());
-    }
-
-    public List<MatchResponse> getAllFinishedMatches() {
-        return matchRepository.findAll()
-                .stream()
-                .filter(match -> "FINISHED".equals(String.valueOf(match.getStatus())))
-                .map(this::buildMatchResponse)
-                .collect(Collectors.toList());
-    }
-
-    public MatchResponse createMatch(MatchRequest matchRequest) {
-        // Since Participants need Match to exist, but Match need to have Participants first
-        // Hence, we will build the Match first
+    private Match buildMatch(MatchRequest matchRequest) {
         Match newMatch = Match.builder()
                 .title(matchRequest.getTitle())
                 .status(Status.NOT_STARTED)
@@ -93,6 +53,82 @@ public class MatchService {
         // And set to Match
         newMatch.setParticipants(participants);
 
+        return newMatch;
+    }
+
+    private MatchResponse buildMatchResponse(Match match) {
+        return MatchResponse.builder()
+                .title(match.getTitle())
+                .status(String.valueOf(match.getStatus()))
+                .participants(buildParticipantResponses(match))
+                .startTime(match.getStartTime())
+                .endTime(match.getEndTime())
+                .build();
+    }
+
+    private List<MatchParticipantResponse> buildParticipantResponses(Match match) {
+        return match.getParticipants()
+                .stream()
+                .map(MatchParticipantResponse::new)
+                .toList();
+    }
+
+    @Scheduled(fixedRate = 60000)
+    private void changeStatus() {
+        for (Match match : matchRepository.findAllNotFinishedMatch()) {
+            LocalDateTime now = LocalDateTime.now();
+            if (match.getEndTime().isAfter(now)) {
+                match.setStatus(Status.FINISHED);
+            }
+            else if (match.getStartTime().isAfter(now)) {
+                match.setStatus(Status.PENDING);
+            }
+        }
+    }
+
+    public List<MatchResponse> getAllMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .map(this::buildMatchResponse)
+                .toList();
+    }
+
+    public List<MatchResponse> getAllNotStartedMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .filter(match -> "NOT_STARTED".equals(String.valueOf(match.getStatus())))
+                .map(this::buildMatchResponse)
+                .toList();
+    }
+
+    public List<MatchResponse> getAllPendingMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .filter(match -> "PENDING".equals(String.valueOf(match.getStatus())))
+                .map(this::buildMatchResponse)
+                .toList();
+    }
+
+    public List<MatchResponse> getAllFinishedMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .filter(match -> "FINISHED".equals(String.valueOf(match.getStatus())))
+                .map(this::buildMatchResponse)
+                .toList();
+    }
+
+    public MatchResponse createMatch(MatchRequest matchRequest) {
+        return buildMatchResponse(matchRepository.save(buildMatch(matchRequest)));
+    }
+
+    public MatchResponse updateMatchById(long id, MatchRequest matchRequest) {
+        Match newMatch = buildMatch(matchRequest);
+        newMatch.setId(id);
         return buildMatchResponse(matchRepository.save(newMatch));
+    }
+
+    public String deleteMatchById(long id) {
+        matchRepository.deleteById(id);
+        return "The match with id " + id + " has been deleted";
     }
 }
