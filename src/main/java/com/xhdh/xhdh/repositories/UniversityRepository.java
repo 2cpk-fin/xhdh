@@ -12,9 +12,8 @@ import java.util.List;
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
 
-    University findByName(String universityName);
-
-    University findByAbbreviation(String universityAbbreviation);
+    @Query("SELECT u FROM University u WHERE u.name = :universityName OR u.abbreviation = :universityName ")
+    University findByName(@Param("universityName") String universityName);
 
     @Query("SELECT u FROM University u JOIN FETCH u.tags t WHERE t.name = :tagName")
     List<University> findAllByTagName(@Param("tagName") String tagName);

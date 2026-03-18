@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,23 +22,23 @@ public class TagService {
     private final UniversityRepository universityRepository;
 
     public ResponseEntity<List<TagResponse>> showAllTags() {
-        List<TagResponse> tagResponses = new ArrayList<>();
-
-        // Using advanced loop to convert all the Entities to TagResponse
-        for (Tag tag : tagRepository.findAll()) {
-            tagResponses.add(new TagResponse(tag));
-        }
+        List<TagResponse> tagResponses = tagRepository.findAll()
+                .stream()
+                .map(tag -> {
+                    TagResponse tagResponse = new TagResponse(tag);
+                    tagResponse.setUniversityNames(showAllUniversitiesByTagName(tag.getName()).getBody());
+                    return tagResponse;
+                })
+                .collect(Collectors.toList());
 
         return new ResponseEntity<>(tagResponses, HttpStatus.OK);
     }
 
     public ResponseEntity<List<String>> showAllUniversitiesByTagName(String tagName) {
-        List<String> universities = new ArrayList<>();
-
-        // Using SQL to fetch all the tags from the university_tag table
-        for (University university : universityRepository.findAllByTagName(tagName)) {
-            universities.add(university.getName());
-        }
+        List<String> universities = universityRepository.findAllByTagName(tagName)
+                .stream()
+                .map(University::getName)
+                .collect(Collectors.toList());
 
         return new ResponseEntity<>(universities, HttpStatus.OK);
     }

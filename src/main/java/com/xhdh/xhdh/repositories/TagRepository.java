@@ -11,6 +11,6 @@ import java.util.List;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {
 
-    @Query("SELECT t FROM Tag t JOIN FETCH t.universities u WHERE u.name = :universityName")
+    @Query("SELECT t FROM Tag t JOIN FETCH t.universities u WHERE u.name = :universityName OR u.abbreviation = :universityName")
     List<Tag> findAllByUniversityName(@Param("universityName") String universityName);
 }

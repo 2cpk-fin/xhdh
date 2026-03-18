@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,33 +22,31 @@ public class UniversityService {
     private final UniversityRepository universityRepository;
 
     public ResponseEntity<List<UniversityResponse>> getUniversityList() {
-        List<UniversityResponse> universityResponseList = new ArrayList<>();
+        List<UniversityResponse> universityResponseList = universityRepository.findAll()
+                .stream()
+                .map(university -> {
+                    UniversityResponse universityResponse = new UniversityResponse(university);
+                    universityResponse.setTags(showAllTagsInUniversity(university.getName()).getBody());
+                    return universityResponse;
+                })
+                .collect(Collectors.toList());
 
-        for (University university : universityRepository.findAll()) {
-            UniversityResponse universityResponse = new UniversityResponse(university);
-            universityResponseList.add(universityResponse);
-        }
         return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
     }
 
     public ResponseEntity<UniversityResponse> getUniversityByName(String universityName) {
         University university = universityRepository.findByName(universityName);
         UniversityResponse universityResponse = new UniversityResponse(university);
-        return new ResponseEntity<>(universityResponse, HttpStatus.OK);
-    }
+        universityResponse.setTags(showAllTagsInUniversity(university.getName()).getBody());
 
-    public ResponseEntity<UniversityResponse> getUniversityByAbbreviation(String universityAbbreviation) {
-        University university = universityRepository.findByAbbreviation(universityAbbreviation);
-        UniversityResponse universityResponse = new UniversityResponse(university);
         return new ResponseEntity<>(universityResponse, HttpStatus.OK);
     }
 
     public ResponseEntity<List<String>> showAllTagsInUniversity(String universityName) {
-        List<String> tags = new ArrayList<>();
-
-        for (Tag tag : tagRepository.findAllByUniversityName(universityName)) {
-            tags.add(tag.getName());
-        }
+        List<String> tags = tagRepository.findAllByUniversityName(universityName)
+                .stream()
+                .map(Tag::getName)
+                .collect(Collectors.toList());
 
         return new ResponseEntity<>(tags, HttpStatus.OK);
     }
