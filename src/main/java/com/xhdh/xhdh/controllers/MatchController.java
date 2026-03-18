@@ -31,7 +31,6 @@ public class MatchController {
         User devUser = userRepository.findAll().get(0);
         return ResponseEntity.ok(matchmakingService.startNewDuel(devUser, false));
     }
-
     String userEmail = principal.getName();
     User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
