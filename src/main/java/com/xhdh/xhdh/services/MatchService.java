@@ -6,9 +6,11 @@ import com.xhdh.xhdh.models.Match;
 import com.xhdh.xhdh.dto.MatchResponse;
 import com.xhdh.xhdh.models.MatchParticipant;
 import com.xhdh.xhdh.models.Status;
+import com.xhdh.xhdh.models.University;
 import com.xhdh.xhdh.repositories.MatchParticipantRepository;
 import com.xhdh.xhdh.repositories.MatchRepository;
 import com.xhdh.xhdh.repositories.UniversityRepository;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -58,6 +60,7 @@ public class MatchService {
 
     private MatchResponse buildMatchResponse(Match match) {
         return MatchResponse.builder()
+                .id(match.getId())
                 .title(match.getTitle())
                 .status(String.valueOf(match.getStatus()))
                 .participants(buildParticipantResponses(match))
@@ -73,12 +76,23 @@ public class MatchService {
                 .toList();
     }
 
-    @Scheduled(fixedRate = 60000)
-    private void changeStatus() {
+    private void updateEloToParticipants(Match match) {
+        List<University> universityList = match.getParticipants()
+                .stream()
+                .map(MatchParticipant::getUniversity)
+                .toList();
+
+        // Algo in here
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    @Transactional
+    protected void changeStatus() {
         for (Match match : matchRepository.findAllNotFinishedMatch()) {
             LocalDateTime now = LocalDateTime.now();
             if (match.getEndTime().isAfter(now)) {
                 match.setStatus(Status.FINISHED);
+                updateEloToParticipants(match);
             }
             else if (match.getStartTime().isAfter(now)) {
                 match.setStatus(Status.PENDING);
