@@ -5,6 +5,7 @@ import com.xhdh.xhdh.services.UniversityService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,16 +19,16 @@ public class UniversityController {
 
     @GetMapping
     public ResponseEntity<List<UniversityResponse>> getUniversityList(){
-        return universityService.getUniversityList();
+        return new ResponseEntity<>(universityService.getUniversityList(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/name/{universityName}")
     public ResponseEntity<UniversityResponse> getUniversityByName(@PathVariable @RequestParam String universityName){
-        return universityService.getUniversityByName(universityName);
+        return new ResponseEntity<>(universityService.getUniversityByName(universityName), HttpStatus.OK);
     }
 
     @GetMapping(path = "/tags/{universityName}")
     public ResponseEntity<List<String>> showAllTagsInUniversity(@PathVariable String universityName){
-        return universityService.showAllTagsInUniversity(universityName);
+        return new ResponseEntity<>(universityService.showAllTagsInUniversity(universityName), HttpStatus.OK);
     }
 }

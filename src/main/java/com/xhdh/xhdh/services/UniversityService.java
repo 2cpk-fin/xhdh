@@ -6,11 +6,8 @@ import com.xhdh.xhdh.models.University;
 import com.xhdh.xhdh.repositories.TagRepository;
 import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,33 +18,29 @@ public class UniversityService {
 
     private final UniversityRepository universityRepository;
 
-    public ResponseEntity<List<UniversityResponse>> getUniversityList() {
-        List<UniversityResponse> universityResponseList = universityRepository.findAll()
+    public List<UniversityResponse> getUniversityList() {
+        return universityRepository.findAll()
                 .stream()
                 .map(university -> {
                     UniversityResponse universityResponse = new UniversityResponse(university);
-                    universityResponse.setTags(showAllTagsInUniversity(university.getName()).getBody());
+                    universityResponse.setTags(showAllTagsInUniversity(university.getName()));
                     return universityResponse;
                 })
                 .collect(Collectors.toList());
-
-        return new ResponseEntity<>(universityResponseList, HttpStatus.OK);
     }
 
-    public ResponseEntity<UniversityResponse> getUniversityByName(String universityName) {
+    public UniversityResponse getUniversityByName(String universityName) {
         University university = universityRepository.findByName(universityName);
         UniversityResponse universityResponse = new UniversityResponse(university);
-        universityResponse.setTags(showAllTagsInUniversity(university.getName()).getBody());
+        universityResponse.setTags(showAllTagsInUniversity(university.getName()));
 
-        return new ResponseEntity<>(universityResponse, HttpStatus.OK);
+        return universityResponse;
     }
 
-    public ResponseEntity<List<String>> showAllTagsInUniversity(String universityName) {
-        List<String> tags = tagRepository.findAllByUniversityName(universityName)
+    public List<String> showAllTagsInUniversity(String universityName) {
+        return tagRepository.findAllByUniversityName(universityName)
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toList());
-
-        return new ResponseEntity<>(tags, HttpStatus.OK);
     }
 }

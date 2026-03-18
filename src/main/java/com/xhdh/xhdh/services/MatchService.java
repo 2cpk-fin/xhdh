@@ -2,24 +2,21 @@ package com.xhdh.xhdh.services;
 
 import com.xhdh.xhdh.dto.MatchParticipantResponse;
 import com.xhdh.xhdh.dto.MatchRequest;
-import com.xhdh.xhdh.dto.UniversityRequest;
 import com.xhdh.xhdh.models.Match;
 import com.xhdh.xhdh.dto.MatchResponse;
 import com.xhdh.xhdh.models.MatchParticipant;
 import com.xhdh.xhdh.models.Status;
-import com.xhdh.xhdh.models.University;
 import com.xhdh.xhdh.repositories.MatchParticipantRepository;
 import com.xhdh.xhdh.repositories.MatchRepository;
 import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -33,75 +30,69 @@ public class MatchService {
     private final UniversityRepository universityRepository;
 
     private MatchResponse buildMatchResponse(Match match) {
-        MatchResponse matchResponse;
-        matchResponse = MatchResponse.builder()
-                .matchTitle(match.getTitle())
+        return MatchResponse.builder()
+                .title(match.getTitle())
                 .status(String.valueOf(match.getStatus()))
-                .participants(buildParticipants(match))
+                .participants(buildParticipantResponses(match))
                 .startTime(match.getStartTime())
                 .endTime(match.getEndTime())
                 .build();
-        return matchResponse;
     }
 
-    private List<MatchParticipantResponse> buildParticipants(Match match) {
-        List<MatchParticipantResponse> participantsResponse = new ArrayList<>();
-        for (MatchParticipant participant : match.getParticipants()) {
-            participantsResponse.add(new MatchParticipantResponse(participant));
-        }
-        return participantsResponse;
+    private List<MatchParticipantResponse> buildParticipantResponses(Match match) {
+        return match.getParticipants()
+                .stream()
+                .map(MatchParticipantResponse::new)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<MatchResponse>> getAllMatches() {
-        List<MatchResponse> matchResponses = new ArrayList<>();
-        for (Match match : matchRepository.findAll()) {
-            MatchResponse matchResponse = buildMatchResponse(match);
-            matchResponses.add(matchResponse);
-        }
-        return new ResponseEntity<>(matchResponses, HttpStatus.OK);
+    public List<MatchResponse> getAllMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .map(this::buildMatchResponse)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<MatchResponse>> getAllPendingMatches() {
-        List<MatchResponse> pendingMatchResponses = new ArrayList<>();
-        for (Match match : matchRepository.findAll()) {
-            if (String.valueOf(match.getStatus()).equals("PENDING")) {
-                MatchResponse matchResponse = buildMatchResponse(match);
-                pendingMatchResponses.add(matchResponse);
-            }
-        }
-        return new ResponseEntity<>(pendingMatchResponses, HttpStatus.OK);
+    public List<MatchResponse> getAllPendingMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .filter(match -> "PENDING".equals(String.valueOf(match.getStatus())))
+                .map(this::buildMatchResponse)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<MatchResponse>> getAllFinishedMatches() {
-        List<MatchResponse> finishedMatchResponses = new ArrayList<>();
-        for (Match match : matchRepository.findAll()) {
-            if (String.valueOf(match.getStatus()).equals("PENDING")) {
-                MatchResponse matchResponse = buildMatchResponse(match);
-                finishedMatchResponses.add(matchResponse);
-            }
-        }
-        return new ResponseEntity<>(finishedMatchResponses, HttpStatus.OK);
+    public List<MatchResponse> getAllFinishedMatches() {
+        return matchRepository.findAll()
+                .stream()
+                .filter(match -> "FINISHED".equals(String.valueOf(match.getStatus())))
+                .map(this::buildMatchResponse)
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<MatchResponse> createMatch(MatchRequest matchRequest) {
-        Match newMatch = new Match();
-        List<MatchParticipant> participants = new ArrayList<>();
-        for (UniversityRequest universityRequest : matchRequest.getParticipants()) {
-            MatchParticipant participant = new MatchParticipant();
-            participant.setTotalVotes(0);
-            participant.setRank(1);
-            participant.setMatch(newMatch);
-            University university = universityRepository.findByName(universityRequest.getName());
-            participant.setUniversity(university);
-            participants.add(participant);
-        }
-        newMatch.setTitle(matchRequest.getTitle());
-        newMatch.setStatus(Status.valueOf("NOT_STARTED"));
-        newMatch.setStartTime(matchRequest.getStartTime());
-        newMatch.setEndTime(matchRequest.getEndTime());
-        newMatch.setVotes(new ArrayList<>());
+    public MatchResponse createMatch(MatchRequest matchRequest) {
+        // Since Participants need Match to exist, but Match need to have Participants first
+        // Hence, we will build the Match first
+        Match newMatch = Match.builder()
+                .title(matchRequest.getTitle())
+                .status(Status.NOT_STARTED)
+                .startTime(matchRequest.getStartTime())
+                .endTime(matchRequest.getEndTime())
+                .build();
+
+        // Then, we will build the Participant
+        List<MatchParticipant> participants = matchRequest.getParticipants()
+                .stream()
+                .map(universityName -> {
+                    MatchParticipant participant = new MatchParticipant();
+                    participant.setMatch(newMatch);
+                    participant.setUniversity(universityRepository.findByName(universityName));
+                    return participant;
+                })
+                .collect(Collectors.toList());
+
+        // And set to Match
         newMatch.setParticipants(participants);
-        MatchResponse matchResponse = buildMatchResponse(matchRepository.save(newMatch));
-        return new ResponseEntity<>(matchResponse, HttpStatus.CREATED);
+
+        return buildMatchResponse(matchRepository.save(newMatch));
     }
 }

@@ -6,8 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.util.Optional;
-
 @Getter
 @Setter
 @Entity
@@ -18,7 +16,8 @@ public class MatchParticipant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long totalVotes;
+    @ColumnDefault("0")
+    private long totalVotes = 0;
 
     @ColumnDefault("1")
     private int rank = 1;
