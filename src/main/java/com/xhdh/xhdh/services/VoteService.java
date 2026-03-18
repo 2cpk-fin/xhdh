@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -24,6 +25,8 @@ public class VoteService {
     private final TagRepository tagRepository;
 
     private final MatchRepository matchRepository;
+
+    private final MatchParticipantRepository  matchParticipantRepository;
 
     public ResponseEntity<List<VoteResponse>> findAllUserVotes(String username) {
         List<VoteResponse> voteResponses = new ArrayList<>();
@@ -57,16 +60,21 @@ public class VoteService {
         return new ResponseEntity<>(voteResponses, HttpStatus.OK);
     }
     public ResponseEntity<VoteResponse> createVote(VoteRequest voteRequest) {
-        User user = userRepository.findById(voteRequest.getUserId())
+        long userId = voteRequest.getUserId();
+        long universityId = voteRequest.getUniversityId();
+        long tagId = voteRequest.getTagId();
+        long matchId = voteRequest.getMatchId();
+
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        University university = universityRepository.findById(voteRequest.getUniversityId())
+        University university = universityRepository.findById(universityId)
                 .orElseThrow(() -> new RuntimeException("University not found"));
 
-        Tag tag =  tagRepository.findById(voteRequest.getTagId())
+        Tag tag =  tagRepository.findById(tagId)
                 .orElseThrow(() -> new RuntimeException("Tag not found"));
 
-        Match match = matchRepository.findById(voteRequest.getMatchId())
+        Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new RuntimeException("Match not found"));
 
         Vote newVote = new Vote();
@@ -74,8 +82,12 @@ public class VoteService {
         newVote.setUniversity(university);
         newVote.setTag(tag);
         newVote.setMatch(match);
+        newVote.setVoteAt(LocalDateTime.now());
 
         voteRepository.save(newVote);
+
+        matchParticipantRepository.addVoteToUniversity(universityId, matchId);
+
         return new ResponseEntity<>(new VoteResponse(newVote), HttpStatus.CREATED);
     }
 }

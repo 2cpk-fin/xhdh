@@ -1,10 +1,16 @@
 package com.xhdh.xhdh.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
-public record UniversityRequest(
-    @NotBlank String name,
-    @NotBlank String abbreviation,
-    @NotBlank int elo
-){
+@Getter
+@Setter
+public class UniversityRequest {
+    private long id;
+
+    private String name;
+
+    private String abbreviation;
+
+    private int elo;
 }

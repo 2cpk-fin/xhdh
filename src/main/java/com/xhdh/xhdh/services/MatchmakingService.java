@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import com.xhdh.xhdh.models.Status;
 import org.springframework.stereotype.Service;
 
 import com.xhdh.xhdh.dto.MatchResponseDTO;
@@ -29,9 +29,9 @@ public class MatchmakingService {
     
     public MatchResponseDTO startNewDuel(User user, boolean isScheduled){
         University uA = universityRepository.findRandom();
-        System.out.println("University A: " + uA.getAbbreviation());
+        // DEBUG : System.out.println("University A: " + uA.getAbbreviation());
         List<University> candidates = universityRepository.findAllOpponentsWithSharedTag(uA.getId());
-        System.out.println("Candidates found: " + candidates.size());
+        // DEBUG : System.out.println("Candidates found: " + candidates.size());
         candidates.removeIf(u -> u.getId() == uA.getId()); // Remove self from candidates
         if (candidates.isEmpty()){
             throw new NotEnoughUniException("Not enough universities to match");
@@ -42,7 +42,7 @@ public class MatchmakingService {
         // Create the match
         Match match = new Match();
         match.setTitle(uA.getAbbreviation() + " vs " + uB.getAbbreviation());
-        match.setStatus("pending");
+        match.setStatus(Status.PENDING);
         match.setStartTime(LocalDateTime.now());
         match.setEndTime(LocalDateTime.now().plusDays(7)); // Will be set when match ends
         Match savedMatch = matchRepository.save(match);

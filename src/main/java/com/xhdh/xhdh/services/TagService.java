@@ -1,42 +1,37 @@
 package com.xhdh.xhdh.services;
 
 import com.xhdh.xhdh.dto.TagResponse;
-import com.xhdh.xhdh.models.Tag;
 import com.xhdh.xhdh.models.University;
 import com.xhdh.xhdh.repositories.TagRepository;
+import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
 
-    public ResponseEntity<List<TagResponse>> showAllTags() {
-        List<TagResponse> tagResponses = new ArrayList<>();
+    private final UniversityRepository universityRepository;
 
-        for (Tag tag : tagRepository.findAll()) {
-            tagResponses.add(new TagResponse(tag));
-        }
-        return new ResponseEntity<>(tagResponses, HttpStatus.OK);
+    public List<TagResponse> showAllTags() {
+        return tagRepository.findAll()
+                .stream()
+                .map(tag -> {
+                    TagResponse tagResponse = new TagResponse(tag);
+                    tagResponse.setUniversityNames(showAllUniversitiesByTagName(tag.getName()));
+                    return tagResponse;
+                })
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<List<TagResponse>> showAllTagsInUniversity(String universityName) {
-        List<TagResponse> tagResponses = new ArrayList<>();
-
-        for (Tag tag : tagRepository.findAll()) {
-            for (University university : tag.getUniversities()) {
-                if (university.getName().equals(universityName)) {
-                    tagResponses.add(new TagResponse(tag));
-                }
-
-            }
-        }
-        return new ResponseEntity<>(tagResponses, HttpStatus.OK);
+    public List<String> showAllUniversitiesByTagName(String tagName) {
+        return universityRepository.findAllByTagName(tagName)
+                .stream()
+                .map(University::getName)
+                .collect(Collectors.toList());
     }
 }

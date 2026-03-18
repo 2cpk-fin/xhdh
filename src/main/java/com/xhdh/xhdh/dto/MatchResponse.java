@@ -9,9 +9,15 @@ import java.util.List;
 @Getter
 @Builder
 public class MatchResponse {
+    private final long id;
+
     private final String title;
+
     private final String status;
+
     private final List<MatchParticipantResponse> participants;
+
     private final LocalDateTime startTime;
+
     private final LocalDateTime endTime;
 }

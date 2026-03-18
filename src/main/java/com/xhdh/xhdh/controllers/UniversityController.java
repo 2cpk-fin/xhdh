@@ -1,11 +1,11 @@
 package com.xhdh.xhdh.controllers;
 
 import com.xhdh.xhdh.dto.UniversityResponse;
-import com.xhdh.xhdh.dto.UniversityRequest;
 import com.xhdh.xhdh.services.UniversityService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,27 +18,17 @@ public class UniversityController {
     private final UniversityService universityService;
 
     @GetMapping
-    public ResponseEntity<List<UniversityResponse>> findAll(){
-        return universityService.getUniversityList();
+    public ResponseEntity<List<UniversityResponse>> getUniversityList(){
+        return new ResponseEntity<>(universityService.getUniversityList(), HttpStatus.OK);
     }
 
-    @PostMapping(path = "/match/create")
-    public ResponseEntity<UniversityResponse> createUniversity(@RequestBody UniversityRequest universityRequest){
-        return universityService.createUniversity(universityRequest);
+    @GetMapping(path = "/name/{universityName}")
+    public ResponseEntity<UniversityResponse> getUniversityByName(@PathVariable @RequestParam String universityName){
+        return new ResponseEntity<>(universityService.getUniversityByName(universityName), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/name/{name}")
-    public ResponseEntity<UniversityResponse> findUniversityByName(@PathVariable @RequestParam String name){
-        return universityService.getUniversityByName(name);
-    }
-
-    @GetMapping(path = "/abbreviation/{abbreviation}")
-    public ResponseEntity<UniversityResponse> findUniversityByAbbreviation(@PathVariable @RequestParam String abbreviation){
-        return universityService.getUniversityByAbbreviation(abbreviation);
-    }
-
-    @GetMapping(path = "/tags/{tagName}")
-    public ResponseEntity<List<UniversityResponse>> findUniversityByTagName(@PathVariable @RequestParam String tagName){
-        return universityService.getAllUniversitiesByTag(tagName);
+    @GetMapping(path = "/tags/{universityName}")
+    public ResponseEntity<List<String>> showAllTagsInUniversity(@PathVariable String universityName){
+        return new ResponseEntity<>(universityService.showAllTagsInUniversity(universityName), HttpStatus.OK);
     }
 }

@@ -29,17 +29,16 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
-
-    @ExceptionHandler(NotEnoughUniException.class)
-    public ResponseEntity<ErrorResponse> handleNotEnoughUni(NotEnoughUniException ex, HttpServletRequest request){
-        ErrorResponse error = new ErrorResponse(    
+    @ExceptionHandler(NotAuthenticated.class)
+    public ResponseEntity<ErrorResponse> handleNotAuthenticated(NotAuthenticated ex, HttpServletRequest request){
+        ErrorResponse error = new ErrorResponse(
             LocalDateTime.now(),
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Not enough university",
+            HttpStatus.UNAUTHORIZED.value(),
+            "Unauthorized",
             ex.getMessage(),
             request.getRequestURI()
         );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleUnknownUser(AuthenticationException ex, HttpServletRequest request){
@@ -65,8 +64,6 @@ public class GlobalExceptionHandler {
             request.getRequestURI());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
-/* 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
@@ -76,6 +73,5 @@ public class GlobalExceptionHandler {
             "Something went wrong", 
             request.getRequestURI() );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-
-    }*/
+    }
 }
