@@ -1,12 +1,17 @@
 package com.xhdh.xhdh.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.xhdh.xhdh.models.MatchParticipant;
 import lombok.Getter;
 
 @Getter
+@JsonPropertyOrder({"universityName", "totalVotes", "rank"})
 public class MatchParticipantResponse {
+
     private final String universityName;
+
     private final long totalVotes;
+
     private final int rank;
 
     public MatchParticipantResponse(MatchParticipant matchParticipant) {

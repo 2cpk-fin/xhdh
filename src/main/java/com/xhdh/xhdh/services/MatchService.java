@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,6 +54,9 @@ public class MatchService {
                 .collect(Collectors.toList());
 
         // And set to Match
+        if (participants.size() < 2) {
+            throw new RuntimeException("Not enough participants for this match");
+        }
         newMatch.setParticipants(participants);
 
         return newMatch;
@@ -77,10 +81,13 @@ public class MatchService {
     }
 
     private void updateEloToParticipants(Match match) {
-        List<University> universityList = match.getParticipants()
-                .stream()
-                .map(MatchParticipant::getUniversity)
-                .toList();
+        int minRank = 1000;
+        List<University> universityList = new ArrayList<>();
+
+        for (MatchParticipant participant : match.getParticipants()) {
+            minRank = Math.min(minRank, participant.getRank());
+            universityList.add(participant.getUniversity());
+        }
 
         // Algo in here
     }
@@ -128,6 +135,16 @@ public class MatchService {
                 .stream()
                 .filter(match -> "FINISHED".equals(String.valueOf(match.getStatus())))
                 .map(this::buildMatchResponse)
+                .toList();
+    }
+
+    public List<MatchParticipantResponse> getAllParticipants(long id) {
+        Match match = matchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+
+        return  match.getParticipants()
+                .stream()
+                .map(MatchParticipantResponse::new)
                 .toList();
     }
 

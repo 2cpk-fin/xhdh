@@ -1,5 +1,6 @@
 package com.xhdh.xhdh.controllers;
 
+import com.xhdh.xhdh.dto.MatchParticipantResponse;
 import com.xhdh.xhdh.dto.MatchRequest;
 import com.xhdh.xhdh.dto.MatchResponse;
 import com.xhdh.xhdh.dto.MatchResponseDTO;
@@ -50,6 +51,11 @@ public class MatchController {
     @GetMapping(path = "/all/finished")
     public ResponseEntity<List<MatchResponse>> getFinishedMatches() {
         return new ResponseEntity<>(matchService.getAllFinishedMatches(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/participants/id/{id}")
+    public ResponseEntity<List<MatchParticipantResponse>> getMatchParticipant(@PathVariable long id) {
+        return new ResponseEntity<>(matchService.getAllParticipants(id), HttpStatus.OK);
     }
 
     @PostMapping

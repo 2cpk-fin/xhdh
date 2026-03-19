@@ -13,7 +13,4 @@ public interface MatchRepository extends JpaRepository<Match, Long> {
 
     @Query("SELECT m FROM Match m WHERE m.status != 'FINSIHED'")
     List<Match> findAllNotFinishedMatch();
-
-    @Query("SELECT m FROM Match m WHERE m.status = 'FINISHED'")
-    List<Match> findAllFinishedMatch();
 }
