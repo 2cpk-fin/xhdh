@@ -1,11 +1,12 @@
 package com.xhdh.xhdh.dto;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.xhdh.xhdh.models.Status;
 
 public record MatchResponseDTO(
-    Long matchId,
+    UUID matchId,
     String title,
     Status status,
     LocalDateTime startTime,

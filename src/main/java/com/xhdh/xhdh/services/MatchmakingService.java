@@ -46,7 +46,7 @@ public class MatchmakingService {
         match.setStartTime(LocalDateTime.now());
         match.setEndTime(LocalDateTime.now().plusDays(7)); // Will be set when match ends
         Match savedMatch = matchRepository.save(match);
-        
+
         // Create match participants
         MatchParticipant participantA = new MatchParticipant();
         participantA.setMatch(savedMatch);
@@ -60,10 +60,10 @@ public class MatchmakingService {
         participantB.setUniversity(uB);
         participantB.setTotalVotes(0);
         participantB.setRank(0);
-        matchParticipantRepository.save(participantB);
-        
+        matchParticipantRepository.save(participantB);    
+
         return new MatchResponseDTO(
-            savedMatch.getId(),
+            savedMatch.getPublicMatchId(),
             savedMatch.getTitle(),
             savedMatch.getStatus(),
             savedMatch.getStartTime(),

@@ -1,5 +1,6 @@
 package com.xhdh.xhdh.controllers;
 
+import com.xhdh.xhdh.dto.UniversityRequest;
 import com.xhdh.xhdh.dto.UniversityResponse;
 import com.xhdh.xhdh.services.UniversityService;
 
@@ -30,5 +31,10 @@ public class UniversityController {
     @GetMapping(path = "/tags/{universityName}")
     public ResponseEntity<List<String>> showAllTagsInUniversity(@PathVariable String universityName){
         return new ResponseEntity<>(universityService.showAllTagsInUniversity(universityName), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/add")
+    public ResponseEntity<UniversityResponse> addUniversity(@RequestBody UniversityRequest request){
+        return new ResponseEntity<>(universityService.createUniversity(request), HttpStatus.CREATED);
     }
 }

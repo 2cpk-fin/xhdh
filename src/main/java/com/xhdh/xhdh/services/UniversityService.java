@@ -8,11 +8,10 @@ import com.xhdh.xhdh.repositories.TagRepository;
 import com.xhdh.xhdh.repositories.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,13 +47,15 @@ public class UniversityService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<UniversityResponse> createUniversity(UniversityRequest universityRequest) {
+    public UniversityResponse createUniversity(UniversityRequest request) {
         University university = new University();
-        university.setName(universityRequest.getName());
-        university.setAbbreviation(universityRequest.getAbbreviation());
-        university.setElo(universityRequest.getElo());
-
+    // Use the existing public ID if you have it, or generate a new one
+        university.setPublicUniversityId(UUID.randomUUID());
+        university.setName(request.getName());
+        university.setAbbreviation(request.getAbbreviation());
+        university.setElo(request.getElo());
+    
         University savedUniversity = universityRepository.save(university);
-        return new ResponseEntity<>(new UniversityResponse(savedUniversity), HttpStatus.CREATED);
-    }
+        return new UniversityResponse(savedUniversity);
+}
 }
