@@ -49,12 +49,10 @@ public class UniversityService {
 
     public UniversityResponse createUniversity(UniversityRequest request) {
         University university = new University();
-    // Use the existing public ID if you have it, or generate a new one
         university.setPublicUniversityId(UUID.randomUUID());
         university.setName(request.getName());
         university.setAbbreviation(request.getAbbreviation());
         university.setElo(request.getElo());
-    
         University savedUniversity = universityRepository.save(university);
         return new UniversityResponse(savedUniversity);
 }

@@ -39,5 +39,6 @@ public class Match {
     @Setter
     @Builder.Default
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("rank ASC")
     private List<MatchParticipant> participants = new ArrayList<>();
 }

@@ -19,9 +19,6 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vote> votes =  new ArrayList<>();
-
     @ManyToMany(mappedBy = "tags")
     List<University> universities = new ArrayList<>();
 }
