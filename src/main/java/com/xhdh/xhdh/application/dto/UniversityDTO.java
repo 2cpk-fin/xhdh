@@ -1,0 +1,10 @@
+package com.xhdh.xhdh.application.dto;
+
+import java.util.UUID;
+
+public record UniversityDTO(
+    UUID id,
+    String name,
+    String abbreviation,
+    int elo
+) {}

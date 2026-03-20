@@ -1,0 +1,27 @@
+package com.xhdh.xhdh.presentation.controllers.searches;
+
+import com.xhdh.xhdh.application.dto.TagResponse;
+import com.xhdh.xhdh.application.services.TagService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping(path = "/tags")
+public class TagController {
+    private final TagService tagService;
+
+    @GetMapping
+    public ResponseEntity<List<TagResponse>> showAllTags() {
+        return new ResponseEntity<>(tagService.showAllTags(), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/universities/{tagName}")
+    public ResponseEntity<List<String>> showTagByName(@PathVariable @RequestParam String tagName) {
+        return new ResponseEntity<>(tagService.showAllUniversitiesByTagName(tagName), HttpStatus.OK);
+    }
+}

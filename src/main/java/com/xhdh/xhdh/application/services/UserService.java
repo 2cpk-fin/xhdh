@@ -1,0 +1,45 @@
+package com.xhdh.xhdh.application.services;
+
+import java.time.LocalDateTime;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.xhdh.xhdh.application.dto.RegisterRequest;
+import com.xhdh.xhdh.domain.models.User;
+import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
+import com.xhdh.xhdh.presentation.exceptions.EmailAlreadyExistsException;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class UserService implements UserDetailsService{
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+
+    public ResponseEntity<String> handleRegistration(RegisterRequest request){
+        if(userRepository.existsByEmail(request.email())){
+            throw new EmailAlreadyExistsException("This email is already taken by someone else");
+        }
+        String hashedpassword = passwordEncoder.encode(request.password());
+        User user = User.builder() /*open builder constructor*/
+                    .username(request.username())
+                    .password(hashedpassword)
+                    .email(request.email())
+                    .createdAt(LocalDateTime.now())
+                    .build(); /*activate the construction*/
+        userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Cannot find this user!"));
+    }
+}
