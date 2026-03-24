@@ -21,4 +21,14 @@ public class AuthController {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestParam String refreshToken){
+        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logoutRequest(){
+        authService.logout();
+        return ResponseEntity.ok().build();
+    }
 }

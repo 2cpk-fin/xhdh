@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.presentation.exceptions;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.springframework.security.core.AuthenticationException;
@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleExistingUser(EmailAlreadyExistsException ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             HttpStatus.CONFLICT.value(),
             "Conflict",
             ex.getMessage(),
@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotAuthenticated.class)
     public ResponseEntity<ErrorResponse> handleNotAuthenticated(NotAuthenticated ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             HttpStatus.UNAUTHORIZED.value(),
             "Unauthorized",
             ex.getMessage(),
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleUnknownUser(AuthenticationException ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             HttpStatus.UNAUTHORIZED.value(),
             "Unauthorized",
             "Invalid email or password",
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
                         .map(FieldError::getDefaultMessage)
                         .orElse("Invalid input data");
         ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             400,
             "Bad Request",
             message,
@@ -67,7 +67,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
-            LocalDateTime.now(),
+            Instant.now(),
             500,
             "Internal Server Error", 
             "Something went wrong", 

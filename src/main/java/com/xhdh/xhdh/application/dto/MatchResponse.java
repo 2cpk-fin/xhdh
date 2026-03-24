@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -19,7 +19,7 @@ public class MatchResponse {
 
     private final List<MatchParticipantResponse> participants;
 
-    private final LocalDateTime startTime;
+    private final Instant startTime;
 
-    private final LocalDateTime endTime;
+    private final Instant endTime;
 }
