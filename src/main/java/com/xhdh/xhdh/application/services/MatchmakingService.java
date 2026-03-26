@@ -7,8 +7,8 @@ import java.util.Map;
 import com.xhdh.xhdh.domain.models.Status;
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.application.dto.MatchResponseDTO;
-import com.xhdh.xhdh.application.dto.UniversityDTO;
+import com.xhdh.xhdh.application.dto.matches.MatchResponseDTO;
+import com.xhdh.xhdh.application.dto.searches.UniversityDTO;
 import com.xhdh.xhdh.presentation.exceptions.NotEnoughUniException;
 import com.xhdh.xhdh.domain.models.Match;
 import com.xhdh.xhdh.domain.models.MatchParticipant;

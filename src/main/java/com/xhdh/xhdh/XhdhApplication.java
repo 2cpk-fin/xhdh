@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class XhdhApplication {
 
+
 	public static void main(String[] args) {
 		Dotenv.configure()
 		.ignoreIfMissing()

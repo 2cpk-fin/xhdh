@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.presentation.controllers.searches;
 
-import com.xhdh.xhdh.application.dto.UniversityRequest;
-import com.xhdh.xhdh.application.dto.UniversityResponse;
+import com.xhdh.xhdh.application.dto.searches.UniversityRequest;
+import com.xhdh.xhdh.application.dto.searches.UniversityResponse;
 import com.xhdh.xhdh.application.services.UniversityService;
 
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.presentation.controllers.searches;
 
-import com.xhdh.xhdh.application.dto.TagResponse;
+import com.xhdh.xhdh.application.dto.searches.TagResponse;
 import com.xhdh.xhdh.application.services.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

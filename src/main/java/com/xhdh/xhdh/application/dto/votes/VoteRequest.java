@@ -1,4 +1,4 @@
-package com.xhdh.xhdh.application.dto;
+package com.xhdh.xhdh.application.dto.votes;
 
 import lombok.Getter;
 import lombok.Setter;

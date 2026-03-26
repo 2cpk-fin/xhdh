@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.presentation.controllers.votes;
 
-import com.xhdh.xhdh.application.dto.VoteRequest;
-import com.xhdh.xhdh.application.dto.VoteResponse;
+import com.xhdh.xhdh.application.dto.votes.VoteRequest;
+import com.xhdh.xhdh.application.dto.votes.VoteResponse;
 import com.xhdh.xhdh.application.services.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

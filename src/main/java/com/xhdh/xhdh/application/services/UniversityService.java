@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.UniversityRequest;
-import com.xhdh.xhdh.application.dto.UniversityResponse;
+import com.xhdh.xhdh.application.dto.searches.UniversityRequest;
+import com.xhdh.xhdh.application.dto.searches.UniversityResponse;
 import com.xhdh.xhdh.domain.models.Tag;
 import com.xhdh.xhdh.domain.models.University;
 import com.xhdh.xhdh.infrastructure.repositories.TagRepository;

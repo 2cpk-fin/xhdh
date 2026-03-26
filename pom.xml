@@ -117,10 +117,13 @@
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
+<<<<<<< HEAD
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+=======
+>>>>>>> 05108717fa51047976de71d3977b0dc0d1804073
 	</dependencies>
 
 	<build>

@@ -7,7 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.application.dto.AuthRequest;
+import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
 import com.xhdh.xhdh.application.dto.AuthResponse;
 import com.xhdh.xhdh.domain.models.RefreshToken;
 import com.xhdh.xhdh.domain.models.User;

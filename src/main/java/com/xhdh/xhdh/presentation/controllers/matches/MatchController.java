@@ -1,9 +1,9 @@
 package com.xhdh.xhdh.presentation.controllers.matches;
 
-import com.xhdh.xhdh.application.dto.MatchParticipantResponse;
-import com.xhdh.xhdh.application.dto.MatchRequest;
-import com.xhdh.xhdh.application.dto.MatchResponse;
-import com.xhdh.xhdh.application.dto.MatchResponseDTO;
+import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
+import com.xhdh.xhdh.application.dto.matches.MatchRequest;
+import com.xhdh.xhdh.application.dto.matches.MatchResponse;
+import com.xhdh.xhdh.application.dto.matches.MatchResponseDTO;
 import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.infrastructure.repositories.*;
 import com.xhdh.xhdh.application.services.MatchService;
