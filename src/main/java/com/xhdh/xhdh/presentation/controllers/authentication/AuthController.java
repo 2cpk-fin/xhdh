@@ -1,10 +1,10 @@
 package com.xhdh.xhdh.presentation.controllers.authentication;
 
+import com.xhdh.xhdh.application.dto.AuthResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
-import com.xhdh.xhdh.application.dto.authentication.AuthResponse;
 import com.xhdh.xhdh.application.services.AuthService;
 
 import jakarta.validation.Valid;
@@ -17,7 +17,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request){
+    public ResponseEntity<com.xhdh.xhdh.application.dto.AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request){
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
