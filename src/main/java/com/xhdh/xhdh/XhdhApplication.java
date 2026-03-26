@@ -11,7 +11,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class XhdhApplication {
 
 	public static void main(String[] args) {
-		Dotenv.configure().systemProperties().load();
+		Dotenv.configure()
+		.ignoreIfMissing()
+		.systemProperties()
+		.load();
 		SpringApplication.run(XhdhApplication.class, args);
 	}
 
