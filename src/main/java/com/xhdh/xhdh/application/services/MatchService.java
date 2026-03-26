@@ -1,9 +1,9 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.MatchParticipantResponse;
-import com.xhdh.xhdh.application.dto.MatchRequest;
+import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
+import com.xhdh.xhdh.application.dto.matches.MatchRequest;
 import com.xhdh.xhdh.domain.models.Match;
-import com.xhdh.xhdh.application.dto.MatchResponse;
+import com.xhdh.xhdh.application.dto.matches.MatchResponse;
 import com.xhdh.xhdh.domain.models.MatchParticipant;
 import com.xhdh.xhdh.domain.models.Status;
 import com.xhdh.xhdh.domain.models.University;

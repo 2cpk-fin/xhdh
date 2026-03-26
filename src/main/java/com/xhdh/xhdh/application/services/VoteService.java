@@ -1,8 +1,8 @@
 package com.xhdh.xhdh.application.services;
 
 
-import com.xhdh.xhdh.application.dto.VoteRequest;
-import com.xhdh.xhdh.application.dto.VoteResponse;
+import com.xhdh.xhdh.application.dto.votes.VoteRequest;
+import com.xhdh.xhdh.application.dto.votes.VoteResponse;
 import com.xhdh.xhdh.domain.models.*;
 import com.xhdh.xhdh.infrastructure.repositories.MatchParticipantRepository;
 import com.xhdh.xhdh.infrastructure.repositories.MatchRepository;

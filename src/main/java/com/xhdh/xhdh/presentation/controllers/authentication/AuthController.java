@@ -3,8 +3,8 @@ package com.xhdh.xhdh.presentation.controllers.authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.xhdh.xhdh.application.dto.AuthRequest;
-import com.xhdh.xhdh.application.dto.AuthResponse;
+import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
+import com.xhdh.xhdh.application.dto.authentication.AuthResponse;
 import com.xhdh.xhdh.application.services.AuthService;
 
 import jakarta.validation.Valid;

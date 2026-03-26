@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.application.dto.RegisterRequest;
+import com.xhdh.xhdh.application.dto.authentication.RegisterRequest;
 import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
 import com.xhdh.xhdh.presentation.exceptions.EmailAlreadyExistsException;

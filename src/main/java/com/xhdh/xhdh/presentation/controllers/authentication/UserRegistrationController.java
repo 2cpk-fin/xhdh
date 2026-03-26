@@ -3,7 +3,7 @@ package com.xhdh.xhdh.presentation.controllers.authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.xhdh.xhdh.application.dto.RegisterRequest;
+import com.xhdh.xhdh.application.dto.authentication.RegisterRequest;
 import com.xhdh.xhdh.application.services.UserService;
 
 import jakarta.validation.Valid;

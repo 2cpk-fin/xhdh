@@ -1,4 +1,4 @@
-package com.xhdh.xhdh.application.dto;
+package com.xhdh.xhdh.application.dto.matches;
 
 import lombok.Getter;
 
