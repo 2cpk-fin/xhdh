@@ -3,7 +3,7 @@ package com.xhdh.xhdh.domain.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,9 +28,9 @@ public class Match {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private LocalDateTime startTime;
+    private Instant startTime;
 
-    private LocalDateTime endTime;
+    private Instant endTime;
 
     @Builder.Default
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)

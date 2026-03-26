@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,8 +43,8 @@ public class MatchmakingService {
         Match match = new Match();
         match.setTitle(uA.getAbbreviation() + " vs " + uB.getAbbreviation());
         match.setStatus(Status.PENDING);
-        match.setStartTime(LocalDateTime.now());
-        match.setEndTime(LocalDateTime.now().plusDays(7)); // Will be set when match ends
+        match.setStartTime(Instant.now());
+        match.setEndTime(Instant.now().plusSeconds(7 * 24 * 60 * 60)); // Will be set when match ends
         Match savedMatch = matchRepository.save(match);
 
         // Create match participants

@@ -5,7 +5,7 @@ import com.xhdh.xhdh.domain.models.Vote;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -21,7 +21,7 @@ public class VoteResponse {
 
     private final String matchTitle;
 
-    private final LocalDateTime voteAt;
+    private final Instant voteAt;
 
     public VoteResponse(Vote vote) {
         this.username = vote.getUser().getUsername();
@@ -29,6 +29,6 @@ public class VoteResponse {
         this.universityAbbreviation = vote.getUniversity().getAbbreviation();
         this.matchId = vote.getMatch().getId();
         this.matchTitle = vote.getMatch().getTitle();
-        this.voteAt = LocalDateTime.now();
+        this.voteAt = Instant.now();
     }
 }

@@ -2,7 +2,7 @@ package com.xhdh.xhdh.application.dto.matches;
 
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -13,7 +13,7 @@ public class MatchRequest {
 
     private List<String> participants;
 
-    private LocalDateTime startTime;
+    private Instant startTime;
 
-    private LocalDateTime endTime;
+    private Instant endTime;
 }

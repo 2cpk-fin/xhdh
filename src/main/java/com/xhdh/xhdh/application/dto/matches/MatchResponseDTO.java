@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.application.dto.matches;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.xhdh.xhdh.application.dto.searches.UniversityDTO;
@@ -10,8 +10,8 @@ public record MatchResponseDTO(
     UUID matchId,
     String title,
     Status status,
-    LocalDateTime startTime,
-    LocalDateTime endTime,
+    Instant startTime,
+    Instant endTime,
     UniversityDTO u1,
     UniversityDTO u2
 ) {}

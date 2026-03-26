@@ -18,7 +18,7 @@ import lombok.Setter;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -96,7 +96,7 @@ public class MatchService {
     @Transactional
     protected void changeStatus() {
         for (Match match : matchRepository.findAllNotFinishedMatch()) {
-            LocalDateTime now = LocalDateTime.now();
+            Instant now = Instant.now();
             if (match.getEndTime().isAfter(now)) {
                 match.setStatus(Status.FINISHED);
                 updateEloToParticipants(match);
