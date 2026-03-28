@@ -30,4 +30,5 @@ public class VoteController {
     public ResponseEntity<VoteResponse> createVote(@RequestBody VoteRequest voteRequest) {
         return new ResponseEntity<>(voteService.createVote(voteRequest), HttpStatus.CREATED);
     }
+
 }

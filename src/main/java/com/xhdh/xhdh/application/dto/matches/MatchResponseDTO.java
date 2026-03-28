@@ -13,6 +13,7 @@ public record MatchResponseDTO(
     Instant startTime,
     Instant endTime,
     UniversityDTO u1,
-    UniversityDTO u2
+    UniversityDTO u2,
+    UUID ownerUUID
 ) {}
 

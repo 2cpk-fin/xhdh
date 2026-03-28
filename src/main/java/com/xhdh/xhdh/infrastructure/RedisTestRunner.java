@@ -30,6 +30,6 @@ public class RedisTestRunner implements CommandLineRunner {
         System.out.println("--- ✨ Redis Test Finished ---");
 
         // 3. Exit the app when the test is finished
-        System.exit(0);
+        // System.exit(0);
     }
 }

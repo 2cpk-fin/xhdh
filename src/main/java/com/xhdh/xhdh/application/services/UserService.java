@@ -1,6 +1,7 @@
 package com.xhdh.xhdh.application.services;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,8 @@ public class UserService implements UserDetailsService{
                     .password(hashedpassword)
                     .email(request.email())
                     .createdAt(LocalDateTime.now())
+                    .totalVote((long) 0)
+                    .userUUID(UUID.randomUUID())
                     .build(); /*activate the construction*/
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");

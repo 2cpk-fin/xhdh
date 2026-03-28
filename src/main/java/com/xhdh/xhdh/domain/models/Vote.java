@@ -3,7 +3,7 @@ package com.xhdh.xhdh.domain.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
@@ -29,6 +29,6 @@ public class Vote {
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;
 
-    private LocalDateTime voteAt;
+    private Instant voteAt;
 
 }

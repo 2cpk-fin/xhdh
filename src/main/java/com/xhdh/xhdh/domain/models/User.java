@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,6 +36,10 @@ public class User implements UserDetails{
     private String password;
 
     private LocalDateTime createdAt;
+
+    private Long totalVote;
+
+    private UUID userUUID;
 
     @Override
     public String getUsername(){

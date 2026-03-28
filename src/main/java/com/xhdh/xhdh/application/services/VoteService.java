@@ -12,7 +12,7 @@ import com.xhdh.xhdh.infrastructure.repositories.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
@@ -42,15 +42,15 @@ public class VoteService {
     }
 
     public VoteResponse createVote(VoteRequest voteRequest) {
-        long userId = voteRequest.getUserId();
+        long userId = voteRequest.userId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        long matchId = voteRequest.getMatchId();
+        long matchId = voteRequest.matchId();
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new RuntimeException("Match not found"));
 
-        long universityId = voteRequest.getUniversityId();
+        long universityId = voteRequest.universityId();
         University university = universityRepository.findById(universityId)
                 .orElseThrow(() -> new RuntimeException("University not found"));
 
@@ -62,9 +62,11 @@ public class VoteService {
                 .user(user)
                 .university(university)
                 .match(match)
-                .voteAt(LocalDateTime.now())
+                .voteAt(Instant.now())
                 .build();
 
         return new VoteResponse(voteRepository.save(newVote));
     }
+
 }
+

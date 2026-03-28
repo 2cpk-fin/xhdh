@@ -4,6 +4,8 @@ import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
 import com.xhdh.xhdh.application.dto.matches.MatchRequest;
 import com.xhdh.xhdh.application.dto.matches.MatchResponse;
 import com.xhdh.xhdh.application.dto.matches.MatchResponseDTO;
+import com.xhdh.xhdh.application.dto.matches.SoloMatchChoiceRequest;
+import com.xhdh.xhdh.application.dto.matches.SoloMatchReport;
 import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.infrastructure.repositories.*;
 import com.xhdh.xhdh.application.services.MatchService;
@@ -28,11 +30,27 @@ public class MatchController {
     
     @PostMapping(path = "/solo/start")
     public ResponseEntity<MatchResponseDTO> startMatch(Principal principal) {
-    String userEmail = principal.getName();
-    User user = userRepository.findByEmail(userEmail)
+        String userEmail = principal.getName();
+        User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    return ResponseEntity.ok(matchmakingService.startNewDuel(user, false));
-}
+        return ResponseEntity.ok(matchmakingService.startNewDuel(user, false));
+    }
+
+    @PostMapping(path = "/solo/choose")
+    public ResponseEntity<SoloMatchReport> chooseSoloMatch(@RequestBody SoloMatchChoiceRequest choiceRequest, Principal principal) {
+        String userEmail = principal.getName();
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        SoloMatchReport report = matchService.chooseSoloMatch(
+                user.getUserUUID(),
+                choiceRequest.matchUUID(),
+                choiceRequest.universityUUID()
+        );
+
+        return new ResponseEntity<>(report, HttpStatus.OK);
+    }
+
     @GetMapping
     public ResponseEntity<List<MatchResponse>> getMatches() {
         return new ResponseEntity<>(matchService.getAllMatches(), HttpStatus.OK);

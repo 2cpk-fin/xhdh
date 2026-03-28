@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
@@ -31,4 +33,6 @@ public interface UniversityRepository extends JpaRepository<University, Long>{
                    "JOIN universities u2 ON ut2.university_id = u2.id " +
                    "WHERE u1.id = :universityId AND u2.id <> :universityId", nativeQuery = true)
     List<University> findAllOpponentsWithSharedTag(@Param("universityId") long universityId);
+
+    Optional<University> findByPublicUniversityId(UUID publicUniversityId);
 }

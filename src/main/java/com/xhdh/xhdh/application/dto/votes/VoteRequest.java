@@ -1,14 +1,9 @@
 package com.xhdh.xhdh.application.dto.votes;
 
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
 
-@Getter
-@Setter
-public class VoteRequest {
-    private long userId;
-
-    private long universityId;
-
-    private long matchId;
-}
+public record VoteRequest(
+    @NotBlank long userId,
+    @NotBlank long universityId,
+    @NotBlank long matchId
+){}
