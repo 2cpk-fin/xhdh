@@ -1,0 +1,42 @@
+
+services:
+  # --- THE CACHE (Redis) ---
+  xhdh-redis:
+    image: redis:7-alpine
+    container_name: xhdh-redis
+    restart: always
+    command: redis-server --save 60 1 --loglevel warning
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s  
+      timeout: 3s
+      retries: 5
+    networks:
+      - xhdh-network
+
+  # --- THE APPLICATION (Your Spring Boot App) ---
+  xhdh-api:
+    image: xhdh-backend:latest
+    container_name: xhdh-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      xhdh-redis:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_DATA_REDIS_HOST: xhdh-redis
+      SPRING_DATA_REDIS_PORT: 6379
+      SERVER_PORT: 8000
+    networks:
+      - xhdh-network
+    volumes:
+      - ./.env:/app/.env
+
+networks:
+  xhdh-network:
+    driver: bridge
