@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.domain.models.Participant;
-import com.xhdh.xhdh.infrastructure.repositories.LeaderboardRepository;
+// import com.xhdh.xhdh.infrastructure.repositories.LeaderboardRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +15,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class LeaderboardService {
-    private LeaderboardRepository leaderboardRepository;
+    // private LeaderboardRepository leaderboardRepository;
     private RedisTemplate<String, Object> redisTemplate;
 
     public List<Participant> showLeaderboard() {

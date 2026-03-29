@@ -1,4 +1,4 @@
-package com.xhdh.xhdh.infrastructure.repositories;
+package com.xhdh.xhdh.infrastructure.repositories.redis;
 
 import com.xhdh.xhdh.domain.models.Participant;
 import org.springframework.data.repository.CrudRepository;

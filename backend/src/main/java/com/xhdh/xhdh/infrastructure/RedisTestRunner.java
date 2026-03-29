@@ -6,8 +6,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RedisTestRunner implements CommandLineRunner {
+
     private final RedisTemplate<String, String> redisTemplate;
 
+    // Use Constructor Injection - this ensures the template is 
+    // already configured with the host from application.yml
     public RedisTestRunner(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
@@ -15,21 +18,9 @@ public class RedisTestRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         System.out.println("--- 🚀 Starting Redis Test ---");
-
-        // 1. Save a value to Redis
-        String testKey = "testing";
-        String testValue = "testing2";
-
-        redisTemplate.opsForValue().set(testKey, testValue);
-        System.out.println("✅ Saved to Redis: " + testKey + " -> " + testValue);
-
-        // 2. Retrieve it back
-        String retrievedValue = redisTemplate.opsForValue().get(testKey);
-        System.out.println("🔍 Retrieved from Redis: " + retrievedValue);
-
-        System.out.println("--- ✨ Redis Test Finished ---");
-
-        // 3. Exit the app when the test is finished
-        // System.exit(0);
+        // This will now use 'xhdh-redis' instead of 'localhost'
+        redisTemplate.opsForValue().set("test-connection", "success");
+        System.out.println("--- ✅ Redis Test Passed! ---");
     }
 }
+

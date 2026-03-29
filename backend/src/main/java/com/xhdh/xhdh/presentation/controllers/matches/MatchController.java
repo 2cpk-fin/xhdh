@@ -7,7 +7,7 @@ import com.xhdh.xhdh.application.dto.matches.MatchResponseDTO;
 import com.xhdh.xhdh.application.dto.matches.SoloMatchChoiceRequest;
 import com.xhdh.xhdh.application.dto.matches.SoloMatchReport;
 import com.xhdh.xhdh.domain.models.User;
-import com.xhdh.xhdh.infrastructure.repositories.*;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 import com.xhdh.xhdh.application.services.MatchService;
 import com.xhdh.xhdh.application.services.MatchmakingService;
 

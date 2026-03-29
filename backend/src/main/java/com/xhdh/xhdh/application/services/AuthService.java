@@ -11,7 +11,7 @@ import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
 import com.xhdh.xhdh.application.dto.AuthResponse;
 import com.xhdh.xhdh.domain.models.RefreshToken;
 import com.xhdh.xhdh.domain.models.User;
-import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 import com.xhdh.xhdh.infrastructure.security.*;
 
 import jakarta.transaction.Transactional;

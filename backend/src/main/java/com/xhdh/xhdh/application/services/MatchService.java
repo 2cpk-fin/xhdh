@@ -11,11 +11,12 @@ import com.xhdh.xhdh.domain.models.MatchParticipant;
 import com.xhdh.xhdh.domain.models.Status;
 import com.xhdh.xhdh.domain.models.University;
 import com.xhdh.xhdh.application.utilities.EloCalculator;
-import com.xhdh.xhdh.infrastructure.repositories.MatchParticipantRepository;
-import com.xhdh.xhdh.infrastructure.repositories.MatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.SoloMatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UniversityRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchParticipantRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.SoloMatchRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
+
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

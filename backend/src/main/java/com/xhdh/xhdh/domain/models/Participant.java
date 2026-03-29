@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.domain.models;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
