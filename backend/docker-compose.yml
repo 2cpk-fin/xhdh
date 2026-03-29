@@ -2,7 +2,7 @@
 services:
   # --- THE CACHE (Redis) ---
   xhdh-redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: xhdh-redis
     restart: always
     command: redis-server --save 60 1 --loglevel warning
