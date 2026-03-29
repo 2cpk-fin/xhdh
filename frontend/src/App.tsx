@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import RegisterPage from './pages/RegisterPage'; // Check your filename/path
 import LoginPage from './pages/LoginPage';
+import DuelPage from './pages/DuelPage';
 import type React from 'react';
 
 // 🛡️ A simple wrapper to protect private pages later
@@ -23,9 +24,7 @@ function App() {
             path="/duel" 
             element={
               <ProtectedRoute>
-                <div className="flex items-center justify-center h-screen">
-                  <h1 className="text-3xl font-bold">University Duel Page (Coming Soon)</h1>
-                </div>
+                <DuelPage />
               </ProtectedRoute>
             } 
           />

@@ -30,10 +30,11 @@ const LoginPage = () => {
       });
 
       // Backend should return token/refreshToken in AuthResponse
-      const token = response.data?.token;
+      const { token, refreshToken } = response.data;
 
-      if (token) {
+      if (token && refreshToken) {
         localStorage.setItem('token', token);
+        localStorage.setItem('refreshToken', refreshToken);
         setAnnouncement({
           message: 'Login successful! Redirecting...',
           isSuccess: true
@@ -44,7 +45,7 @@ const LoginPage = () => {
           navigate('/duel');
         }, 1200);
       } else {
-        throw new Error('Login failed: token missing.');
+        throw new Error('Login failed: token or refresh token missing.');
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Invalid credentials.';
