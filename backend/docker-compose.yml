@@ -18,6 +18,7 @@ services:
 
   # --- THE APPLICATION (Your Spring Boot App) ---
   xhdh-api:
+    build: .
     image: xhdh-backend:latest
     container_name: xhdh-backend
     ports:
