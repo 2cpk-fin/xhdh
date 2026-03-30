@@ -120,15 +120,9 @@ const DuelPage = () => {
           </h1>
           <p className="text-slate-400 text-lg">Choose the university you think will win!</p>
           <div className="mt-4">
-            {currentMatch ? (
               <span className="bg-slate-800 px-3 py-1.5 rounded-full text-slate-100">
                 Match ends in: {countdownMinutes}:{countdownSeconds}
               </span>
-            ) : (
-              <span className="bg-slate-800 px-3 py-1.5 rounded-full text-slate-100">
-                Duel timer: {Math.floor(seconds / 60).toString().padStart(2, '0')}:{(seconds % 60).toString().padStart(2, '0')}
-              </span>
-            )}
           </div>
         </div>
 
