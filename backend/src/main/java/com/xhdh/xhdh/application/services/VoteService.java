@@ -19,15 +19,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class VoteService {
-    private final VoteRepository voteRepository;
+    public final VoteRepository voteRepository;
 
-    private final UserRepository userRepository;
-
-    private final UniversityRepository universityRepository;
-
-    private final MatchRepository matchRepository;
-
-    private final MatchParticipantRepository  matchParticipantRepository;
+    private final VotePersistenceService votePersistenceService;
 
     private final LeaderboardService leaderboardService;
 
@@ -46,33 +40,12 @@ public class VoteService {
     }
 
     @Transactional
-    public VoteResponse createVote(VoteRequest voteRequest) {
+    public String createVote(VoteRequest voteRequest) {
         leaderboardService.vote(voteRequest.universityId());
 
-        long userId = voteRequest.userId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        votePersistenceService.asyncVote(voteRequest);
 
-        long matchId = voteRequest.matchId();
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-
-        long universityId = voteRequest.universityId();
-        University university = universityRepository.findById(universityId)
-                .orElseThrow(() -> new RuntimeException("University not found"));
-
-        if ("PENDING".equals(String.valueOf(match.getStatus()))) {
-            matchParticipantRepository.addVoteToUniversity(universityId, matchId);
-        }
-
-        Vote newVote = Vote.builder()
-                .user(user)
-                .university(university)
-                .match(match)
-                .voteAt(Instant.now())
-                .build();
-
-        return new VoteResponse(voteRepository.save(newVote));
+        return "Success";
     }
 
 }

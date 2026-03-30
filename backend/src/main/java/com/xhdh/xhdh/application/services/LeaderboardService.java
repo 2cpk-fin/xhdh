@@ -1,7 +1,7 @@
 package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.domain.models.Participant;
-import com.xhdh.xhdh.infrastructure.repositories.LeaderboardRepository;
+import com.xhdh.xhdh.infrastructure.repositories.redis.LeaderboardRepository;
 
 import lombok.RequiredArgsConstructor;
 
