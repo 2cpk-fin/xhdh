@@ -1,3 +1,16 @@
-README.md
+newupdate.md
 ws.md
-ANNOUNCEMENT_BOX_IMPLEMENTATION.md
+README.md
+# Root ignore
+.idea/
+*.iml
+target/
+**/target/
+
+# Frontend ignore
+frontend/node_modules/
+frontend/dist/
+
+# Backend ignore
+backend/target/
+backend/.mvn/
