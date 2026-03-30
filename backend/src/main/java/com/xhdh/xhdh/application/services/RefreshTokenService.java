@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 
 import com.xhdh.xhdh.domain.models.RefreshToken;
 import com.xhdh.xhdh.domain.models.User;
-import com.xhdh.xhdh.infrastructure.repositories.RefreshTokenRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.RefreshTokenRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

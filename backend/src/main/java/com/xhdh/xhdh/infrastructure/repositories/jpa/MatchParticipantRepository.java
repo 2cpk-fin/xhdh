@@ -1,4 +1,4 @@
-package com.xhdh.xhdh.infrastructure.repositories;
+package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
 import com.xhdh.xhdh.domain.models.MatchParticipant;
 import jakarta.transaction.Transactional;

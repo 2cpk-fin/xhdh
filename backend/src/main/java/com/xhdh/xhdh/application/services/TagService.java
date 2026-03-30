@@ -2,8 +2,9 @@ package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.application.dto.searches.TagResponse;
 import com.xhdh.xhdh.domain.models.University;
-import com.xhdh.xhdh.infrastructure.repositories.TagRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UniversityRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.TagRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

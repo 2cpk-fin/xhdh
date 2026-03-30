@@ -4,8 +4,9 @@ import com.xhdh.xhdh.application.dto.searches.UniversityRequest;
 import com.xhdh.xhdh.application.dto.searches.UniversityResponse;
 import com.xhdh.xhdh.domain.models.Tag;
 import com.xhdh.xhdh.domain.models.University;
-import com.xhdh.xhdh.infrastructure.repositories.TagRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UniversityRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.TagRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;

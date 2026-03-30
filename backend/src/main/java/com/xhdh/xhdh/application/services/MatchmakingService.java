@@ -16,10 +16,10 @@ import com.xhdh.xhdh.domain.models.MatchParticipant;
 import com.xhdh.xhdh.domain.models.SoloMatch;
 import com.xhdh.xhdh.domain.models.University;
 import com.xhdh.xhdh.domain.models.User;
-import com.xhdh.xhdh.infrastructure.repositories.MatchParticipantRepository;
-import com.xhdh.xhdh.infrastructure.repositories.MatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.SoloMatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.UniversityRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchParticipantRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.SoloMatchRepository;
+import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,4 +1,4 @@
-package com.xhdh.xhdh.infrastructure.repositories;
+package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
