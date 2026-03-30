@@ -14,8 +14,8 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**") // Apply to all API paths
-                        .allowedOrigins("http://localhost:5173") 
-                        .allowedOrigins("https://xhdh-frontend.vercel.app")// Your Vite dev server
+                        .allowedOrigins("http://localhost:5173",
+                                        "https://xhdh-wine.vercel.app") 
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true); // Crucial for JWT/Cookies
