@@ -5,10 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.io.Serializable;
+
 @RedisHash("Leaderboard")
 @Getter
 @Setter
-public class Participant {
+public class Participant implements Serializable {
     @Id
     private String id;
 

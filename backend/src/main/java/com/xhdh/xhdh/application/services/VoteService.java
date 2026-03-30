@@ -11,6 +11,7 @@ import com.xhdh.xhdh.infrastructure.repositories.UserRepository;
 import com.xhdh.xhdh.infrastructure.repositories.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,6 +28,8 @@ public class VoteService {
 
     private final MatchParticipantRepository  matchParticipantRepository;
 
+    private final LeaderboardService leaderboardService;
+
     public List<VoteResponse> findAllUserVotes(String username) {
         return voteRepository.findAllByUsername(username)
                 .stream()
@@ -41,7 +44,10 @@ public class VoteService {
                 .toList();
     }
 
+    @Transactional
     public VoteResponse createVote(VoteRequest voteRequest) {
+        leaderboardService.vote(voteRequest.universityId());
+
         long userId = voteRequest.userId();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
