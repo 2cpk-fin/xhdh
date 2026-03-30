@@ -30,8 +30,13 @@ services:
       SPRING_DATASOURCE_URL: ${DB_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      
       SPRING_DATA_REDIS_HOST: xhdh-redis
       SPRING_DATA_REDIS_PORT: 6379
+      SPRING_DATA_REDIS_SSL_ENABLED: "false" # Local Docker doesn't use SSL
+      # Leave password blank if your local redis container doesn't have one
+      SPRING_DATA_REDIS_PASSWORD: "" 
+
       SERVER_PORT: 8000
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRY: ${JWT_EXPIRY}
