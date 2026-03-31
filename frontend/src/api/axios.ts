@@ -1,13 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api', // Your Spring Boot port
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -16,18 +15,21 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Add response interceptor to handle token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 1. Identify if this request was an authentication attempt
+    // Adjust these strings to match your exact backend endpoints
+    const isLoginRequest = originalRequest.url.includes('/auth/login') || originalRequest.url.includes('/login');
+    const isRegisterRequest = originalRequest.url.includes('/users/register') || originalRequest.url.includes('/register');
+
+    // 2. Only attempt refresh/redirect if it's NOT a login/register failure
+    if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest && !isRegisterRequest) {
       originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem('refreshToken');
@@ -38,28 +40,25 @@ api.interceptors.response.use(
           });
 
           const { token: newToken, refreshToken: newRefreshToken } = refreshResponse.data;
-
           localStorage.setItem('token', newToken);
           localStorage.setItem('refreshToken', newRefreshToken);
 
-          // Retry the original request with new token
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
         } catch (refreshError) {
-          // Refresh failed, redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          localStorage.clear();
+          window.location.href = '/login'; // Hard reload only if refresh fails
           return Promise.reject(refreshError);
         }
       } else {
-        // No refresh token, redirect to login
         localStorage.removeItem('token');
-        window.location.href = '/login';
+        window.location.href = '/login'; // Hard reload if no refresh token exists
         return Promise.reject(error);
       }
     }
 
+    // 3. If it's a 401 on the login/register page, just reject the promise.
+    // This allows your React catch(err) block to show the error message.
     return Promise.reject(error);
   }
 );

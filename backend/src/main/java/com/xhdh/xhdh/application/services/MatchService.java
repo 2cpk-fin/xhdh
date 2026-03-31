@@ -276,7 +276,7 @@ public class MatchService {
         soloMatchRepository.save(soloMatch);
 
         // Auto-create next solo match for user
-        matchmakingService.startNewDuel(user, false);
+        // matchmakingService.startNewDuel(user, false);
 
         return new SoloMatchReport(
                 winner.getPublicUniversityId(),

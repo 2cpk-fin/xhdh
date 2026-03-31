@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, UserPlus, ArrowLeft } from 'lucide-react';
+import { User, Mail, Lock, UserPlus, ArrowLeft, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import AnnouncementBox from '../components/AnnouncementBox';
 import SpaceBackground from '../components/SpaceBackground';
+
+interface Announcement {
+  message: string;
+  isSuccess: boolean;
+}
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -13,11 +18,10 @@ const RegisterPage = () => {
     password: '',
     confirmPassword: ''
   });
+  
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [announcement, setAnnouncement] = useState<{
-    message: string;
-    isSuccess: boolean;
-  } | null>(null);
+  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [showPlanet, setShowPlanet] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -25,6 +29,18 @@ const RegisterPage = () => {
     setError('');
     setAnnouncement(null);
 
+    // 1. Client-side validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    if (formData.password.length < 8) {
+        setError("Password must be at least 8 characters");
+        return;
+    }
+
+    setLoading(true);
 
     try {
       // Send registration request to backend
@@ -34,37 +50,29 @@ const RegisterPage = () => {
         password: formData.password
       });
 
-      // Success response from backend
+      // Success logic
       const { username } = response.data;
-      const successMsg = `Registration successful! Welcome, ${username}!`;
-      
       setAnnouncement({ 
-        message: successMsg, 
+        message: `Registration successful! Welcome, ${username}!`, 
         isSuccess: true 
       });
 
-      // Clear form
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
+      setFormData({ username: '', email: '', password: '', confirmPassword: '' });
       setShowPlanet(true);
 
-      // Navigate to login after announcement is shown
       setTimeout(() => {
         navigate('/login');
       }, 3000);
 
     } catch (err: any) {
-      // Error response from backend
       const errorMessage = err.response?.data?.message || "Registration failed. Try again.";
       setError(errorMessage);
       setAnnouncement({ 
         message: errorMessage, 
         isSuccess: false 
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,7 +80,6 @@ const RegisterPage = () => {
     <div className="relative min-h-screen bg-slate-950 flex items-center justify-center p-4 overflow-hidden">
       <SpaceBackground showPlanet={showPlanet} />
 
-      {/* Announcement Box */}
       {announcement && (
         <AnnouncementBox
           message={announcement.message}
@@ -96,6 +103,7 @@ const RegisterPage = () => {
             <input 
               type="text"
               required
+              value={formData.username}
               placeholder="Username"
               className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               onChange={(e) => setFormData({...formData, username: e.target.value})}
@@ -107,6 +115,7 @@ const RegisterPage = () => {
             <input 
               type="email"
               required
+              value={formData.email}
               placeholder="Email (e.g. example@example.com)"
               className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -118,6 +127,7 @@ const RegisterPage = () => {
             <input 
               type="password"
               required
+              value={formData.password}
               placeholder="Password (min 8 chars)"
               className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -129,17 +139,26 @@ const RegisterPage = () => {
             <input 
               type="password"
               required
+              value={formData.confirmPassword}
               placeholder="Confirm Password"
               className="w-full bg-slate-800 border border-slate-700 rounded-xl py-3 pl-10 pr-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
             />
           </div>
 
-          {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center font-medium">{error}</div>}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center font-medium animate-shake">
+              {error}
+            </div>
+          )}
 
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-blue-900/20">
-            <UserPlus className="w-5 h-5" />
-            Register Now
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-transform active:scale-95 shadow-lg shadow-blue-900/20"
+          >
+            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
+            {loading ? "Creating Account..." : "Register Now"}
           </button>
         </form>
       </div>
