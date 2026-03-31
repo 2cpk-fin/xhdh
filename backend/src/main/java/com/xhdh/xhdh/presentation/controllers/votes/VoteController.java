@@ -27,7 +27,7 @@ public class VoteController {
     }
 
     @PostMapping
-    public ResponseEntity<VoteResponse> createVote(@RequestBody VoteRequest voteRequest) {
+    public ResponseEntity<String> createVote(@RequestBody VoteRequest voteRequest) {
         return new ResponseEntity<>(voteService.createVote(voteRequest), HttpStatus.CREATED);
     }
 

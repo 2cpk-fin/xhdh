@@ -3,31 +3,19 @@ package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.application.dto.votes.VoteRequest;
 import com.xhdh.xhdh.application.dto.votes.VoteResponse;
-import com.xhdh.xhdh.domain.models.*;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchParticipantRepository;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.VoteRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class VoteService {
-    private final VoteRepository voteRepository;
+    public final VoteRepository voteRepository;
 
-    private final UserRepository userRepository;
-
-    private final UniversityRepository universityRepository;
-
-    private final MatchRepository matchRepository;
-
-    private final MatchParticipantRepository  matchParticipantRepository;
+    private final VotePersistenceService votePersistenceService;
 
     private final LeaderboardService leaderboardService;
 
@@ -46,33 +34,12 @@ public class VoteService {
     }
 
     @Transactional
-    public VoteResponse createVote(VoteRequest voteRequest) {
-        leaderboardService.vote(voteRequest.universityId());
+    public String createVote(VoteRequest voteRequest) {
+        leaderboardService.vote(voteRequest.universityId(), String.valueOf(voteRequest.matchId()));
 
-        long userId = voteRequest.userId();
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        votePersistenceService.asyncVote(voteRequest);
 
-        long matchId = voteRequest.matchId();
-        Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-
-        long universityId = voteRequest.universityId();
-        University university = universityRepository.findById(universityId)
-                .orElseThrow(() -> new RuntimeException("University not found"));
-
-        if ("PENDING".equals(String.valueOf(match.getStatus()))) {
-            matchParticipantRepository.addVoteToUniversity(universityId, matchId);
-        }
-
-        Vote newVote = Vote.builder()
-                .user(user)
-                .university(university)
-                .match(match)
-                .voteAt(Instant.now())
-                .build();
-
-        return new VoteResponse(voteRepository.save(newVote));
+        return "Success";
     }
 
 }
