@@ -21,13 +21,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 )
 public class XhdhApplication {
 
-
 	public static void main(String[] args) {
 		Dotenv.configure()
 		.ignoreIfMissing()
 		.systemProperties()
 		.load();
+		System.out.println("JWT_SECRET từ hệ thống: " + System.getenv("JWT_SECRET"));
 		SpringApplication.run(XhdhApplication.class, args);
 	}
 
 }
+ 
