@@ -16,23 +16,29 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LeaderboardService {
 
-    private LeaderboardRepository leaderboardRepository;
+    private final LeaderboardRepository leaderboardRepository;
 
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    private static final String ZSET_KEY = "leaderboards:votes";
+    private String getMatchKey(String matchId) {
+        return "leaderboard:match:" + matchId;
+    }
 
-    public void vote(Long universityId) {
+    public void vote(Long universityId, String matchId) {
+        String key = getMatchKey(matchId);
+
         Participant p = leaderboardRepository.findById(String.valueOf(universityId))
                 .orElseThrow(() -> new RuntimeException("University not found"));
         p.setVote(p.getVote() + 1);
         leaderboardRepository.save(p);
 
-        redisTemplate.opsForZSet().incrementScore(ZSET_KEY, universityId, 1);
+        redisTemplate.opsForZSet().incrementScore(key, universityId, 1);
     }
 
-    public List<Participant> showLeaderboard() {
-        Set<Object> universityIds = redisTemplate.opsForZSet().reverseRange(ZSET_KEY, 0, -1);
+    public List<Participant> showLeaderboard(String matchId) {
+        String key = getMatchKey(matchId);
+
+        Set<Object> universityIds = redisTemplate.opsForZSet().reverseRange(key, 0, -1);
 
         List<Participant> topParticipants = new ArrayList<>();
 
@@ -40,7 +46,7 @@ public class LeaderboardService {
             Participant p = leaderboardRepository.findById(universityId.toString())
                     .orElseThrow(() -> new RuntimeException("University not found"));
 
-            Long rank = redisTemplate.opsForZSet().reverseRank(ZSET_KEY, universityId);
+            Long rank = redisTemplate.opsForZSet().reverseRank(key, universityId);
             p.setRank(rank.intValue());
             topParticipants.add(p);
         }
