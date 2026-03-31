@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService{
                     .username(request.username())
                     .password(hashedpassword)
                     .email(request.email())
-                    .createdAt(LocalDateTime.now())
+                    .createdAt(Instant.now())
                     .totalVote((long) 0)
                     .userUUID(UUID.randomUUID())
                     .build(); /*activate the construction*/
