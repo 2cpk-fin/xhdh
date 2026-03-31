@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.domain.models;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,20 +26,25 @@ public class User implements UserDetails{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Username is required")
     private String username;
 
     @NotBlank(message = "Email is required")
+    @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @Column(nullable = true)
     private String password;
 
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     private Long totalVote;
 
     private UUID userUUID;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AuthProvider authProvider = AuthProvider.LOCAL;
+
 
     @Override
     public String getUsername(){

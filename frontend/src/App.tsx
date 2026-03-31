@@ -3,6 +3,7 @@ import RegisterPage from './pages/RegisterPage'; // Check your filename/path
 import LoginPage from './pages/LoginPage';
 import DuelPage from './pages/DuelPage';
 import type React from 'react';
+import AuthCallback from './pages/AuthCallback';
 
 // 🛡️ A simple wrapper to protect private pages later
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -32,6 +33,8 @@ function App() {
           {/* Redirects */}
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="*" element={<div className="p-10 text-center">404 - Not Found</div>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+
         </Routes>
       </div>
     </BrowserRouter>
