@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,8 @@ public class MatchService {
     private final UserRepository userRepository;
 
     private final MatchmakingService matchmakingService;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private Match buildMatch(MatchRequest matchRequest) {
         Match newMatch = Match.builder()

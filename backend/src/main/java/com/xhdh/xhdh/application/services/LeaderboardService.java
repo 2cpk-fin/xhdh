@@ -6,6 +6,7 @@ import com.xhdh.xhdh.infrastructure.repositories.redis.LeaderboardRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,19 +27,15 @@ public class LeaderboardService {
 
     public void vote(Long universityId, String matchId) {
         String key = getMatchKey(matchId);
+        String member = universityId.toString();
 
-        Participant p = leaderboardRepository.findById(String.valueOf(universityId))
-                .orElseThrow(() -> new RuntimeException("University not found"));
-        p.setVote(p.getVote() + 1);
-        leaderboardRepository.save(p);
-
-        redisTemplate.opsForZSet().incrementScore(key, universityId, 1);
+        redisTemplate.opsForZSet().incrementScore(key, member, 1);
     }
 
     public List<Participant> showLeaderboard(String matchId) {
         String key = getMatchKey(matchId);
 
-        Set<Object> universityIds = redisTemplate.opsForZSet().reverseRange(key, 0, -1);
+        Set<ZSetOperations.TypedTuple<Object>> universityIds = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
         List<Participant> topParticipants = new ArrayList<>();
 
