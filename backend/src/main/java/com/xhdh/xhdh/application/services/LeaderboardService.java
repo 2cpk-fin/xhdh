@@ -27,12 +27,12 @@ public class LeaderboardService {
     public void vote(Long universityId, String matchId) {
         String key = getMatchKey(matchId);
 
+        redisTemplate.opsForZSet().incrementScore(key, universityId, 1);
+
         Participant p = leaderboardRepository.findById(String.valueOf(universityId))
-                .orElseThrow(() -> new RuntimeException("University not found"));
+            .orElseThrow(() -> new RuntimeException("University not found"));
         p.setVote(p.getVote() + 1);
         leaderboardRepository.save(p);
-
-        redisTemplate.opsForZSet().incrementScore(key, universityId, 1);
     }
 
     public List<Participant> showLeaderboard(String matchId) {
@@ -50,9 +50,6 @@ public class LeaderboardService {
             p.setRank(rank.intValue());
             topParticipants.add(p);
         }
-
         return topParticipants;
     }
-
-
 }
