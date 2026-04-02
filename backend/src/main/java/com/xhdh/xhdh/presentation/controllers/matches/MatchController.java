@@ -8,8 +8,8 @@ import com.xhdh.xhdh.application.dto.matches.SoloMatchChoiceRequest;
 import com.xhdh.xhdh.application.dto.matches.SoloMatchReport;
 import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
-import com.xhdh.xhdh.application.services.MatchService;
-import com.xhdh.xhdh.application.services.MatchmakingService;
+import com.xhdh.xhdh.application.services.ScheduleMatchService;
+import com.xhdh.xhdh.application.services.SoloMatchService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,16 +24,19 @@ import java.util.List;
 @RequestMapping(path = "/api/matches")
 @RequiredArgsConstructor
 public class MatchController {
-    private final MatchService matchService;
+
+    private final ScheduleMatchService scheduleMatchService;
+
+    private final SoloMatchService soloMatchService;
+
     private final UserRepository userRepository;
-    private final MatchmakingService matchmakingService;
     
     @PostMapping(path = "/solo/start")
-    public ResponseEntity<MatchResponseDTO> startMatch(Principal principal) {
+    public ResponseEntity<MatchResponseDTO> startSoloMatch(Principal principal) {
         String userEmail = principal.getName();
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(matchmakingService.startNewDuel(user, false));
+        return ResponseEntity.ok(soloMatchService.startNewDuel(user));
     }
 
     @PostMapping(path = "/solo/choose")
@@ -42,7 +45,7 @@ public class MatchController {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        SoloMatchReport report = matchService.chooseSoloMatch(
+        SoloMatchReport report = soloMatchService.chooseSoloMatch(
                 user.getUserUUID(),
                 choiceRequest.matchUUID(),
                 choiceRequest.universityUUID()
@@ -52,42 +55,42 @@ public class MatchController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MatchResponse>> getMatches() {
-        return new ResponseEntity<>(matchService.getAllMatches(), HttpStatus.OK);
+    public ResponseEntity<List<MatchResponse>> getAllScheduledMatches() {
+        return new ResponseEntity<>(scheduleMatchService.getAllMatches(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/not-started")
-    public ResponseEntity<List<MatchResponse>> getMatchesNotStarted() {
-        return new ResponseEntity<>(matchService.getAllNotStartedMatches(), HttpStatus.OK);
+    public ResponseEntity<List<MatchResponse>> getScheduledMatchesNotStarted() {
+        return new ResponseEntity<>(scheduleMatchService.getAllNotStartedMatches(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/pending")
-    public ResponseEntity<List<MatchResponse>> getPendingMatches() {
-        return new ResponseEntity<>(matchService.getAllPendingMatches(), HttpStatus.OK);
+    public ResponseEntity<List<MatchResponse>> getScheduledPendingMatches() {
+        return new ResponseEntity<>(scheduleMatchService.getAllPendingMatches(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/all/finished")
-    public ResponseEntity<List<MatchResponse>> getFinishedMatches() {
-        return new ResponseEntity<>(matchService.getAllFinishedMatches(), HttpStatus.OK);
+    public ResponseEntity<List<MatchResponse>> getScheduledFinishedMatches() {
+        return new ResponseEntity<>(scheduleMatchService.getAllFinishedMatches(), HttpStatus.OK);
     }
 
     @GetMapping(path = "/participants/id/{id}")
-    public ResponseEntity<List<MatchParticipantResponse>> getMatchParticipant(@PathVariable long id) {
-        return new ResponseEntity<>(matchService.getAllParticipants(id), HttpStatus.OK);
+    public ResponseEntity<List<MatchParticipantResponse>> getScheduledMatchParticipant(@PathVariable long id) {
+        return new ResponseEntity<>(scheduleMatchService.getAllParticipants(id), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<MatchResponse> createMatch(@RequestBody MatchRequest matchRequest) {
-        return new ResponseEntity<>(matchService.createMatch(matchRequest), HttpStatus.CREATED);
+    public ResponseEntity<MatchResponse> createScheduledMatch(@RequestBody MatchRequest matchRequest) {
+        return new ResponseEntity<>(scheduleMatchService.createMatch(matchRequest), HttpStatus.CREATED);
     }
 
     @PutMapping(path = "/id/{id}")
-    public ResponseEntity<MatchResponse> updateMatch(@PathVariable long id, @RequestBody MatchRequest matchRequest) {
-        return new ResponseEntity<>(matchService.updateMatchById(id, matchRequest), HttpStatus.OK);
+    public ResponseEntity<MatchResponse> updateScheduledMatch(@PathVariable long id, @RequestBody MatchRequest matchRequest) {
+        return new ResponseEntity<>(scheduleMatchService.updateMatchById(id, matchRequest), HttpStatus.OK);
     }
 
     @DeleteMapping(path = "id/{id}")
-    public ResponseEntity<String> deleteMatchById(@PathVariable long id) {
-        return new ResponseEntity<>(matchService.deleteMatchById(id), HttpStatus.OK);
+    public ResponseEntity<String> deleteScheduledMatch(@PathVariable long id) {
+        return new ResponseEntity<>(scheduleMatchService.deleteMatchById(id), HttpStatus.OK);
     }
 }
