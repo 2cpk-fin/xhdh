@@ -7,6 +7,8 @@ import java.util.List;
 
 @Getter
 public class MatchRequest {
+    private String id;
+
     private String title;
 
     private String tagName;
