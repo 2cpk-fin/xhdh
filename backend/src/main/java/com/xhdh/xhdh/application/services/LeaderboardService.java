@@ -1,5 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
+import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
 import com.xhdh.xhdh.domain.models.Participant;
 import com.xhdh.xhdh.infrastructure.repositories.redis.LeaderboardRepository;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -32,20 +34,26 @@ public class LeaderboardService {
         redisTemplate.opsForZSet().incrementScore(key, member, 1);
     }
 
-    public List<Participant> showLeaderboard(String matchId) {
+    public List<MatchParticipantResponse> showLeaderboard(String matchId) {
         String key = getMatchKey(matchId);
 
-        Set<ZSetOperations.TypedTuple<Object>> universityIds = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
+        Set<ZSetOperations.TypedTuple<Object>> participants = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
-        List<Participant> topParticipants = new ArrayList<>();
+        List<MatchParticipantResponse> topParticipants = new ArrayList<>();
 
-        for (Object universityId : universityIds) {
-            Participant p = leaderboardRepository.findById(universityId.toString())
-                    .orElseThrow(() -> new RuntimeException("University not found"));
+        for (ZSetOperations.TypedTuple<Object> participant : participants) {
+            MatchParticipantResponse participantResponse = new MatchParticipantResponse();
 
-            Long rank = redisTemplate.opsForZSet().reverseRank(key, universityId);
-            p.setRank(rank.intValue());
-            topParticipants.add(p);
+            int totalVotes = Objects.requireNonNull(participant.getScore()).intValue();
+            Object universityName = Objects.requireNonNull(participant.getValue());
+
+            Long rank = redisTemplate.opsForZSet().reverseRank(key, universityName);
+
+            participantResponse.setUniversityName(universityName.toString());
+            participantResponse.setTotalVotes(totalVotes);
+            participantResponse.setRank(rank.intValue());
+
+            topParticipants.add(participantResponse);
         }
         return topParticipants;
     }

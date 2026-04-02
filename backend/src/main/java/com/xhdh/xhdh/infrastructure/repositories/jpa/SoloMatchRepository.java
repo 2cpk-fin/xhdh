@@ -11,7 +11,7 @@ import java.util.UUID;
 @Repository
 public interface SoloMatchRepository extends JpaRepository<SoloMatch, Long> {
     Optional<SoloMatch> findByMatchUUID(UUID matchUUID);
+
     List<SoloMatch> findByOwnerUUID(UUID ownerUUID);
 
-    
 }
