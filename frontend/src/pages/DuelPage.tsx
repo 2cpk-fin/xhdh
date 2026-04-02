@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Zap, Star, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
 interface UniversityDTO {
@@ -34,11 +34,32 @@ const DuelPage = () => {
   const [error, setError] = useState('');
   const [seconds, setSeconds] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const navigate = useNavigate();
 
   const MATCH_DURATION = 180; // 3 minutes
   const remainingSeconds = Math.max(0, MATCH_DURATION - seconds);
   const countdownMinutes = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
   const countdownSeconds = (remainingSeconds % 60).toString().padStart(2, '0');
+  const handleLogout = async () => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = localStorage.getItem('accessToken'); // Grab this too!
+
+    if (refreshToken) {
+      // Ensure the keys match your LogoutRequest DTO in Java
+      await api.post('/auth/logout', { 
+        refreshToken: refreshToken,
+        accessToken: accessToken 
+      });
+    }
+  } catch (err) {
+    console.error("Logout failed", err);
+  } finally {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/login');
+  }
+};
 
   useEffect(() => {
     if (!timerActive) return;
@@ -109,9 +130,14 @@ const DuelPage = () => {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
-        <Link to="/login" className="text-slate-500 hover:text-blue-400 flex items-center gap-2 mb-6 text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Login
-        </Link>
+        {/* Replace your old Link with this */}
+      <button 
+        onClick={handleLogout}
+        className="text-slate-500 hover:text-blue-400 flex items-center gap-2 mb-6 text-sm transition-colors border-none bg-transparent cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" /> 
+        Logout & Exit
+      </button>
 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">

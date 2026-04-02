@@ -22,24 +22,40 @@ import lombok.RequiredArgsConstructor;
 public class RefreshTokenService {
     private final RedisTemplate<String,Object> redisTemplate;
     private static final String REDIS_PREFIX = "rt:";
+    private static final String USER_RT_PREFIX = "user_rt:";
     private final JwtService jwtService;
 
-    public RefreshToken createRefreshToken(User user, HttpServletRequest request){
-        RefreshToken refreshToken = RefreshToken.builder()
-                                                .userId(user.getId())
-                                                .email(user.getEmail())
-                                                .token(UUID.randomUUID().toString())
-                                                .expiryDate(Instant.now().plusSeconds(60*60*24*7))
-                                                .ipAddress(request.getRemoteAddr())
-                                                .userAgent(request.getHeader("User-Agent"))
-                                                .build();
-        
-        redisTemplate.opsForValue().set(
-            REDIS_PREFIX + refreshToken.getToken(),
-            refreshToken,
-            Duration.ofDays(7));
-        return refreshToken;
+    public RefreshToken createRefreshToken(User user, HttpServletRequest request) {
+    // 1. Force the ID to a String for consistent Key naming
+    String userIdStr = String.valueOf(user.getId());
+    String userMappingKey = USER_RT_PREFIX + userIdStr;
+    
+    // 2. Lookup existing token UUID
+    Object existingUuidObj = redisTemplate.opsForValue().get(userMappingKey);
+    
+    if (existingUuidObj != null) {
+        String existingTokenUuid = existingUuidObj.toString();
+        // Delete the old data key
+        redisTemplate.delete(REDIS_PREFIX + existingTokenUuid);
     }
+
+    // 3. Generate New Token
+    String newTokenUuid = UUID.randomUUID().toString();
+    RefreshToken refreshToken = RefreshToken.builder()
+            .userId(user.getId())
+            .email(user.getEmail())
+            .token(newTokenUuid)
+            .expiryDate(Instant.now().plus(Duration.ofDays(7)))
+            .ipAddress(request.getRemoteAddr())
+            .userAgent(request.getHeader("User-Agent"))
+            .build();
+
+    // 4. Save New Data & Update Mapping
+    redisTemplate.opsForValue().set(REDIS_PREFIX + newTokenUuid, refreshToken, Duration.ofDays(7));
+    redisTemplate.opsForValue().set(userMappingKey, newTokenUuid, Duration.ofDays(7));
+
+    return refreshToken;
+}
 
     public RefreshToken verifyRefreshToken(String token){
         RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(REDIS_PREFIX + token);
@@ -69,9 +85,26 @@ public class RefreshTokenService {
         return Optional.ofNullable(refreshToken);
     }
     
-    public void deleteRefreshToken(String token){
-        redisTemplate.delete(REDIS_PREFIX + token);
+    public void deleteRefreshToken(String token) {
+    String tokenKey = REDIS_PREFIX + token;
+    
+    // 1. Retrieve the token data so we know WHICH user this belongs to
+    RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
+    
+    if (refreshToken != null) {
+        // 2. Delete the User -> Token mapping (the "index")
+        String userMappingKey = USER_RT_PREFIX + String.valueOf(refreshToken.getUserId());
+        redisTemplate.delete(userMappingKey);
+        
+        // 3. Delete the actual Token data
+        redisTemplate.delete(tokenKey);
+        
+        System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserId());
+    } else {
+        // Fallback: Just try to delete the token key anyway if the data is already gone
+        redisTemplate.delete(tokenKey);
     }
+}
 
     public void blackListAccessToken(String accessToken){
         Date expiration = jwtService.extractExpiration(accessToken);

@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.xhdh.xhdh.application.services.RefreshTokenService;
 import com.xhdh.xhdh.domain.models.AuthProvider;
 import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -47,12 +49,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                                 .build();
                                 return userRepository.save(newuser);
     });
-    String token = jwtService.generateToken(user);
-
-    // 3. Redirect back to Frontend
+    String accesstoken = jwtService.generateToken(user);
+    var refreshToken = refreshTokenService.createRefreshToken(user, request);
+    // 3. Redirect back to Frontent
     // For local testing: http://localhost:5173/auth/callback?token=...
     // For production: https://xhdh-wine.vercel.app/auth/callback?token=...
-    String targetUrl = "https://xhdh-wine.vercel.app/auth/callback?token=" + token;
+    String targetUrl = "https://xhdh-wine.vercel.app/auth/callback?token=" + accesstoken;
     getRedirectStrategy().sendRedirect(request, response, targetUrl);         
     }
 }
