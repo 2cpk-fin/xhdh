@@ -79,7 +79,7 @@ html, body {
   }
 
   .shooting-star {
-    position: absolute;
+    position: absolute; 
     width: 340px;
     height: 2.5px;
     background: linear-gradient(to left, rgba(255,255,255,0), var(--highlight), rgba(255,255,255,0)); /* Purple Trail */

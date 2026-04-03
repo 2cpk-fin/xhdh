@@ -106,7 +106,7 @@ const HomePage = () => {
           <header className="flex justify-between items-start mb-12">
             <div>
               <h1 className={`text-5xl font-black mb-3 tracking-tight ${textColor}`}>Home Base</h1>
-              <p className="text-purple-500 font-medium text-lg">Choose your mode to begin competing.</p>
+              <p className="text-purple-500 font-medium text-lg">Choose your mode to participate.</p>
             </div>
             <button
               onClick={handleLogout}
@@ -132,7 +132,7 @@ const HomePage = () => {
                 <Trophy className="text-[var(--trophy-yellow)] opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5" />
               </div>
               <p className={`mb-6 leading-relaxed ${subTextColor}`}>
-                Practice and duel AI or recorded opponents one-on-one to sharpen your skills.
+                Decide your OWN winner in head-to-head university duels.
               </p>
               <span className="font-bold text-purple-500 flex items-center gap-2 group-hover:gap-4 transition-all">
                 Enter Solo Mode <span>→</span>
@@ -148,7 +148,7 @@ const HomePage = () => {
             >
               <h2 className={`text-2xl font-bold mb-4 ${textColor}`}>Event Mode</h2>
               <p className={`mb-6 leading-relaxed ${subTextColor}`}>
-                Join the next live event and compete with other players for exclusive rewards.
+                Join community vote events to give your favourite university for much higher elo increase.
               </p>
               <span className="font-bold text-green-500 flex items-center gap-2 group-hover:gap-4 transition-all">
                 Go to Event Mode <span>→</span>
