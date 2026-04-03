@@ -5,8 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
+import com.xhdh.xhdh.application.dto.authentication.LogoutRequest;
 import com.xhdh.xhdh.application.services.AuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -17,18 +19,18 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<com.xhdh.xhdh.application.dto.AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request){
-        return ResponseEntity.ok(authService.authenticate(request));
+    public ResponseEntity<com.xhdh.xhdh.application.dto.AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request, HttpServletRequest httpRequest){
+        return ResponseEntity.ok(authService.authenticate(request,httpRequest));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestParam String refreshToken){
-        return ResponseEntity.ok(authService.refreshToken(refreshToken));
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody String refreshToken, HttpServletRequest httpRequest){
+        return ResponseEntity.ok(authService.refreshToken(refreshToken,httpRequest));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logoutRequest(){
-        authService.logout();
+    public ResponseEntity<Void> logoutRequest(@RequestBody LogoutRequest logoutRequest){
+        authService.logout(logoutRequest);
         return ResponseEntity.ok().build();
     }
 }

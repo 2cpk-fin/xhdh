@@ -36,7 +36,6 @@ const DuelPage = () => {
   const [seconds, setSeconds] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
   useEffect(() => {
     const storedTheme = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
     setTheme(storedTheme);
@@ -49,6 +48,7 @@ const DuelPage = () => {
     window.addEventListener('themeChange', onThemeChange);
     return () => window.removeEventListener('themeChange', onThemeChange);
   }, []);
+  
 
   const MATCH_DURATION = 180; // 3 minutes
   const remainingSeconds = Math.max(0, MATCH_DURATION - seconds);
