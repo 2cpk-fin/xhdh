@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Trophy, Users, Zap, Vote, ArrowRight, ShieldCheck, School, Clock, History } from 'lucide-react';
+import { Trophy, Zap, Vote, ArrowRight, ShieldCheck, School, Clock, History } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
@@ -98,7 +98,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <h3 className={`text-2xl font-black ${textColor}`}>Your Recent Activity</h3>
-                    <p className={subTextColor}>Lịch sử bình chọn và đóng góp cá nhân của bạn.</p>
+                    <p className={subTextColor}>Your history and contribution</p>
                   </div>
                 </div>
                 <button className="text-xs font-black uppercase tracking-widest text-purple-500 hover:underline">Full History</button>
