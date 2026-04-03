@@ -8,6 +8,7 @@ import SettingsPage from './pages/SettingsPage';
 import NewsPage from './pages/NewsPage';
 import CommunityPage from './pages/CommunityPage';
 import ProfilePage from './pages/ProfilePage';
+import PlayPage from './pages/PlayPage';
 import type React from 'react';
 import AuthCallback from './pages/AuthCallback';
 
@@ -54,6 +55,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DuelPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/play" 
+            element={
+              <ProtectedRoute>
+                <PlayPage />
               </ProtectedRoute>
             } 
           />
