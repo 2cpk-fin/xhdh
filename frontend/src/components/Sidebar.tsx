@@ -15,7 +15,8 @@ const Sidebar = () => {
   }, []);
 
   const isDark = theme === 'dark';
-  const sidebarBg = isDark ? 'bg-black border-white/10' : 'bg-[#1a1a1a] border-white/5';
+  const sidebarBg = isDark ? 'bg-black border-white/10' : 'bg-white border-zinc-200 shadow-[0_2px_18px_rgba(0,0,0,0.05)]';
+  const sidebarText = isDark ? 'text-zinc-400' : 'text-zinc-700';
 
   const links = [
     { name: 'Home', icon: Home, path: '/home' },
@@ -44,7 +45,7 @@ const Sidebar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`group flex items-center gap-4 py-3 px-4 rounded-xl text-zinc-400 hover:text-white hover:bg-purple-500/10 transition-all duration-200 ${isActive ? 'text-white bg-purple-500/20' : ''}`}
+                className={`group flex items-center gap-4 py-3 px-4 rounded-xl ${isActive ? 'text-white bg-purple-500/20' : sidebarText + ' hover:text-purple-500 hover:bg-purple-500/10'} transition-all duration-200`}
               >
                 <Icon className="w-5 h-5 group-hover:text-[var(--highlight)] transition-colors" />
                 <span className="font-medium">{item.name}</span>
@@ -56,11 +57,11 @@ const Sidebar = () => {
       </div>
 
       <div className="space-y-1 border-t border-zinc-800/50 pt-6">
-        <Link to="/profile" className="group flex items-center gap-4 py-3 px-4 rounded-xl text-zinc-400 hover:text-[var(--accent-green)] hover:bg-green-500/5 transition-all">
+        <Link to="/profile" className={`group flex items-center gap-4 py-3 px-4 rounded-xl ${sidebarText} hover:text-[var(--accent-green)] hover:bg-green-500/5 transition-all`}>
           <UserCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
           <span className="font-medium">User</span>
         </Link>
-        <Link to="/settings" className="group flex items-center gap-4 py-3 px-4 rounded-xl text-zinc-400 hover:text-[var(--accent-green)] hover:bg-green-500/5 transition-all">
+        <Link to="/settings" className={`group flex items-center gap-4 py-3 px-4 rounded-xl ${sidebarText} hover:text-[var(--accent-green)] hover:bg-green-500/5 transition-all`}>
           <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform duration-500" />
           <span className="font-medium">Setting</span>
         </Link>
