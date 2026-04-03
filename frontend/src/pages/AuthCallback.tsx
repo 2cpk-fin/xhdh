@@ -10,7 +10,7 @@ useEffect(() => {
   
   if (token) {
     localStorage.setItem('token', token);
-    navigate('/duel');
+    navigate('/home');
   } else {
     navigate('/login?error=oauth_failed');
   }

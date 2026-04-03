@@ -1,15 +1,36 @@
 @import "tailwindcss";
 
+:root {
+  /* YOUR NEW PALETTE - LIGHT MODE */
+  --bg: #f8fafc;
+  --text: #2D3436;         /* Dark Charcoal */
+  --divider: #E8F5E9;      /* Light Green */
+  --highlight: #6C5CE7;    /* Purple */
+  --accent-green: #10b981;
+  --trophy-yellow: #facc15;
+}
+
+[data-theme='dark'], .dark-mode {
+  /* YOUR NEW PALETTE - DARK MODE */
+  --bg: #0a0a0a;           /* Deep Black */
+  --text: #f1f5f9;         /* Soft White */
+  --divider: #1B3022;      /* Deep Forest Green */
+  --highlight: #a78bfa;    /* Lighter Purple */
+  --accent-green: #34d399;
+  --trophy-yellow: #facc15;
+}
+
+html, body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
 @layer utilities {
+  /* Original Animations Kept */
   @keyframes slideInBottom {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .animate-slide-in-bottom {
@@ -33,13 +54,9 @@
     100% { opacity: 0; transform: translate3d(-1900px, 350px, 0) scale(1.2); }
   }
 
-  @keyframes planetAppear {
-    from { opacity: 0; transform: translateY(20px) scale(0.9); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
-
+  /* Updated Space Background to use Purple/Dark tones */
   .space-background {
-    background: radial-gradient(circle at center, #020320 0%, #050717 30%, #01020f 90%);
+    background: radial-gradient(circle at center, #0f051a 0%, #050717 30%, #000000 90%);
     background-size: 200% 200%;
     animation: animateNebula 25s linear infinite;
     z-index: 0;
@@ -53,7 +70,7 @@
 
   .star {
     position: absolute;
-    background: linear-gradient(to right, #fff, #d6d6d6);
+    background: linear-gradient(to right, #fff, var(--divider)); /* Uses your Green divider tint */
     border-radius: 50%;
     animation: starTwinkle 1.2s ease-in-out infinite alternate, starMove 1.9s linear infinite;
     opacity: 0.95;
@@ -65,33 +82,22 @@
     position: absolute;
     width: 340px;
     height: 2.5px;
-    background: linear-gradient(to left, rgba(255,255,255,0), rgba(255,255,255,1), rgba(255,255,255,0));
-    filter: drop-shadow(0 0 18px rgba(255,255,255,1));
+    background: linear-gradient(to left, rgba(255,255,255,0), var(--highlight), rgba(255,255,255,0)); /* Purple Trail */
+    filter: drop-shadow(0 0 18px var(--highlight));
     border-radius: 999px;
     animation: shootingStar linear infinite;
   }
 
-  .planet-overlay {
-    position: absolute;
-    right: -200px;
-    top: -240px;
-    width: 900px;
-    height: 600px;
-    overflow: visible;
-    animation: planetAppear 0.8s ease-out forwards;
-    pointer-events: none;
-    z-index: 5;
-  }
-
+  /* Planet Overlay Adjustments */
   .planet-glow {
     position: absolute;
     right: -140px;
     top: 120px;
     width: 700px;
     height: 700px;
-    transform: translate(0, 0);
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(143,197,255,0.6) 0%, rgba(29,130,242,0.16) 60%, rgba(1,12,25,0) 100%);
+    /* Use Green/Purple glow to match the cards */
+    background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(16, 185, 129, 0.1) 60%, transparent 100%);
     filter: blur(22px);
   }
 
@@ -102,89 +108,31 @@
     width: 640px;
     height: 380px;
     border-radius: 50% 50% 65% 60%;
-    transform: translate(0, 0);
+    /* Using Dark/Purple theme for the planet body */
     background: 
-      radial-gradient(ellipse 140px 100px at 35% 30%, rgba(90, 140, 180, 0.4) 0%, transparent 70%),
-      radial-gradient(ellipse 120px 80px at 75% 60%, rgba(50, 90, 140, 0.3) 0%, transparent 70%),
-      linear-gradient(180deg, #506d8f 0%, #29405f 28%, #0a1b2f 68%, #051126 100%);
+      radial-gradient(ellipse 140px 100px at 35% 30%, rgba(108, 92, 231, 0.2) 0%, transparent 70%),
+      linear-gradient(180deg, #1e1b4b 0%, #0f172a 28%, #020617 68%, #000000 100%);
     box-shadow: 
-      inset 0 40px 30px rgba(255,255,255,0.18), 
-      inset 0 -15px 22px rgba(0,0,0,0.7),
-      inset -30px 20px 40px rgba(200,220,255,0.08);
-    border: 3px solid rgba(188,219,255,0.32);
+      inset 0 40px 30px rgba(167, 139, 250, 0.1), 
+      inset 0 -15px 22px rgba(0,0,0,0.7);
+    border: 3px solid var(--divider);
   }
 
-  .planet-surface::before,
-  .planet-surface::after {
-    content: '';
+  /* Craters kept as they are for texture */
+  .planet-surface .crater, .planet-surface::before, .planet-surface::after {
     position: absolute;
     border-radius: 50%;
     background: radial-gradient(circle at 30% 30%, rgba(0,0,0,0.4), rgba(18,23,40,0.7) 50%);
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.6), inset -2px -2px 5px rgba(255,255,255,0.08);
   }
 
-  .planet-surface::before {
-    width: 85px;
-    height: 85px;
-    right: 18%;
-    top: 18%;
-  }
-
-  .planet-surface::after {
-    width: 62px;
-    height: 62px;
-    right: 42%;
-    top: 38%;
-  }
-
-  .planet-surface .crater {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(0,0,0,0.38), rgba(18,23,40,0.68) 50%);
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.5), inset -1px -1px 3px rgba(255,255,255,0.06);
-  }
-
-  .crater-1 {
-    width: 48px;
-    height: 48px;
-    right: 30%;
-    top: 65%;
-  }
-
-  .crater-2 {
-    width: 35px;
-    height: 35px;
-    right: 56%;
-    top: 28%;
-  }
-
-  .crater-3 {
-    width: 42px;
-    height: 42px;
-    right: 24%;
-    top: 52%;
-  }
-
-  .crater-4 {
-    width: 28px;
-    height: 28px;
-    right: 68%;
-    top: 55%;
-  }
-
-  .crater-5 {
-    width: 38px;
-    height: 38px;
-    right: 45%;
-    top: 72%;
-  }
-
-  .crater-6 {
-    width: 26px;
-    height: 26px;
-    right: 78%;
-    top: 40%;
-  }
-
-
+  /* Original Crater positions maintained */
+  .planet-surface::before { width: 85px; height: 85px; right: 18%; top: 18%; content: ''; }
+  .planet-surface::after { width: 62px; height: 62px; right: 42%; top: 38%; content: ''; }
+  .crater-1 { width: 48px; height: 48px; right: 30%; top: 65%; }
+  .crater-2 { width: 35px; height: 35px; right: 56%; top: 28%; }
+  .crater-3 { width: 42px; height: 42px; right: 24%; top: 52%; }
+  .crater-4 { width: 28px; height: 28px; right: 68%; top: 55%; }
+  .crater-5 { width: 38px; height: 38px; right: 45%; top: 72%; }
+  .crater-6 { width: 26px; height: 26px; right: 78%; top: 40%; }
 }

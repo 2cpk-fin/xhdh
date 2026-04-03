@@ -34,6 +34,20 @@ const DuelPage = () => {
   const [error, setError] = useState('');
   const [seconds, setSeconds] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const storedTheme = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
+    setTheme(storedTheme);
+
+    const onThemeChange = () => {
+      const updatedTheme = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
+      setTheme(updatedTheme);
+    };
+
+    window.addEventListener('themeChange', onThemeChange);
+    return () => window.removeEventListener('themeChange', onThemeChange);
+  }, []);
 
   const MATCH_DURATION = 180; // 3 minutes
   const remainingSeconds = Math.max(0, MATCH_DURATION - seconds);
@@ -69,13 +83,23 @@ const DuelPage = () => {
     try {
       const response = await api.post('/matches/solo/start');
       setCurrentMatch(response.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to start duel');
+    } catch (err: unknown) {
+      const maybeError = err as ApiError;
+      const message = maybeError.response?.data?.message ?? 'Failed to start duel';
+      setError(message);
       setTimerActive(false);
     } finally {
       setLoading(false);
     }
   };
+
+  interface ApiError {
+    response?: {
+      data?: {
+        message?: string;
+      };
+    };
+  }
 
   const chooseUniversity = async (universityId: string) => {
     if (!currentMatch) return;
@@ -90,8 +114,10 @@ const DuelPage = () => {
       setMatchResult(response.data);
       // Keep currentMatch for result display, clear it on reset
       setTimerActive(false);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to make choice');
+    } catch (err: unknown) {
+      const maybeError = err as ApiError;
+      const message = maybeError.response?.data?.message ?? 'Failed to make choice';
+      setError(message);
       setTimerActive(false);
     } finally {
       setLoading(false);
@@ -106,21 +132,28 @@ const DuelPage = () => {
     setSeconds(0);
   };
 
+  const isDark = theme === 'dark';
+  const bgClass = isDark ? 'bg-black text-white' : 'bg-white text-black';
+  const cardClass = isDark ? 'bg-black/80 border border-purple-500/30' : 'bg-white border border-black/10';
+  const titleColor = isDark ? 'text-yellow-500' : 'text-yellow-500';
+  const subtitleColor = isDark ? 'text-purple-200' : 'text-purple-700';
+  const textColor = isDark ? 'text-white' : 'text-black';
+
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+    <div className={`min-h-screen flex items-center justify-center p-4 ${bgClass}`}>
       <div className="max-w-4xl w-full">
-        <Link to="/login" className="text-slate-500 hover:text-blue-400 flex items-center gap-2 mb-6 text-sm transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Login
+        <Link to="/home" className={`flex items-center gap-2 mb-6 text-sm transition-colors ${isDark ? 'text-black-300 hover:text-purple-300' : 'text-black-700 hover:text-purple-700'}`}>
+          <ArrowLeft className="w-4 h-4" /> Back to Home
         </Link>
 
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center justify-center gap-3">
-            <Trophy className="w-10 h-10 text-yellow-500" />
+          <h1 className={`text-4xl font-bold ${titleColor} mb-2 flex items-center justify-center gap-3`}>
+            <Trophy className="w-10 h-10 text-black-400" />
             University Duel
           </h1>
-          <p className="text-slate-400 text-lg">Choose the university you think will win!</p>
+          <p className={`${subtitleColor} text-lg`}>Choose the university you think will win!</p>
           <div className="mt-4">
-              <span className="bg-slate-800 px-3 py-1.5 rounded-full text-slate-100">
+              <span className={`${cardClass} px-3 py-1.5 rounded-full ${textColor}`}>
                 Match ends in: {countdownMinutes}:{countdownSeconds}
               </span>
           </div>
@@ -163,7 +196,7 @@ const DuelPage = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-stretch gap-6">
               {/* University 1 */}
-              <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl hover:border-blue-500/50 transition-colors flex flex-col">
+              <div className={`${cardClass} p-8 rounded-3xl shadow-2xl hover:border-blue-500/50 transition-colors flex flex-col`}>
                 <div className="text-center mb-6 flex-1">
                   <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Star className="w-10 h-10 text-white" />
@@ -192,7 +225,7 @@ const DuelPage = () => {
               </div>
 
               {/* University 2 */}
-              <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl hover:border-red-500/50 transition-colors flex flex-col">
+              <div className={`${cardClass} p-8 rounded-3xl shadow-2xl hover:border-red-500/50 transition-colors flex flex-col`}>
                 <div className="text-center mb-6 flex-1">
                   <div className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Star className="w-10 h-10 text-white" />
@@ -218,7 +251,7 @@ const DuelPage = () => {
 
         {matchResult && currentMatch && (
           <div className="text-center space-y-6">
-            <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-2xl max-w-2xl mx-auto">
+            <div className={`${cardClass} p-8 rounded-3xl shadow-2xl max-w-2xl mx-auto`}>
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Trophy className="w-8 h-8 text-white" />
               </div>
