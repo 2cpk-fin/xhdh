@@ -19,7 +19,6 @@ const ProfilePage = () => {
   const bgMain = isDark ? 'bg-[#0a0a0a]' : 'bg-[#f8fafc]';
   const cardBg = isDark ? 'bg-[#121212] border-zinc-800' : 'bg-white border-zinc-200';
   const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
-  const subTextColor = isDark ? 'text-zinc-400' : 'text-zinc-500';
 
   return (
     <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
