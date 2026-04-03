@@ -2,20 +2,13 @@ package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
 import com.xhdh.xhdh.application.dto.matches.MatchRequest;
-import com.xhdh.xhdh.application.dto.matches.SoloMatchReport;
 import com.xhdh.xhdh.application.dto.matches.MatchResponse;
 import com.xhdh.xhdh.domain.models.Match;
-import com.xhdh.xhdh.domain.models.SoloMatch;
-import com.xhdh.xhdh.domain.models.User;
 import com.xhdh.xhdh.domain.models.MatchParticipant;
 import com.xhdh.xhdh.domain.models.Status;
 import com.xhdh.xhdh.domain.models.University;
-import com.xhdh.xhdh.application.utilities.EloCalculator;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchParticipantRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.SoloMatchRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
-import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +18,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,15 +82,57 @@ public class ScheduleMatchService {
     }
 
     private void updateEloToParticipants(Match match) {
-        int minRank = 1000;
-        List<University> universityList = new ArrayList<>();
+        List<MatchParticipant> participants = match.getParticipants();
+        if (participants == null || participants.isEmpty()) return;
 
-        for (MatchParticipant participant : match.getParticipants()) {
-            minRank = Math.min(minRank, participant.getRank());
-            universityList.add(participant.getUniversity());
+        // 1. Sort participants by rank (ascending: 1 is best)
+        participants.sort(Comparator.comparingInt(MatchParticipant::getRank));
+
+        int total = participants.size();
+        int firstGroupSize = total / 3;
+
+        // In case of small numbers, ensure we have at least 1 in each group if possible
+        int lastGroupSize = total - firstGroupSize;
+
+        // 2. Define base reward
+        // We want Sum(G1) + Sum(G3) = 0.
+        // Let's say base change is 20 points.
+        double baseReward = 20.0;
+
+        for (int i = 0; i < total; i++) {
+            MatchParticipant participant = participants.get(i);
+            University university = participant.getUniversity();
+            int currentElo = university.getElo();
+            double eloChange = 0;
+
+            if (i < firstGroupSize) {
+                // GROUP 1: Increase
+                eloChange = baseReward;
+
+                // Apply Rank Multiplier for Top 1
+                if (i == 0) { // Top 1
+                    eloChange *=  1.5;
+                }
+                else {
+                    // Scaling multiplier from 1.4 down to 1.1 for the rest of Group 1
+                    double multiplier = 1.0 + (0.5 * (double)(firstGroupSize - i) / firstGroupSize);
+                    eloChange *= Math.max(1.0, multiplier);
+                }
+            }
+            else if (i >= lastGroupSize) {
+                // GROUP 3: Decrease
+                // To satisfy Sum = 0, Group 3 total must equal Group 1 total
+                // We calculate the proportional drain here
+                eloChange = -baseReward;
+
+                // Rank logic: Lower rank (worst) is unchanged (multiplier 1.0)
+                // Higher rank within Group 3 gets hit slightly harder?
+                // Or keep it simple as per your request: Lowest is unchanged (x1.0)
+            }
+
+            university.setElo((int) (currentElo + eloChange));
+            universityRepository.save(university);
         }
-
-        // Algo in here
     }
 
     @Scheduled(fixedRate = 3600000)

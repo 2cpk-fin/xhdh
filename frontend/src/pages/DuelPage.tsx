@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Zap, Star, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Sidebar from '../components/Sidebar';
 import api from '../api/axios';
 
 interface UniversityDTO {
@@ -140,11 +141,13 @@ const DuelPage = () => {
   const textColor = isDark ? 'text-white' : 'text-black';
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${bgClass}`}>
-      <div className="max-w-4xl w-full">
-        <Link to="/home" className={`flex items-center gap-2 mb-6 text-sm transition-colors ${isDark ? 'text-black-300 hover:text-purple-300' : 'text-black-700 hover:text-purple-700'}`}>
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
+    <div className={`min-h-screen flex transition-colors duration-300 ${bgClass}`}>
+      <Sidebar />
+      <main className="flex-1 p-4">
+        <div className="max-w-4xl w-full mx-auto">
+          <Link to="/home" className={`flex items-center gap-2 mb-6 text-sm transition-colors ${isDark ? 'text-black-300 hover:text-purple-300' : 'text-black-700 hover:text-purple-700'}`}>
+            <ArrowLeft className="w-4 h-4" /> Back to Home
+          </Link>
 
         <div className="text-center mb-8">
           <h1 className={`text-4xl font-bold ${titleColor} mb-2 flex items-center justify-center gap-3`}>
@@ -311,7 +314,8 @@ const DuelPage = () => {
           </div>
         )}
       </div>
-    </div>
+    </main>
+  </div>
   );
 };
 

@@ -2,7 +2,6 @@ package com.xhdh.xhdh.presentation.controllers.matches;
 
 import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
 import com.xhdh.xhdh.application.services.LeaderboardService;
-import com.xhdh.xhdh.domain.models.Participant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

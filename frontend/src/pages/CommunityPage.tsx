@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Users, MessageSquare, Trophy, ArrowLeft } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
 
 const CommunityPage = () => (
   <div className="min-h-screen flex bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
+    <Sidebar />
     <main className="flex-1 p-10 flex justify-center">
       <div className="max-w-4xl w-full bg-[var(--bg)] border border-[var(--divider)] rounded-3xl p-10 shadow-2xl">
         <div className="flex items-center gap-4 mb-8">

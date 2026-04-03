@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import Sidebar from '../components/Sidebar';
 
 const EventPage = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
@@ -19,9 +20,11 @@ const EventPage = () => {
   const cardClass = isDark ? 'bg-black/80 border border-purple-500/30' : 'bg-white border border-black/10';
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-6 ${bgClass}`}>
-      <div className={`${cardClass} rounded-2xl p-8 shadow-xl max-w-2xl w-full`}>
-        <h1 className="text-3xl font-bold mb-4 text-black-600">Event Mode</h1>
+    <div className={`min-h-screen flex transition-colors duration-300 ${bgClass}`}>
+      <Sidebar />
+      <main className="flex-1 p-6">
+        <div className={`${cardClass} rounded-2xl p-8 shadow-xl max-w-2xl w-full`}>
+          <h1 className="text-3xl font-bold mb-4 text-black-600">Event Mode</h1>
         <p className={`${isDark ? 'text-black-200' : 'text-black-800'} mb-6`}>
           Event mode is coming soon! Check in later for scheduled competitions, live leaderboards, and tournament formats.
         </p>
@@ -32,7 +35,8 @@ const EventPage = () => {
           Back to Home
         </Link>
       </div>
-    </div>
+    </main>
+  </div>
   );
 };
 
