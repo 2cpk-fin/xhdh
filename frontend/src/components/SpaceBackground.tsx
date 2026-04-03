@@ -35,7 +35,7 @@ const SpaceBackground: React.FC<SpaceBackgroundProps> = ({ showPlanet = false })
           style={{
             top: `${random(5, 80)}%`,
             left: `${random(-30, 110)}%`,
-            animationDelay: `${random(0, 7)}s`,
+            animationDelay: `${random(0, 0)}s`,
             animationDuration: `${random(0.5, 1.1)}s`,
             opacity: random(0.7, 1),
             transform: `scale(${random(0.2, 0.9)})`,

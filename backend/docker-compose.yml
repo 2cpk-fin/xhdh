@@ -27,9 +27,9 @@ services:
       xhdh-redis:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: ${DB_URL}
-      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      DB_URL: ${DB_URL}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
       
       SPRING_DATA_REDIS_HOST: xhdh-redis
       SPRING_DATA_REDIS_PORT: 6379

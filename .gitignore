@@ -1,12 +1,14 @@
 newupdate.md
 ws.md
 README.md
+xhdh.iml
+
 # Root ignore
 .idea/
 *.iml
 target/
 **/target/
-
+.vscode/
 # Frontend ignore
 frontend/node_modules/
 frontend/dist/

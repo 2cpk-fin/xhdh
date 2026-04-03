@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Zap, Star, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 
 interface UniversityDTO {
@@ -35,7 +35,7 @@ const DuelPage = () => {
   const [seconds, setSeconds] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
+  const navigate = useNavigate();
   useEffect(() => {
     const storedTheme = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
     setTheme(storedTheme);
@@ -48,11 +48,32 @@ const DuelPage = () => {
     window.addEventListener('themeChange', onThemeChange);
     return () => window.removeEventListener('themeChange', onThemeChange);
   }, []);
+  
 
   const MATCH_DURATION = 180; // 3 minutes
   const remainingSeconds = Math.max(0, MATCH_DURATION - seconds);
   const countdownMinutes = Math.floor(remainingSeconds / 60).toString().padStart(2, '0');
   const countdownSeconds = (remainingSeconds % 60).toString().padStart(2, '0');
+  const handleLogout = async () => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = localStorage.getItem('accessToken'); // Grab this too!
+
+    if (refreshToken) {
+      // Ensure the keys match your LogoutRequest DTO in Java
+      await api.post('/auth/logout', { 
+        refreshToken: refreshToken,
+        accessToken: accessToken 
+      });
+    }
+  } catch (err) {
+    console.error("Logout failed", err);
+  } finally {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    navigate('/login');
+  }
+};
 
   useEffect(() => {
     if (!timerActive) return;

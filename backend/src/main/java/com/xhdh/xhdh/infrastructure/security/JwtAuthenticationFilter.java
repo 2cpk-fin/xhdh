@@ -1,5 +1,6 @@
 package com.xhdh.xhdh.infrastructure.security;
 
+import com.xhdh.xhdh.application.services.RefreshTokenService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ import java.io.IOException;
 @Slf4j // Uses Lombok to provide 'log' object
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
@@ -42,6 +44,11 @@ protected void doFilterInternal(
     }
 
     final String jwt = authHeader.substring(7).trim();
+
+    if(refreshTokenService.isAccessTokenBlacklisted(jwt)){
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        return;
+    }
     
     try {
         final String userEmail = jwtService.extractUsername(jwt);
