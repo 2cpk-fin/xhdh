@@ -80,8 +80,10 @@ const RegisterPage = () => {
         navigate('/login');
       }, 3000);
 
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Registration failed. Try again.";
+    } catch (err: unknown) {
+      type ApiError = { response?: { data?: { message?: string } } };
+      const maybeError = err as ApiError;
+      const errorMessage = maybeError.response?.data?.message || "Registration failed. Try again.";
       setError(errorMessage);
       setAnnouncement({ 
         message: errorMessage, 

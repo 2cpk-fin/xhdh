@@ -54,13 +54,15 @@ const LoginPage = () => {
         setShowPlanet(true);
 
         setTimeout(() => {
-          navigate('/duel');
+          navigate('/home');
         }, 1200);
       } else {
         throw new Error('Login failed: token or refresh token missing.');
       }
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Invalid credentials.';
+    } catch (err: unknown) {
+      type ApiError = { response?: { data?: { message?: string } } };
+      const maybeError = err as ApiError;
+      const errorMessage = maybeError.response?.data?.message || 'Invalid credentials.';
       setError(errorMessage);
       setAnnouncement({ message: errorMessage, isSuccess: false });
     }
