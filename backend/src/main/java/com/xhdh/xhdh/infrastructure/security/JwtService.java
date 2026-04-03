@@ -2,10 +2,10 @@ package com.xhdh.xhdh.infrastructure.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,43 +22,55 @@ import org.springframework.security.core.userdetails.UserDetails;
 public class JwtService {
 
     @Value("${jwt.secret}")
-
     private String jwtSecret;
 
     @Value("${jwt.expiry}")
-
-    private long jwtExpiry;    
-
-
-
-    public SecretKey getSecretKey(){
-
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-
-        return Keys.hmacShaKeyFor(keyBytes);
-
-    }
+    private long jwtExpiry;
 
     public String generateToken(UserDetails userDetails){
-
-        return generateToken(new HashMap<>() , userDetails);
-
-    }
-
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
-
+        Map <String, Object> claims =  new HashMap<>();
         return Jwts.builder()
-                    .setClaims(extraClaims)
-                    .setSubject(userDetails.getUsername())
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + jwtExpiry))
-                    .signWith(getSecretKey(), SignatureAlgorithm.HS256)
-                    .compact();
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiry))
+                .signWith(getKey())
+                .compact();
     }
-    
+
+    // Validates the token
+    // Checks if user is an authenticate one and using the token is the one that was generated and sent to the user.
+    // Token is parsed for the claims such as username, roles, authorities, validity period etc.
+    public Boolean validateJwtToken(String token, UserDetails userDetails) {
+        final String username = getUsernameFromToken(token);
+        final Claims claims = Jwts
+                .parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token).getBody();
+        boolean isTokenExpired = claims.getExpiration().before(new Date());
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired;
+    }
+
+    // get the username by checking subject of JWT Token
+    public String getUsernameFromToken(String token) {
+        final Claims claims = Jwts
+                .parserBuilder()
+                .setSigningKey(getKey())
+                .build()
+                .parseClaimsJws(token).getBody();
+        return claims.getSubject();
+    }
+
+    // create a signing key based on secret
+    private Key getKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
     public Claims extractAllClaims(String token){
         return Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())
+                    .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -72,8 +84,6 @@ public class JwtService {
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
     }
-
-
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         final String email = extractUsername(token);
