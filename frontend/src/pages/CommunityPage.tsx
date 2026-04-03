@@ -17,7 +17,6 @@ const CommunityPage = () => {
 
   const isDark = theme === 'dark';
   // Standardizing the glass look
-  const bgMain = isDark ? 'bg-[#0a0a0a]/40' : 'bg-[#f8fafc]/40';
   const cardBg = isDark 
     ? 'bg-[#121212]/70 backdrop-blur-xl border-white/10 shadow-2xl' 
     : 'bg-white/80 backdrop-blur-md border-zinc-200 shadow-xl shadow-blue-500/5';
