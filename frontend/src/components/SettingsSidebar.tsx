@@ -1,8 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Gamepad2, Newspaper, Users, Settings, Search, Smile, HelpCircle, LogOut, Moon, Sun, ExternalLink, Bell, Mail, Languages } from 'lucide-react';
+import { Settings, Search, Moon, Sun, Bell, Mail, Users, ArrowLeft, Activity, Cpu, ShieldCheck, Smile, HelpCircle, LogOut, ExternalLink, Languages } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
-const Sidebar = () => {
+const SettingsSidebar = () => {
     const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
     const [lang, setLang] = useState<'EN' | 'VI'>(() => (localStorage.getItem('lang') as 'EN' | 'VI') ?? 'EN');
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -46,12 +46,12 @@ const Sidebar = () => {
     const popoverBg = isDark ? 'bg-[#121212] border-zinc-800' : 'bg-white border-zinc-200 shadow-2xl';
     const searchBg = isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200';
 
-    const links = [
-        { name: 'Home', icon: Home, path: '/home' },
-        { name: 'Search', icon: Search, path: '/search' },
-        { name: 'Play', icon: Gamepad2, path: '/play' },
-        { name: 'News', icon: Newspaper, path: '/news' },
-        { name: 'Community', icon: Users, path: '/community' },
+    const settingsLinks = [
+        { name: 'Back', icon: ArrowLeft, path: '/home', isBack: true },
+        { name: 'General', icon: Settings, path: '/settings/general' },
+        { name: 'Activity', icon: Activity, path: '/settings/activity' },
+        { name: 'System', icon: Cpu, path: '/settings/system' },
+        { name: 'Authentication', icon: ShieldCheck, path: '/settings/auth' },
     ];
 
     return (
@@ -66,7 +66,7 @@ const Sidebar = () => {
             </div>
 
             <nav className="flex-1 space-y-1 overflow-y-auto no-scrollbar">
-                {links.map((item) => {
+                {settingsLinks.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.path;
                     return (
@@ -76,10 +76,12 @@ const Sidebar = () => {
                             className={`group flex items-center gap-4 py-3.5 px-4 rounded-xl transition-all duration-200 ${
                                 isActive
                                     ? 'text-white bg-purple-500/20 shadow-inner'
-                                    : sidebarText + ' hover:text-purple-500 hover:bg-purple-500/10'
+                                    : item.isBack
+                                        ? 'text-purple-500 hover:bg-purple-500/10 mb-4'
+                                        : sidebarText + ' hover:text-purple-500 hover:bg-purple-500/10'
                             }`}
                         >
-                            <Icon className={`w-5 h-5 ${isActive ? 'text-purple-400' : 'group-hover:text-purple-400'} transition-colors`} />
+                            <Icon className={`w-5 h-5 ${isActive ? 'text-purple-400' : item.isBack ? 'text-purple-500' : 'group-hover:text-purple-400'} transition-colors`} />
                             <span className="font-bold text-sm">{item.name}</span>
                             {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_8px_rgba(167,139,250,0.8)]" />}
                         </Link>
@@ -174,4 +176,4 @@ const Sidebar = () => {
     );
 };
 
-export default Sidebar;
+export default SettingsSidebar;
