@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Sun, Moon, Shield, Palette, Bell, Settings, Zap, Volume2, Eye, User, Lock, Globe, CheckCircle2 } from 'lucide-react';
+import { Sun, Moon, Shield, Palette, Bell, Volume2, User, Lock, Globe, CheckCircle2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 
