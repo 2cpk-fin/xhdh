@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Home, Gamepad2, Newspaper, Users, UserCircle, Settings, Trophy, LogOut } from 'lucide-react';
+import api from '../api/axios';
 
 const HomePage = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
@@ -24,10 +25,26 @@ const HomePage = () => {
   const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
   const subTextColor = isDark ? 'text-zinc-400' : 'text-zinc-500';
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
+    const handleLogout = async () => {
+  try {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = localStorage.getItem('accessToken'); // Grab this too!
+
+    if (refreshToken) {
+      // Ensure the keys match your LogoutRequest DTO in Java
+      await api.post('/auth/logout', { 
+        refreshToken: refreshToken,
+        accessToken: accessToken 
+      });
+    }
+  } catch (err) {
+    console.error("Logout failed", err);
+  } finally {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     navigate('/login');
-  };
+  }
+};
 
   return (
     <div className={`min-h-screen flex transition-colors duration-300 ${bgMain}`}>
