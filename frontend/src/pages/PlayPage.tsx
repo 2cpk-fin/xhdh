@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Gamepad2, Sparkles, Trophy, Target, Zap, ChevronRight, BookOpen, BarChart3, Star } from 'lucide-react';
+import { Gamepad2, Sparkles, Target, Zap, ChevronRight, BookOpen, BarChart3, Star } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
