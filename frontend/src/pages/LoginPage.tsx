@@ -16,11 +16,16 @@ const GoogleIcon = () => (
 const LoginPage = () => {
   const navigate = useNavigate();
   const [isExiting, setIsExiting] = useState(false);
+  const [isAnimateIn, setIsAnimateIn] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [announcement, setAnnouncement] = useState<{ message: string; isSuccess: boolean } | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
 
   useEffect(() => {
+    requestAnimationFrame(() => {
+      setIsAnimateIn(true);
+    });
+
     const syncTheme = () => {
       const fromStorage = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
       setTheme(fromStorage);
@@ -157,7 +162,8 @@ const LoginPage = () => {
             <AnnouncementBox message={announcement.message} isSuccess={announcement.isSuccess} duration={4000} onDismiss={() => setAnnouncement(null)} />
         )}
 
-        <div className={`w-full flex justify-start px-12 lg:px-64 z-10 transition-all duration-700 ease-in-out ${isExiting ? 'translate-x-[-100%] opacity-0' : 'translate-x-0 opacity-100'}`}>
+        <div className={`w-full flex justify-start px-12 lg:px-64 z-10 transition-all duration-1000 ease-in-out 
+          ${isExiting ? 'translate-x-[-100%] opacity-0' : isAnimateIn ? 'translate-x-0 opacity-100' : 'translate-x-[-100%] opacity-0'}`}>
           <div className={`max-w-md w-full rounded-[2.5rem] border p-10 relative transition-all duration-300 ${cardBg}`}>
             <button onClick={toggleTheme} className={`absolute top-8 right-8 p-3 rounded-xl border transition-all active:scale-95 ${isDark ? 'bg-white/5 border-zinc-800 text-yellow-500' : 'bg-zinc-50 border-zinc-200 text-purple-600'}`}>
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
