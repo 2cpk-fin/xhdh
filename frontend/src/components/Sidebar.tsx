@@ -11,11 +11,18 @@ const Sidebar = () => {
     const menuRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const onThemeChange = () => {
+        const syncTheme = () => {
             const fromStorage = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
             setTheme(fromStorage);
+            if (fromStorage === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         };
-        window.addEventListener('themeChange', onThemeChange);
+
+        window.addEventListener('themeChange', syncTheme);
+        syncTheme();
 
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -24,7 +31,7 @@ const Sidebar = () => {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
-            window.removeEventListener('themeChange', onThemeChange);
+            window.removeEventListener('themeChange', syncTheme);
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
@@ -32,6 +39,13 @@ const Sidebar = () => {
     const toggleTheme = (newTheme: 'light' | 'dark') => {
         localStorage.setItem('theme', newTheme);
         setTheme(newTheme);
+
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
         window.dispatchEvent(new Event('themeChange'));
     };
 
@@ -42,8 +56,8 @@ const Sidebar = () => {
 
     const isDark = theme === 'dark';
     const sidebarBg = isDark ? 'bg-black border-white/10' : 'bg-white border-zinc-200 shadow-[0_2px_18px_rgba(0,0,0,0.05)]';
-    const sidebarText = isDark ? 'text-zinc-400' : 'text-zinc-700';
-    const popoverBg = isDark ? 'bg-[#121212] border-zinc-800' : 'bg-white border-zinc-200 shadow-2xl';
+    const sidebarText = isDark ? 'text-zinc-100' : 'text-zinc-700'; // Đổi zinc-400 thành zinc-100 cho sáng hơn
+    const popoverBg = isDark ? 'bg-[#121212] border-zinc-800 shadow-[0_0_30px_rgba(0,0,0,0.5)]' : 'bg-white border-zinc-200 shadow-2xl';
     const searchBg = isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200';
 
     const links = [
@@ -57,7 +71,7 @@ const Sidebar = () => {
     return (
         <aside className={`w-64 h-screen sticky top-0 p-6 flex flex-col border-r transition-all duration-300 z-[100] ${sidebarBg}`}>
             <div className="relative mb-8 group">
-                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${isDark ? 'text-zinc-600 group-focus-within:text-purple-500' : 'text-zinc-400 group-focus-within:text-purple-500'}`} />
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${isDark ? 'text-zinc-500 group-focus-within:text-purple-500' : 'text-zinc-400 group-focus-within:text-purple-500'}`} />
                 <input
                     type="text"
                     placeholder="Find..."
@@ -96,7 +110,7 @@ const Sidebar = () => {
                 >
                     <div className="w-9 h-9 rounded-xl overflow-hidden border border-emerald-500/20 group-hover:border-emerald-500 transition-colors">
                         <img
-                            src={`https://ui-avatars.com/api/?name=Long+Khanh&background=${isDark ? '18181b' : '10b981'}&color=fff`}
+                            src={`https://ui-avatars.com/api/?name=Tester&background=${isDark ? '18181b' : '10b981'}&color=fff`}
                             alt="Avatar"
                             className="w-full h-full object-cover"
                         />
@@ -105,7 +119,7 @@ const Sidebar = () => {
                         <p className={`text-xs font-black truncate tracking-tight ${isDark ? 'text-zinc-100' : 'text-zinc-900'}`}>
                             Tester
                         </p>
-                        <p className="text-[10px] opacity-40 font-medium truncate italic">Online</p>
+                        <p className={`text-[10px] font-medium truncate italic ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>Online</p>
                     </div>
                     <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                 </Link>
@@ -127,7 +141,7 @@ const Sidebar = () => {
                             <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-56 rounded-2xl border shadow-2xl z-[110] animate-in fade-in zoom-in slide-in-from-bottom-2 duration-200 ${popoverBg}`}>
                                 <div className="p-2 space-y-1">
                                     <button
-                                        onClick={() => navigate('/settings')}
+                                        onClick={() => navigate('/settings/general')}
                                         className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-black uppercase tracking-widest hover:bg-purple-500/10 rounded-xl transition-all text-purple-500"
                                     >
                                         <span className="flex items-center gap-3"><Settings className="w-4 h-4" /> ALL SETTINGS</span>
@@ -137,7 +151,7 @@ const Sidebar = () => {
                                     <div className="h-px bg-zinc-500/10 mx-2 my-1" />
 
                                     <div className="flex items-center justify-between px-3 py-2">
-                                        <span className="flex items-center gap-3 text-xs font-bold opacity-70">
+                                        <span className={`flex items-center gap-3 text-xs font-bold ${isDark ? 'text-zinc-200' : 'text-zinc-600'}`}>
                                             {isDark ? <Moon className="w-4 h-4 text-purple-400" /> : <Sun className="w-4 h-4 text-orange-500" />}
                                             Theme
                                         </span>
@@ -148,7 +162,7 @@ const Sidebar = () => {
                                     </div>
 
                                     <div className="flex items-center justify-between px-3 py-2">
-                                        <span className="flex items-center gap-3 text-xs font-bold opacity-70">
+                                        <span className={`flex items-center gap-3 text-xs font-bold ${isDark ? 'text-zinc-200' : 'text-zinc-600'}`}>
                                             <Languages className="w-4 h-4 text-blue-500" />
                                             Language
                                         </span>
@@ -158,8 +172,12 @@ const Sidebar = () => {
                                         </div>
                                     </div>
 
-                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold opacity-70 hover:opacity-100 hover:bg-zinc-500/10 rounded-xl transition-all"><Smile className="w-4 h-4 text-yellow-500" /> Feedback</button>
-                                    <button className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold opacity-70 hover:opacity-100 hover:bg-zinc-500/10 rounded-xl transition-all"><HelpCircle className="w-4 h-4 text-blue-500" /> Help Center</button>
+                                    <button className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-bold rounded-xl transition-all ${isDark ? 'text-zinc-200 hover:bg-zinc-500/10' : 'text-zinc-600 hover:bg-zinc-500/10'}`}>
+                                        <Smile className="w-4 h-4 text-yellow-500" /> Feedback
+                                    </button>
+                                    <button className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-bold rounded-xl transition-all ${isDark ? 'text-zinc-200 hover:bg-zinc-500/10' : 'text-zinc-600 hover:bg-zinc-500/10'}`}>
+                                        <HelpCircle className="w-4 h-4 text-blue-500" /> Help Center
+                                    </button>
                                 </div>
 
                                 <div className="p-2 border-t border-zinc-500/10 bg-zinc-500/5 rounded-b-2xl">
