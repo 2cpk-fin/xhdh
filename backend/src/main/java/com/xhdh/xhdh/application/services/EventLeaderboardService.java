@@ -1,8 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
 import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
-// import com.xhdh.xhdh.domain.models.Participant;
-// import com.xhdh.xhdh.infrastructure.repositories.redis.LeaderboardRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,10 +15,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class LeaderboardService {
-
-    // private final LeaderboardRepository leaderboardRepository;
-
+public class EventLeaderboardService {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private String getMatchKey(String matchId) {

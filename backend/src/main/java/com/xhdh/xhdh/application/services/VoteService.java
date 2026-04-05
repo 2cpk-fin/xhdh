@@ -17,7 +17,7 @@ public class VoteService {
 
     private final VotePersistenceService votePersistenceService;
 
-    private final LeaderboardService leaderboardService;
+    private final EventLeaderboardService eventLeaderboardService;
 
     public List<VoteResponse> findAllUserVotes(String username) {
         return voteRepository.findAllByUsername(username)
@@ -35,7 +35,7 @@ public class VoteService {
 
     @Transactional
     public String createVote(VoteRequest voteRequest) {
-        leaderboardService.vote(voteRequest.universityId(), String.valueOf(voteRequest.matchId()));
+        eventLeaderboardService.vote(voteRequest.universityId(), String.valueOf(voteRequest.matchId()));
 
         votePersistenceService.asyncVote(voteRequest);
 

@@ -41,4 +41,9 @@ public class Match {
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("rank ASC")
     private List<MatchParticipant> participants = new ArrayList<>();
+
+
+    // One match -> Many comments
+    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 }

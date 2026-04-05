@@ -8,6 +8,7 @@ import SystemSettings from './pages/SystemSettings';
 import GeneralSettings from './pages/GeneralSettings';
 import ActivityPage from './pages/ActivityPage';
 import AuthenticationSettings from './pages/AuthenticationSettings';
+import LeaderboardPage from "./pages/LeaderboardPage.tsx";
 import NewsPage from './pages/NewsPage';
 import CommunityPage from './pages/CommunityPage';
 import ProfilePage from './pages/ProfilePage';
@@ -37,6 +38,7 @@ function App() {
 
     useEffect(() => {
         window.addEventListener('themeChange', syncTheme);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         syncTheme();
         return () => window.removeEventListener('themeChange', syncTheme);
     }, [syncTheme]);
@@ -56,6 +58,7 @@ function App() {
                     <Route path="/duel" element={<ProtectedRoute><DuelPage /></ProtectedRoute>} />
                     <Route path="/play" element={<ProtectedRoute><PlayPage /></ProtectedRoute>} />
                     <Route path="/event" element={<ProtectedRoute><EventPage /></ProtectedRoute>} />
+                    <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
                     <Route path="/news" element={<ProtectedRoute><NewsPage /></ProtectedRoute>} />
                     <Route path="/community" element={<ProtectedRoute><CommunityPage /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />

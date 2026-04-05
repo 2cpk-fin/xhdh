@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Gamepad2, Newspaper, Users, Settings, Search, Smile, HelpCircle, LogOut, Moon, Sun, ExternalLink, Bell, Mail, Languages } from 'lucide-react';
+import { Home, Gamepad2, Newspaper, BarChart3, Users, Settings, Search, Smile, HelpCircle, LogOut, Moon, Sun, ExternalLink, Bell, Mail, Languages } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 
 const Sidebar = () => {
@@ -56,12 +56,13 @@ const Sidebar = () => {
 
     const isDark = theme === 'dark';
     const sidebarBg = isDark ? 'bg-black border-white/10' : 'bg-white border-zinc-200 shadow-[0_2px_18px_rgba(0,0,0,0.05)]';
-    const sidebarText = isDark ? 'text-zinc-100' : 'text-zinc-700'; // Đổi zinc-400 thành zinc-100 cho sáng hơn
+    const sidebarText = isDark ? 'text-zinc-100' : 'text-zinc-700';
     const popoverBg = isDark ? 'bg-[#121212] border-zinc-800 shadow-[0_0_30px_rgba(0,0,0,0.5)]' : 'bg-white border-zinc-200 shadow-2xl';
     const searchBg = isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200';
 
     const links = [
         { name: 'Home', icon: Home, path: '/home' },
+        { name: 'Leaderboard', icon: BarChart3, path: '/leaderboard' },
         { name: 'Search', icon: Search, path: '/search' },
         { name: 'Play', icon: Gamepad2, path: '/play' },
         { name: 'News', icon: Newspaper, path: '/news' },
