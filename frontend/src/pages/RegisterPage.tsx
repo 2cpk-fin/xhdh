@@ -127,7 +127,7 @@ const RegisterPage = () => {
               </filter>
             </defs>
 
-            <g transform="rotate(-45 200 400)" stroke={strokeColor} strokeWidth="1.2" fill="none">
+            <g transform="rotate(-45 200 400)" stroke={strokeColor} strokeWidth="2" fill="none">
               {paths.map((d, i) => <path key={`p-${i}`} d={d} />)}
 
               <g filter="url(#circuitGlowGreen)">

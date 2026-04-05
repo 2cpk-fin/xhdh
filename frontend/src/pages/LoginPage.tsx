@@ -78,7 +78,7 @@ const LoginPage = () => {
   };
 
   const ComplexAnimatedCircuitry = useMemo(() => {
-    const strokeColor = isDark ? "rgba(167, 139, 250, 0.2)" : "rgba(109, 40, 217, 0.1)";
+    const strokeColor = isDark ? "rgba(167, 139, 250, 0.25)" : "rgba(109, 40, 217, 0.15)";
     const nodeColor = isDark ? "#a855f7" : "#7c3aed";
     const flowColor = isDark ? "#d8b4fe" : "#a855f7";
 
@@ -95,7 +95,8 @@ const LoginPage = () => {
     ];
 
     return (
-        <div className={`absolute inset-0 z-0 pointer-events-none transition-all duration-1000 ease-in-out ${isExiting ? 'translate-x-[-20%] opacity-0' : 'opacity-60 lg:opacity-80'}`}>
+        <div className={`absolute inset-0 z-0 pointer-events-none transition-all duration-1000 ease-in-out 
+          ${isExiting ? 'translate-x-[-15%] opacity-0' : isAnimateIn ? 'translate-x-0 opacity-60 lg:opacity-80' : 'translate-x-[-15%] opacity-0'}`}>
           <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="none">
             <defs>
               <filter id="circuitGlow">
@@ -107,17 +108,17 @@ const LoginPage = () => {
               </filter>
             </defs>
 
-            <g transform="rotate(-45 800 400)" stroke={strokeColor} strokeWidth="1.2" fill="none">
+            <g transform="rotate(-45 800 400)" stroke={strokeColor} strokeWidth="2" fill="none">
               {paths.map((d, i) => <path key={`p-${i}`} d={d} />)}
 
               <g filter="url(#circuitGlow)">
                 {[0, 1, 2].map((i) => (
-                    <circle key={`dot-1-${i}`} r="2.5" fill={flowColor}>
+                    <circle key={`dot-1-${i}`} r="3.5" fill={flowColor}>
                       <animateMotion path={paths[0]} dur="4s" begin={`${i * 0.2}s`} repeatCount="indefinite" />
                     </circle>
                 ))}
                 {[0, 1, 2].map((i) => (
-                    <circle key={`dot-2-${i}`} r="2" fill={flowColor} opacity="0.6">
+                    <circle key={`dot-2-${i}`} r="3" fill={flowColor} opacity="0.6">
                       <animateMotion path={paths[6]} dur="5s" begin={`${i * 0.3}s`} repeatCount="indefinite" />
                     </circle>
                 ))}
@@ -153,7 +154,7 @@ const LoginPage = () => {
         `}</style>
         </div>
     );
-  }, [isDark, isExiting]);
+  }, [isDark, isExiting, isAnimateIn]);
 
   return (
       <div className={`min-h-screen flex items-center relative overflow-hidden transition-colors duration-300 ${bgMain}`}>
