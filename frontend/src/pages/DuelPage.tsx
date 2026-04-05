@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Trophy, Zap, Star } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
 import api from '../api/axios';
 
 interface UniversityDTO {
@@ -302,7 +301,6 @@ const DuelPage = () => {
             )}
           </div>
         </main>
-        <Footer />
       </div>
     </div>
   );

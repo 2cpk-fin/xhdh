@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
 import { Sparkles, Calendar, Trophy, Timer, ArrowRight, Star } from 'lucide-react';
 
 const EventPage = () => {
@@ -91,10 +90,8 @@ const EventPage = () => {
                 </div>
               ))}
             </div>
-
           </div>
         </main>
-        <Footer />
       </div>
     </div>
   );

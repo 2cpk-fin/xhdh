@@ -27,8 +27,8 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(User user, HttpServletRequest request) {
     // 1. Force the ID to a String for consistent Key naming
-    String userIdStr = String.valueOf(user.getId());
-    String userMappingKey = USER_RT_PREFIX + userIdStr;
+    String userUUIDStr = String.valueOf(user.getUserUUID());
+    String userMappingKey = USER_RT_PREFIX + userUUIDStr;
     
     // 2. Lookup existing token UUID
     Object existingUuidObj = redisTemplate.opsForValue().get(userMappingKey);
@@ -40,19 +40,19 @@ public class RefreshTokenService {
     }
 
     // 3. Generate New Token
-    String newTokenUuid = UUID.randomUUID().toString();
+    String newTokenUUID = UUID.randomUUID().toString();
     RefreshToken refreshToken = RefreshToken.builder()
-            .userId(user.getId())
+            .userUUID(user.getUserUUID())
             .email(user.getEmail())
-            .token(newTokenUuid)
+            .token(newTokenUUID)
             .expiryDate(Instant.now().plus(Duration.ofDays(7)))
             .ipAddress(request.getRemoteAddr())
             .userAgent(request.getHeader("User-Agent"))
             .build();
 
     // 4. Save New Data & Update Mapping
-    redisTemplate.opsForValue().set(REDIS_PREFIX + newTokenUuid, refreshToken, Duration.ofDays(7));
-    redisTemplate.opsForValue().set(userMappingKey, newTokenUuid, Duration.ofDays(7));
+    redisTemplate.opsForValue().set(REDIS_PREFIX + newTokenUUID, refreshToken, Duration.ofDays(7));
+    redisTemplate.opsForValue().set(userMappingKey, newTokenUUID, Duration.ofDays(7));
 
     return refreshToken;
 }
@@ -93,13 +93,13 @@ public class RefreshTokenService {
     
     if (refreshToken != null) {
         // 2. Delete the User -> Token mapping (the "index")
-        String userMappingKey = USER_RT_PREFIX + String.valueOf(refreshToken.getUserId());
+        String userMappingKey = USER_RT_PREFIX + String.valueOf(refreshToken.getUserUUID());
         redisTemplate.delete(userMappingKey);
         
         // 3. Delete the actual Token data
         redisTemplate.delete(tokenKey);
         
-        System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserId());
+        System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserUUID());
     } else {
         // Fallback: Just try to delete the token key anyway if the data is already gone
         redisTemplate.delete(tokenKey);

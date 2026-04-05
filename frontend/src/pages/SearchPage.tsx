@@ -72,7 +72,6 @@ const SearchPage = () => {
     const cardBg = isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-white border-zinc-200 shadow-sm';
     const inputBg = isDark ? 'bg-zinc-900 border-zinc-700' : 'bg-white border-zinc-200 shadow-md';
     const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
-    const subTextColor = isDark ? 'text-zinc-400' : 'text-zinc-500';
 
     return (
         <div className={`min-h-screen flex transition-colors duration-300 ${bgMain}`}>

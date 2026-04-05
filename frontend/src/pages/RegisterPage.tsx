@@ -47,7 +47,7 @@ const RegisterPage = () => {
 
   const isDark = theme === 'dark';
   const bgMain = isDark ? 'bg-[#0a0a0a]' : 'bg-[#f8fafc]';
-  const cardBg = isDark ? 'bg-[#121212] border-zinc-800 shadow-none' : 'bg-white border-zinc-200 shadow-2xl shadow-blue-500/5';
+  const cardBg = isDark ? 'bg-[#121212]/80 backdrop-blur-xl border-zinc-800' : 'bg-white/90 backdrop-blur-md border-zinc-200 shadow-2xl';
   const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
   const inputBg = isDark ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200';
 
@@ -66,15 +66,11 @@ const RegisterPage = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAnnouncement(null);
-
     if (formData.password !== formData.confirmPassword) {
       setAnnouncement({ message: "Passwords do not match", isSuccess: false });
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await api.post('/users/register', {
         username: formData.username,
@@ -89,8 +85,7 @@ const RegisterPage = () => {
 
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Registration failed. Try again.";
-      setAnnouncement({ message: errorMessage, isSuccess: false });
+      setAnnouncement({ message: err.response?.data?.message || "Registration failed.", isSuccess: false });
     } finally {
       setLoading(false);
     }

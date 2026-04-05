@@ -2,8 +2,8 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Trophy, Users, Vote, ArrowRight, ShieldCheck, School, Clock, History, Gamepad2, Zap } from 'lucide-react';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
 import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
 
 const HomePage = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
@@ -18,8 +18,13 @@ const HomePage = () => {
   }, []);
 
   const isDark = theme === 'dark';
-  const bgMain = isDark ? 'bg-[#0a0a0a]' : 'bg-[#f8fafc]';
-  const cardBg = isDark ? 'bg-[#121212] border-zinc-800' : 'bg-white border-zinc-200';
+  
+  // Adjusted background colors for transparency/glass effect
+  const bgMain = isDark ? 'bg-[#0a0a0a]/50' : 'bg-[#f8fafc]/50';
+  const cardBg = isDark 
+    ? 'bg-[#121212]/80 backdrop-blur-md border-zinc-800 shadow-xl' 
+    : 'bg-white/80 backdrop-blur-md border-zinc-200 shadow-lg';
+    
   const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
   const subTextColor = isDark ? 'text-zinc-400' : 'text-zinc-500';
 

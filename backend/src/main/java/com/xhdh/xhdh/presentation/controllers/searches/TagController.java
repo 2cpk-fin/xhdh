@@ -11,11 +11,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/tags")
+@RequestMapping(path = "/api/tags")
 public class TagController {
     private final TagService tagService;
 
-    @GetMapping
+    @GetMapping(path = "/all")
     public ResponseEntity<List<TagResponse>> showAllTags() {
         return new ResponseEntity<>(tagService.showAllTags(), HttpStatus.OK);
     }
