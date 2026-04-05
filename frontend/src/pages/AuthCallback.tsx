@@ -6,11 +6,11 @@ const AuthCallback = () => {
   const navigate = useNavigate();
 
 useEffect(() => {
-  const token = searchParams.get('token');
+  const accessToken = searchParams.get('token'); // or 'accessToken' depending on Backend
   const refreshToken = searchParams.get('refreshToken');
   
-  if (token && refreshToken) {
-    localStorage.setItem('token', token);
+  if (accessToken && refreshToken) {
+    localStorage.setItem('accessToken', accessToken); // Consistent key
     localStorage.setItem('refreshToken', refreshToken);
     navigate('/home');
   } else {

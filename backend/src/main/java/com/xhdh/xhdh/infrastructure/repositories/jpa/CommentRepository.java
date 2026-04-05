@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
-    @Query("SELECT c FROM Comment c WHERE c.matchId = :matchId AND c.parent IS NULL")
+    @Query("SELECT c FROM Comment c WHERE c.match.id = :matchId AND c.parent IS NULL")
     Page<Comment> findAllTopComments(@Param("matchId") Long matchId, Pageable pageable);
 
     @Query("SELECT c FROM Comment c WHERE c.parent.id = :parentId")

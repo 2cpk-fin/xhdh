@@ -54,18 +54,18 @@ const LoginPage = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAnnouncement(null);
     try {
-      const response = await api.post('/auth/login', { email: formData.email, password: formData.password });
-      const { token, refreshToken } = response.data;
-      if (token && refreshToken) {
-        localStorage.setItem('token', token);
+      const response = await api.post('/auth/login', formData);
+      const { accessToken, refreshToken } = response.data; // Destructure new keys
+      
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
         setAnnouncement({ message: 'Login successful!', isSuccess: true });
         setTimeout(() => navigate('/home'), 1000);
       }
     } catch (err: any) {
-      setAnnouncement({ message: err.response?.data?.message || 'Invalid credentials.', isSuccess: false });
+      setAnnouncement({ message: 'Invalid credentials.', isSuccess: false });
     }
   };
 

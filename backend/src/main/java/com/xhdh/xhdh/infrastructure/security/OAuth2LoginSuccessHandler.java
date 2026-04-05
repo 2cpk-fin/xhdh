@@ -55,7 +55,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     // For local testing: http://localhost:5173/auth/callback?token=%s&refreshToken=%s
     // For production: https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s
     String targetUrl = String.format(
-    "https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s", 
+    "http://localhost:5173/auth/callback?token=%s&refreshToken=%s", 
     accesstoken, 
     refreshToken.getToken()
 );

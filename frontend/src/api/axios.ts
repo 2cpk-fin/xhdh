@@ -9,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,7 +40,7 @@ api.interceptors.response.use(
           });
 
           const { token: newToken, refreshToken: newRefreshToken } = refreshResponse.data;
-          localStorage.setItem('token', newToken);
+          localStorage.setItem('accessToken', newToken);
           localStorage.setItem('refreshToken', newRefreshToken);
 
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
@@ -51,7 +51,8 @@ api.interceptors.response.use(
           return Promise.reject(refreshError);
         }
       } else {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('token'); // Remove old key for backward compatibility
         window.location.href = '/login'; // Hard reload if no refresh token exists
         return Promise.reject(error);
       }
