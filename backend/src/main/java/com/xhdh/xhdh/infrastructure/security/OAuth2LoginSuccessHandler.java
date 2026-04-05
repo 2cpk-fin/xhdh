@@ -52,10 +52,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     String accesstoken = jwtService.generateToken(user);
     var refreshToken = refreshTokenService.createRefreshToken(user, request);
     // 3. Redirect back to Frontent
-    // For local testing: http://localhost:5173/auth/callback?token=...
-    // For production: https://xhdh-wine.vercel.app/auth/callback?token=...
+    // For local testing: http://localhost:5173/auth/callback?token=%s&refreshToken=%s
+    // For production: https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s
     String targetUrl = String.format(
-    "http://localhost:5173/auth/callback?token=%s&refreshToken=%s", 
+    "https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s", 
     accesstoken, 
     refreshToken.getToken()
 );
