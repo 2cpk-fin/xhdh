@@ -10,6 +10,25 @@ const SettingsSidebar = () => {
     const navigate = useNavigate();
     const menuRef = useRef<HTMLDivElement>(null);
 
+ const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      const accessToken = localStorage.getItem('accessToken');
+      if (refreshToken) {
+        await api.post('/auth/logout', {
+          refreshToken: refreshToken,
+          accessToken: accessToken,
+        });
+      }
+    } catch (err) {
+      console.error('Logout failed', err);
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      navigate('/login');
+    }
+  };
+
     useEffect(() => {
         const syncTheme = () => {
             const fromStorage = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
@@ -181,7 +200,7 @@ const SettingsSidebar = () => {
                                 </div>
 
                                 <div className="p-2 border-t border-zinc-500/10 bg-zinc-500/5 rounded-b-2xl">
-                                    <button onClick={() => navigate('/login')} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-black text-red-500 hover:bg-red-500/20 rounded-xl transition-all"><LogOut className="w-4 h-4" /> Log Out</button>
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-black text-red-500 hover:bg-red-500/20 rounded-xl transition-all"><LogOut className="w-4 h-4" /> Log Out</button>
                                 </div>
                             </div>
                         )}
