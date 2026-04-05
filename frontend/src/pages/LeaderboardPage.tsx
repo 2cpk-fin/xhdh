@@ -23,7 +23,7 @@ const LeaderboardPage = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+    // const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const itemsPerPage = 10;
 
     useEffect(() => {
@@ -36,7 +36,7 @@ const LeaderboardPage = () => {
                 ]);
                 setTags(tagsRes.data);
                 setUniversities(unisRes.data);
-                setLastUpdated(new Date());
+                // setLastUpdated(new Date());
             } catch (error) {
                 console.error('Error fetching leaderboard data:', error);
             } finally {
