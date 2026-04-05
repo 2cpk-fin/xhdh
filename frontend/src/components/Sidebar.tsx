@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Gamepad2, Newspaper, Users, UserCircle, Settings, Trophy, Search } from 'lucide-react';
+import { Home, Gamepad2, Newspaper, Users, UserCircle, Settings, Trophy, Search, BarChart3 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const Sidebar = () => {
@@ -21,6 +21,7 @@ const Sidebar = () => {
 
     const links = [
         { name: 'Home', icon: Home, path: '/home' },
+        { name: 'Leaderboard', icon: BarChart3, path: '/leaderboard' },
         { name: 'Search', icon: Search, path: '/search' },
         { name: 'Play', icon: Gamepad2, path: '/play' },
         { name: 'News', icon: Newspaper, path: '/news' },

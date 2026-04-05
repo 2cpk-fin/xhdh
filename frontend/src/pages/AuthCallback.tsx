@@ -7,9 +7,11 @@ const AuthCallback = () => {
 
 useEffect(() => {
   const token = searchParams.get('token');
+  const refreshToken = searchParams.get('refreshToken');
   
-  if (token) {
+  if (token && refreshToken) {
     localStorage.setItem('token', token);
+    localStorage.setItem('refreshToken', refreshToken);
     navigate('/home');
   } else {
     navigate('/login?error=oauth_failed');

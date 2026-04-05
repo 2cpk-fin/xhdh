@@ -1,6 +1,7 @@
 package com.xhdh.xhdh.domain.models;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import lombok.*;
 
@@ -9,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RefreshToken{
-    private Long userId;
+    private UUID userUUID;
     private String email; 
     private String token;
     private Instant expiryDate;

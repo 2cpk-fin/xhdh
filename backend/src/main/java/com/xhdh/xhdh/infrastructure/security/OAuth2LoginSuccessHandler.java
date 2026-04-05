@@ -54,7 +54,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     // 3. Redirect back to Frontent
     // For local testing: http://localhost:5173/auth/callback?token=...
     // For production: https://xhdh-wine.vercel.app/auth/callback?token=...
-    String targetUrl = "https://xhdh-wine.vercel.app/auth/callback?token=" + accesstoken;
+    String targetUrl = String.format(
+    "http://localhost:5173/auth/callback?token=%s&refreshToken=%s", 
+    accesstoken, 
+    refreshToken.getToken()
+);
     getRedirectStrategy().sendRedirect(request, response, targetUrl);         
     }
 }

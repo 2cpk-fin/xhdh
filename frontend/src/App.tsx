@@ -10,6 +10,7 @@ import CommunityPage from './pages/CommunityPage';
 import ProfilePage from './pages/ProfilePage';
 import PlayPage from './pages/PlayPage';
 import SearchPage from './pages/SearchPage';
+import LeaderboardPage from './pages/LeaderboardPage';
 import type React from 'react';
 import AuthCallback from './pages/AuthCallback';
 import { useEffect, useState } from 'react';
@@ -54,6 +55,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <SearchPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/leaderboard"
+                        element={
+                            <ProtectedRoute>
+                                <LeaderboardPage />
                             </ProtectedRoute>
                         }
                     />

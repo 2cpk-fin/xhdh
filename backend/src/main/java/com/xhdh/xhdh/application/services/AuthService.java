@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
 import com.xhdh.xhdh.application.dto.authentication.LogoutRequest;
+import com.xhdh.xhdh.application.dto.authentication.LogoutResponse;
 import com.xhdh.xhdh.application.dto.AuthResponse;
 import com.xhdh.xhdh.domain.models.RefreshToken;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
@@ -41,7 +42,7 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(token);
         refreshTokenService.verifyMetaData(refreshToken, httpRequest);
 
-        var user = userRepository.findById(refreshToken.getUserId())
+        var user = userRepository.findByUserUUID(refreshToken.getUserUUID())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
         
         String newjwt = jwtService.generateToken(user);
@@ -50,12 +51,11 @@ public class AuthService {
         return new AuthResponse(newjwt, newRefreshToken.getToken());
           
     }
-    public void logout(LogoutRequest request){
+    public LogoutResponse logout(LogoutRequest request, HttpServletRequest httpRequest){
         refreshTokenService.deleteRefreshToken(request.getRefreshToken());
         if (request.getAccessToken() != null) {
             refreshTokenService.blackListAccessToken(request.getAccessToken());
         }
+        return new LogoutResponse("Logout successful");
     }
-
-    
 }
