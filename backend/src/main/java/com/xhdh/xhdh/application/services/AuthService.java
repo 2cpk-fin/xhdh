@@ -51,6 +51,7 @@ public class AuthService {
         return new AuthResponse(newjwt, newRefreshToken.getToken());
           
     }
+
     public LogoutResponse logout(LogoutRequest request, HttpServletRequest httpRequest){
         refreshTokenService.deleteRefreshToken(request.getRefreshToken());
         if (request.getAccessToken() != null) {

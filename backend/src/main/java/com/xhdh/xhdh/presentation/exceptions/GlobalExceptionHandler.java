@@ -64,14 +64,15 @@ public class GlobalExceptionHandler {
             request.getRequestURI());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
-        ErrorResponse error = new ErrorResponse(
-            Instant.now(),
-            500,
-            "Internal Server Error", 
-            "Something went wrong", 
-            request.getRequestURI() );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
+//        ErrorResponse error = new ErrorResponse(
+//            Instant.now(),
+//            500,
+//            "Internal Server Error",
+//            "Something went wrong",
+//            request.getRequestURI() );
+//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+//    }
 }

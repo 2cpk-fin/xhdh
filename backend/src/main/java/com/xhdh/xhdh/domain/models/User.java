@@ -56,10 +56,6 @@ public class User implements UserDetails{
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vote> votes = new ArrayList<>();
-
 
     // One user -> Many comments
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

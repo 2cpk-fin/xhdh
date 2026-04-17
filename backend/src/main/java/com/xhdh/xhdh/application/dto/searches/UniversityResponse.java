@@ -9,13 +9,17 @@ import java.util.List;
 import java.util.UUID;
 
 @Getter
-@JsonPropertyOrder({"id", "name", "abbreviation", "tags", "elo"})
+@Setter
+@JsonPropertyOrder({"publicUniversityId", "name", "abbreviation", "tags", "elo"})
 public class UniversityResponse {
-    private UUID publicUniversityId;
+    private final UUID publicUniversityId;
+
     private final String name;
+
     private final String abbreviation;
-    @Setter
+
     private List<String> tags;
+
     private final int elo;
 
     public UniversityResponse(University university) {

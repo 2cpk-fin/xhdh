@@ -21,7 +21,7 @@ public class TagController {
     }
 
     @GetMapping(path = "/universities/{tagName}")
-    public ResponseEntity<List<String>> showTagByName(@PathVariable @RequestParam String tagName) {
+    public ResponseEntity<List<String>> showTagByName(@PathVariable String tagName) {
         return new ResponseEntity<>(tagService.showAllUniversitiesByTagName(tagName), HttpStatus.OK);
     }
 }

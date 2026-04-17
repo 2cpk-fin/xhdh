@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
+import com.xhdh.xhdh.application.dto.matches.ParticipantResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,22 +22,15 @@ public class EventLeaderboardService {
         return "leaderboard:match:" + matchId;
     }
 
-    public void vote(Long universityId, String matchId) {
-        String key = getMatchKey(matchId);
-        String member = universityId.toString();
-
-        redisTemplate.opsForZSet().incrementScore(key, member, 1);
-    }
-
-    public List<MatchParticipantResponse> showLeaderboard(String matchId) {
+    public List<ParticipantResponse> showLeaderboard(String matchId) {
         String key = getMatchKey(matchId);
 
         Set<ZSetOperations.TypedTuple<Object>> participants = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
-        List<MatchParticipantResponse> topParticipants = new ArrayList<>();
+        List<ParticipantResponse> topParticipants = new ArrayList<>();
 
         for (ZSetOperations.TypedTuple<Object> participant : participants) {
-            MatchParticipantResponse participantResponse = new MatchParticipantResponse();
+            ParticipantResponse participantResponse = new ParticipantResponse();
 
             int totalVotes = Objects.requireNonNull(participant.getScore()).intValue();
             Object universityName = Objects.requireNonNull(participant.getValue());

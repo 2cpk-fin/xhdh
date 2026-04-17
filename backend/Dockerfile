@@ -1,18 +1,17 @@
-# STAGE 1: Build (The Kitchen)
+# Transforming src into runnable JAR file
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
 
-# Step 1: Cache dependencies (The "DevOps" Speed Hack)
+# Copy all the dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-# Step 2: Build the application
+# Copy the src code and packages it into a .jar
 COPY src ./src
 RUN mvn clean package -DskipTests -B
 
-# STAGE 2: Run (The Dining Room)
-# Use the lightweight Java 21 Runtime (JRE)
+# Starts with image only contains JRE, but not the full JDK
 FROM eclipse-temurin:21-jre-jammy
 
 # Install curl for the Healthcheck pulse

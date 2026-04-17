@@ -1,6 +1,6 @@
 
 services:
-  # --- THE CACHE (Redis) ---
+  # --- THE CACHE ---
   xhdh-redis:
     image: redis:latest
     container_name: xhdh-redis
@@ -16,7 +16,7 @@ services:
     networks:
       - xhdh-network
 
-  # --- THE APPLICATION (Your Spring Boot App) ---
+  # --- THE APPLICATION ---
   xhdh-api:
     build: .
     image: xhdh-backend:latest

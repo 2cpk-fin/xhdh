@@ -5,10 +5,13 @@ import com.xhdh.xhdh.domain.models.MatchParticipant;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
-@JsonPropertyOrder({"universityName", "totalVotes", "rank"})
-public class MatchParticipantResponse {
+@JsonPropertyOrder({"publicUniversityId", "universityName", "totalVotes", "rank"})
+public class ParticipantResponse {
+    private UUID publicUniversityId;
 
     private String universityName;
 
@@ -16,9 +19,10 @@ public class MatchParticipantResponse {
 
     private int rank;
 
-    public MatchParticipantResponse() {}
+    public ParticipantResponse() {}
 
-    public MatchParticipantResponse(MatchParticipant matchParticipant) {
+    public ParticipantResponse(MatchParticipant matchParticipant) {
+        this.publicUniversityId = matchParticipant.getPublicParticipantId();
         this.universityName = matchParticipant.getUniversity().getName();
         this.totalVotes = matchParticipant.getTotalVotes();
         this.rank = matchParticipant.getRank();

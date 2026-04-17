@@ -6,12 +6,12 @@ import com.xhdh.xhdh.domain.models.Comment;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.CommentRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +26,16 @@ public class CommentService {
     private final MatchRepository matchRepository;
 
     private Comment buildComment(CommentRequest commentRequest) {
+        Comment parent = null;
+        if (commentRequest.getParentId() != null && commentRequest.getParentId() > 0) {
+            parent = commentRepository.findById(commentRequest.getParentId()).orElse(null);
+        }
+
         return Comment.builder()
                 .user(userRepository.getUserById(commentRequest.getUserId()))
                 .match(matchRepository.getMatchById(commentRequest.getMatchId()))
-                .commentDate(LocalDateTime.from(Instant.now()))
-                .parent(commentRepository.findByParentId(commentRequest.getParentId()))
+                .commentDate(LocalDateTime.now())
+                .parent(parent)
                 .children(new ArrayList<>())
                 .content(commentRequest.getContent())
                 .build();
@@ -38,12 +43,12 @@ public class CommentService {
 
     private CommentResponse buildCommentResponse(Comment comment) {
         return CommentResponse.builder()
-                .id(comment.getId())
+                .publicCommentId(comment.getPublicCommentId())
                 .username(comment.getUser().getUsername())
                 .matchId(comment.getMatch().getId())
                 .commentDate(comment.getCommentDate())
                 .likes(comment.getLikes())
-                .parentId(comment.getParent().getId())
+                .parentId(comment.getParent() != null ? comment.getParent().getId() : null)
                 .content(comment.getContent())
                 .build();
     }
@@ -63,6 +68,11 @@ public class CommentService {
         Comment comment = buildComment(commentRequest);
         Comment savedComment = commentRepository.save(comment);
         return buildCommentResponse(savedComment);
+    }
+
+    @Transactional
+    public void updateLike(Long id) {
+        commentRepository.incrementLikes(id);
     }
 
     public CommentResponse updateComment(Long id, String newContent) {

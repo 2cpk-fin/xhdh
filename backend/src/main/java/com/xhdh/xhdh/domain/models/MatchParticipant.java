@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Entity
@@ -17,6 +19,10 @@ public class MatchParticipant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_participant_id", updatable = false, nullable = false)
+    @ColumnDefault("gen_random_uuid()")
+    private UUID publicParticipantId;
 
     @ColumnDefault("0")
     private long totalVotes = 0;

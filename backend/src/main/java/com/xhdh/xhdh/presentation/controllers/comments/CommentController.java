@@ -3,6 +3,8 @@ package com.xhdh.xhdh.presentation.controllers.comments;
 import com.xhdh.xhdh.application.dto.comments.CommentRequest;
 import com.xhdh.xhdh.application.dto.comments.CommentResponse;
 import com.xhdh.xhdh.application.services.CommentService;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,20 +25,26 @@ public class CommentController {
     @GetMapping(path = "/{matchId}/comments")
     public ResponseEntity<Page<CommentResponse>> getTopLevelComments(
             @PathVariable Long matchId,
-            @PageableDefault(size = 19, sort = "commentDate", direction = Sort.Direction.DESC) Pageable pageable
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "commentDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return new ResponseEntity<>(commentService.getTopLevelComments(matchId, pageable), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/replies/{parentId}")
+    @GetMapping(path = "/{parentId}/replies")
     public ResponseEntity<List<CommentResponse>> getReplies(@PathVariable Long parentId) {
         return new ResponseEntity<>(commentService.getReplies(parentId), HttpStatus.OK);
     }
 
-    @PostMapping("/comments")
-    public ResponseEntity<CommentResponse> createComment(@RequestBody CommentRequest request) {
+    @PostMapping
+    public ResponseEntity<CommentResponse> createComment(@Valid @RequestBody CommentRequest request) {
         CommentResponse newComment = commentService.createComment(request);
         return new ResponseEntity<>(newComment, HttpStatus.CREATED);
+    }
+
+    @PatchMapping("/comments/{id}/likes")
+    public void updateLikes(@RequestParam Long id) {
+        commentService.updateLike(id);
     }
 
     @PutMapping("/comments/{id}")

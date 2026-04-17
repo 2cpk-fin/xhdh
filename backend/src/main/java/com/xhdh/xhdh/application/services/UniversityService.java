@@ -1,6 +1,5 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.searches.UniversityRequest;
 import com.xhdh.xhdh.application.dto.searches.UniversityResponse;
 import com.xhdh.xhdh.domain.models.Tag;
 import com.xhdh.xhdh.domain.models.University;
@@ -9,10 +8,11 @@ import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,15 +22,13 @@ public class UniversityService {
 
     private final UniversityRepository universityRepository;
 
-    public List<UniversityResponse> getUniversityList() {
-        return universityRepository.findAll()
-                .stream()
+    public Page<UniversityResponse> getUniversityList(Pageable pageable) {
+        return universityRepository.findUniversityList(pageable)
                 .map(university -> {
                     UniversityResponse universityResponse = new UniversityResponse(university);
                     universityResponse.setTags(showAllTagsInUniversity(university.getName()));
                     return universityResponse;
-                })
-                .collect(Collectors.toList());
+                });
     }
 
     public UniversityResponse getUniversityByName(String universityName) {
@@ -47,14 +45,4 @@ public class UniversityService {
                 .map(Tag::getName)
                 .collect(Collectors.toList());
     }
-
-    public UniversityResponse createUniversity(UniversityRequest request) {
-        University university = new University();
-        university.setPublicUniversityId(UUID.randomUUID());
-        university.setName(request.getName());
-        university.setAbbreviation(request.getAbbreviation());
-        university.setElo(request.getElo());
-        University savedUniversity = universityRepository.save(university);
-        return new UniversityResponse(savedUniversity);
-}
 }

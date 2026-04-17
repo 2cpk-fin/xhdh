@@ -2,11 +2,14 @@ package com.xhdh.xhdh.domain.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,10 +18,15 @@ import java.util.List;
 @Table(name = "comments")
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "public_comment_id", updatable = false, nullable = false)
+    @ColumnDefault("gen_random_uuid()")
+    private UUID publicCommentId;
 
     // Many comments -> One user
     @ManyToOne
@@ -33,6 +41,8 @@ public class Comment {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime commentDate;
 
+    @Builder.Default
+    @ColumnDefault("1200")
     private Long likes = 0L;
 
     // One comment only have one parent and one comment can have many sub-comments
@@ -46,5 +56,7 @@ public class Comment {
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Builder.Default
+    @ColumnDefault("1200")
     private Long replyCount = 0L;
 }

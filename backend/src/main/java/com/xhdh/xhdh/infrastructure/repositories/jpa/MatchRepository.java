@@ -14,7 +14,7 @@ import java.util.UUID;
 @Repository
 public interface MatchRepository extends JpaRepository<Match, Long> {
 
-    @Query("SELECT m FROM Match m WHERE m.status != 'FINSIHED'")
+    @Query("SELECT m FROM Match m WHERE m.status != 'FINISHED'")
     List<Match> findAllNotFinishedMatch();
 
     Optional<Match> findByPublicMatchId(UUID publicMatchId);

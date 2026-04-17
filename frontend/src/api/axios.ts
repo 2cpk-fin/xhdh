@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// VITE_API_BASE_URL is the render backend URL
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   headers: {
@@ -24,7 +25,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // 1. Identify if this request was an authentication attempt
-    // Adjust these strings to match your exact backend endpoints
+    // to Adjust these strings to match your exact backend endpoints
     const isLoginRequest = originalRequest.url.includes('/auth/login') || originalRequest.url.includes('/login');
     const isRegisterRequest = originalRequest.url.includes('/users/register') || originalRequest.url.includes('/register');
 

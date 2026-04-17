@@ -20,8 +20,9 @@ public class University {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID publicUniversityId = UUID.randomUUID();
+    @Column(name = "public_university_id", updatable = false, nullable = false)
+    @ColumnDefault("gen_random_uuid()")
+    private UUID publicUniversityId;
 
     @Column(length = 100, nullable = false, unique = true)
     private String name;
@@ -39,9 +40,6 @@ public class University {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags = new ArrayList<>();
-
-    @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Vote> votes = new ArrayList<>();
 
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MatchParticipant> participants = new ArrayList<>();
