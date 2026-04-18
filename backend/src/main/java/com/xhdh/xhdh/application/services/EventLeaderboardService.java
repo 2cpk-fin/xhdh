@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.matches.ParticipantResponse;
+import com.xhdh.xhdh.application.dto.match.ParticipantResponse;
 
 import lombok.RequiredArgsConstructor;
 

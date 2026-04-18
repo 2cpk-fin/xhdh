@@ -10,8 +10,8 @@ import java.util.UUID;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.domain.models.RefreshToken;
-import com.xhdh.xhdh.domain.models.User;
+import com.xhdh.xhdh.domain.models.authentication.RefreshToken;
+import com.xhdh.xhdh.domain.models.authentication.User;
 import com.xhdh.xhdh.infrastructure.security.JwtService;
 
 import jakarta.servlet.http.HttpServletRequest;

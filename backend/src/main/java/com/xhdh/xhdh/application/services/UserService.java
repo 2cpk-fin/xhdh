@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.xhdh.xhdh.application.dto.authentication.RegisterRequest;
 import com.xhdh.xhdh.application.dto.authentication.RegistrationResponse;
-import com.xhdh.xhdh.domain.models.User;
+import com.xhdh.xhdh.domain.models.authentication.User;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 import com.xhdh.xhdh.presentation.exceptions.EmailAlreadyExistsException;
 

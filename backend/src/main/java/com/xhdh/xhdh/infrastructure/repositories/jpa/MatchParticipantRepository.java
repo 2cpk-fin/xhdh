@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
-import com.xhdh.xhdh.domain.models.MatchParticipant;
+import com.xhdh.xhdh.domain.models.match.MatchParticipant;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

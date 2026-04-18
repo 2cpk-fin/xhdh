@@ -1,8 +1,8 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.comments.CommentRequest;
-import com.xhdh.xhdh.application.dto.comments.CommentResponse;
-import com.xhdh.xhdh.domain.models.Comment;
+import com.xhdh.xhdh.application.dto.comment.CommentRequest;
+import com.xhdh.xhdh.application.dto.comment.CommentResponse;
+import com.xhdh.xhdh.domain.models.comment.Comment;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.CommentRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;

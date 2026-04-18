@@ -6,22 +6,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.xhdh.xhdh.application.dto.matches.SoloMatchReport;
+import com.xhdh.xhdh.application.dto.match.SoloMatchReport;
 import com.xhdh.xhdh.application.utilities.EloCalculator;
-import com.xhdh.xhdh.domain.models.Status;
+import com.xhdh.xhdh.domain.models.match.Status;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.*;
 import jakarta.transaction.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import com.xhdh.xhdh.application.dto.matches.MatchResponseDTO;
-import com.xhdh.xhdh.application.dto.searches.UniversityDTO;
+import com.xhdh.xhdh.application.dto.match.MatchResponseDTO;
+import com.xhdh.xhdh.application.dto.search.UniversityDTO;
 import com.xhdh.xhdh.presentation.exceptions.NotEnoughUniException;
-import com.xhdh.xhdh.domain.models.Match;
-import com.xhdh.xhdh.domain.models.MatchParticipant;
-import com.xhdh.xhdh.domain.models.SoloMatch;
-import com.xhdh.xhdh.domain.models.University;
-import com.xhdh.xhdh.domain.models.User;
+import com.xhdh.xhdh.domain.models.match.Match;
+import com.xhdh.xhdh.domain.models.match.MatchParticipant;
+import com.xhdh.xhdh.domain.models.match.SoloMatch;
+import com.xhdh.xhdh.domain.models.search.University;
+import com.xhdh.xhdh.domain.models.authentication.User;
 
 import lombok.RequiredArgsConstructor;
 

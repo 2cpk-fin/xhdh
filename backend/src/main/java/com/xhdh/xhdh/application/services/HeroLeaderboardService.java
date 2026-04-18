@@ -8,9 +8,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.xhdh.xhdh.application.dto.searches.UniversityMetadataDTO;
-import com.xhdh.xhdh.domain.models.Tag;
-import com.xhdh.xhdh.domain.models.University;
+import com.xhdh.xhdh.application.dto.search.UniversityMetadataDTO;
+import com.xhdh.xhdh.domain.models.search.Tag;
+import com.xhdh.xhdh.domain.models.search.University;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;

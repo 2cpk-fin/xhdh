@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
-import com.xhdh.xhdh.domain.models.Comment;
+import com.xhdh.xhdh.domain.models.comment.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

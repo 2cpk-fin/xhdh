@@ -2,7 +2,7 @@ package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.xhdh.xhdh.domain.models.Match;
+import com.xhdh.xhdh.domain.models.match.Match;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

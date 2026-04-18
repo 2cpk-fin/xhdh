@@ -9,7 +9,7 @@ import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
 import com.xhdh.xhdh.application.dto.authentication.LogoutRequest;
 import com.xhdh.xhdh.application.dto.authentication.LogoutResponse;
 import com.xhdh.xhdh.application.dto.AuthResponse;
-import com.xhdh.xhdh.domain.models.RefreshToken;
+import com.xhdh.xhdh.domain.models.authentication.RefreshToken;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 import com.xhdh.xhdh.infrastructure.security.*;
 

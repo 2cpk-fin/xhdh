@@ -1,12 +1,12 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.matches.ParticipantResponse;
-import com.xhdh.xhdh.application.dto.matches.ScheduleMatchRequest;
-import com.xhdh.xhdh.application.dto.matches.ScheduleMatchResponse;
-import com.xhdh.xhdh.domain.models.Match;
-import com.xhdh.xhdh.domain.models.MatchParticipant;
-import com.xhdh.xhdh.domain.models.Status;
-import com.xhdh.xhdh.domain.models.University;
+import com.xhdh.xhdh.application.dto.match.ParticipantResponse;
+import com.xhdh.xhdh.application.dto.match.ScheduleMatchRequest;
+import com.xhdh.xhdh.application.dto.match.ScheduleMatchResponse;
+import com.xhdh.xhdh.domain.models.match.Match;
+import com.xhdh.xhdh.domain.models.match.MatchParticipant;
+import com.xhdh.xhdh.domain.models.match.Status;
+import com.xhdh.xhdh.domain.models.search.University;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
@@ -71,6 +71,7 @@ public class ScheduleMatchService {
     private ScheduleMatchResponse buildMatchResponse(Match match) {
         return ScheduleMatchResponse.builder()
                 .publicMatchId(match.getPublicMatchId())
+                .matchId(match.getId())
                 .title(match.getTitle())
                 .status(String.valueOf(match.getStatus()))
                 .participants(buildParticipantResponses(match))

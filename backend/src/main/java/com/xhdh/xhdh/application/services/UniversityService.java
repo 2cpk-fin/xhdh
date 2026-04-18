@@ -1,8 +1,9 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.searches.UniversityResponse;
-import com.xhdh.xhdh.domain.models.Tag;
-import com.xhdh.xhdh.domain.models.University;
+import com.xhdh.xhdh.application.dto.search.UniversityResponse;
+import com.xhdh.xhdh.application.mappers.search.UniversityMapper;
+import com.xhdh.xhdh.domain.models.search.Tag;
+import com.xhdh.xhdh.domain.models.search.University;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.TagRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
@@ -22,21 +23,23 @@ public class UniversityService {
 
     private final UniversityRepository universityRepository;
 
+    private final UniversityMapper universityMapper;
+
+    private UniversityResponse mapToResponseWithTags(University university) {
+        if (university == null) return null;
+        UniversityResponse response = universityMapper.toUniversityResponse(university);
+        response.setTags(showAllTagsInUniversity(university.getName()));
+        return response;
+    }
+
     public Page<UniversityResponse> getUniversityList(Pageable pageable) {
         return universityRepository.findUniversityList(pageable)
-                .map(university -> {
-                    UniversityResponse universityResponse = new UniversityResponse(university);
-                    universityResponse.setTags(showAllTagsInUniversity(university.getName()));
-                    return universityResponse;
-                });
+                .map(this::mapToResponseWithTags);
     }
 
     public UniversityResponse getUniversityByName(String universityName) {
         University university = universityRepository.findByName(universityName);
-        UniversityResponse universityResponse = new UniversityResponse(university);
-        universityResponse.setTags(showAllTagsInUniversity(university.getName()));
-
-        return universityResponse;
+        return mapToResponseWithTags(university);
     }
 
     public List<String> showAllTagsInUniversity(String universityName) {

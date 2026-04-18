@@ -10,8 +10,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import com.xhdh.xhdh.application.services.RefreshTokenService;
-import com.xhdh.xhdh.domain.models.AuthProvider;
-import com.xhdh.xhdh.domain.models.User;
+import com.xhdh.xhdh.domain.models.authentication.AuthProvider;
+import com.xhdh.xhdh.domain.models.authentication.User;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UserRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
