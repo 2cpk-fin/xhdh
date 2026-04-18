@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Settings, Search, Moon, Sun, Bell, Mail, Users, ArrowLeft, Activity, Cpu, ShieldCheck, Smile, HelpCircle, LogOut, ExternalLink, Languages } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
+import api from '../api/axios';
 
 const SettingsSidebar = () => {
     const [theme, setTheme] = useState<'light' | 'dark'>(() => (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light');
@@ -51,6 +52,25 @@ const SettingsSidebar = () => {
         localStorage.setItem('lang', newLang);
         setLang(newLang);
     };
+
+    const handleLogout = async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    const accessToken = localStorage.getItem('accessToken');
+
+    try {
+      if (refreshToken) {
+        await api.post('/auth/logout', { refreshToken, accessToken });
+      }
+    } catch (err) {
+      console.error('Server-side logout failed', err);
+    } finally {
+      // CLEAR EVERYTHING
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('token'); // Clear the old key just in case
+      navigate('/login');
+    }
+};
 
     const isDark = theme === 'dark';
     const sidebarBg = isDark ? 'bg-black border-white/10' : 'bg-white border-zinc-200 shadow-[0_2px_18px_rgba(0,0,0,0.05)]';
@@ -181,7 +201,7 @@ const SettingsSidebar = () => {
                                 </div>
 
                                 <div className="p-2 border-t border-zinc-500/10 bg-zinc-500/5 rounded-b-2xl">
-                                    <button onClick={() => navigate('/login')} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-black text-red-500 hover:bg-red-500/20 rounded-xl transition-all"><LogOut className="w-4 h-4" /> Log Out</button>
+                                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-black text-red-500 hover:bg-red-500/20 rounded-xl transition-all"><LogOut className="w-4 h-4" /> Log Out</button>
                                 </div>
                             </div>
                         )}
