@@ -8,6 +8,7 @@ export interface ParticipantResponse {
 
 export interface ScheduleMatchResponse {
     publicMatchId: string;
+    matchId: number;
     title: string;
     status: 'NOT_STARTED' | 'PENDING' | 'FINISHED';
     participants: ParticipantResponse[];
@@ -19,17 +20,17 @@ export interface ScheduleMatchResponse {
 export interface CommentResponse {
     publicCommentId: string;
     username: string;
-    matchId: number;
+    matchId: number; // FIXED: Changed to number to align with backend Long
     commentDate: string; // ISO DateTime string
     likes: number;
-    parentId: number | null;
+    parentId: number | null; // FIXED: Changed to number
     content: string;
 }
 
 export interface CommentRequest {
     userId: number;
-    matchId: number;
-    parentId?: number;
+    matchId: number; // FIXED: Changed to number
+    parentId?: number; // FIXED: Changed to number
     content: string;
 }
 

@@ -72,7 +72,7 @@ const RegisterPage = () => {
     }
     setLoading(true);
     try {
-      const response = await api.post('/users/register', {
+      const response = await api.post('/api/users/register', {
         username: formData.username,
         email: formData.email,
         password: formData.password

@@ -102,13 +102,12 @@ const SearchPage = () => {
                                     <button
                                         key={f}
                                         onClick={() => setActiveFilter(f)}
-                                        className={`px-5 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest border-2 transition-all active:scale-95 ${
-                                            activeFilter === f
+                                        className={`px-5 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest border-2 transition-all active:scale-95 ${activeFilter === f
                                                 ? 'bg-purple-600 border-purple-600 text-white shadow-lg'
                                                 : isDark
                                                     ? 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600'
                                                     : 'bg-white border-zinc-200 text-zinc-600 hover:bg-zinc-50'
-                                        }`}
+                                            }`}
                                     >
                                         {f}
                                     </button>

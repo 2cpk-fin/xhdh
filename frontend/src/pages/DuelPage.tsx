@@ -87,7 +87,7 @@ const DuelPage = () => {
     setSeconds(0);
     setTimerActive(true);
     try {
-      const response = await api.post('/matches/solo/start');
+      const response = await api.post('/api/matches/solo/start');
       setCurrentMatch(response.data);
     } catch (err: unknown) {
       const maybeError = err as ApiError;
@@ -104,7 +104,7 @@ const DuelPage = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await api.post('/matches/solo/choose', {
+      const response = await api.post('/api/matches/solo/choose', {
         matchUUID: currentMatch.matchId,
         universityUUID: universityId
       });

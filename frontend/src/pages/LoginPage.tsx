@@ -56,7 +56,7 @@ const LoginPage = () => {
     e.preventDefault();
     setAnnouncement(null);
     try {
-      const response = await api.post('/auth/login', { email: formData.email, password: formData.password });
+      const response = await api.post('/api/auth/login', { email: formData.email, password: formData.password });
       const { token, refreshToken } = response.data;
       if (token && refreshToken) {
         localStorage.setItem('token', token);

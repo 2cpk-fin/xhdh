@@ -4,55 +4,55 @@ import type { ScheduleMatchResponse, CommentResponse, CommentRequest, Page } fro
 // Event Match API Endpoints
 export const eventMatchAPI = {
     // Get all scheduled matches
-    getAllMatches: () => api.get<ScheduleMatchResponse[]>('/events/match/all'),
+    getAllMatches: () => api.get<ScheduleMatchResponse[]>('/api/events/match/all'),
 
     // Get matches not started
-    getNotStartedMatches: () => api.get<ScheduleMatchResponse[]>('/events/match/all/not-started'),
+    getNotStartedMatches: () => api.get<ScheduleMatchResponse[]>('/api/events/match/all/not-started'),
 
     // Get pending matches
-    getPendingMatches: () => api.get<ScheduleMatchResponse[]>('/events/match/all/pending'),
+    getPendingMatches: () => api.get<ScheduleMatchResponse[]>('/api/events/match/all/pending'),
 
     // Get finished matches
-    getFinishedMatches: () => api.get<ScheduleMatchResponse[]>('/events/match/all/finished'),
+    getFinishedMatches: () => api.get<ScheduleMatchResponse[]>('/api/events/match/all/finished'),
 
     // Get participants for a specific match
-    getMatchParticipants: (matchId: number) => api.get(`/events/match/${matchId}/participants`),
+    getMatchParticipants: (matchId: string) => api.get(`/api/events/match/${matchId}/participants`),
 
     // Create a scheduled match
-    createMatch: (matchData: any) => api.post<ScheduleMatchResponse>('/events/match', matchData),
+    createMatch: (matchData: any) => api.post<ScheduleMatchResponse>('/api/events/match', matchData),
 
     // Update a scheduled match
-    updateMatch: (matchId: number, matchData: any) => api.put<ScheduleMatchResponse>(`/events/match/${matchId}`, matchData),
+    updateMatch: (matchId: string, matchData: any) => api.put<ScheduleMatchResponse>(`/api/events/match/${matchId}`, matchData),
 
     // Vote on a match
     voteOnMatch: (matchId: string, universityName: string) =>
-        api.patch(`/events/match/votes/${matchId}`, null, { params: { universityName } }),
+        api.patch(`/api/events/match/votes/${matchId}`, null, { params: { universityName } }),
 
     // Delete a match
-    deleteMatch: (matchId: number) => api.delete(`/events/match/${matchId}`),
+    deleteMatch: (matchId: string) => api.delete(`/api/events/match/${matchId}`),
 };
 
 // Comment API Endpoints
 export const commentAPI = {
     // Get top-level comments for a match (paginated)
     getComments: (matchId: number, page: number = 0, size: number = 20) =>
-        api.get<Page<CommentResponse>>(`/matches/${matchId}/comments`, {
+        api.get<Page<CommentResponse>>(`/api/matches/${matchId}/comments`, {
             params: { page, size, sort: 'commentDate,desc' },
         }),
 
     // Get replies to a comment
-    getReplies: (parentId: number) => api.get<CommentResponse[]>(`/matches/${parentId}/replies`),
+    getReplies: (parentId: number) => api.get<CommentResponse[]>(`/api/matches/${parentId}/replies`),
 
     // Create a new comment
-    createComment: (commentData: CommentRequest) => api.post<CommentResponse>('/matches', commentData),
+    createComment: (commentData: CommentRequest) => api.post<CommentResponse>('/api/matches', commentData),
 
     // Like a comment
-    likeComment: (commentId: number) => api.patch(`/matches/comments/${commentId}/likes`, null, { params: { id: commentId } }),
+    likeComment: (commentId: string) => api.patch(`/api/matches/comments/${commentId}/likes`, null, { params: { id: commentId } }),
 
     // Update a comment
-    updateComment: (commentId: number, newContent: string) =>
-        api.put<CommentResponse>(`/matches/comments/${commentId}`, null, { params: { newContent } }),
+    updateComment: (commentId: string, newContent: string) =>
+        api.put<CommentResponse>(`/api/matches/comments/${commentId}`, null, { params: { newContent } }),
 
     // Delete a comment
-    deleteComment: (commentId: number) => api.delete(`/matches/comments/${commentId}`),
+    deleteComment: (commentId: string) => api.delete(`/api/matches/comments/${commentId}`),
 };

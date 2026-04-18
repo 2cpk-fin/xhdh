@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Trash2, Edit2 } from 'lucide-react';
 import { commentAPI } from '../api/eventService';
-import type { CommentResponse, Page } from '../types/event';
+import type { CommentResponse } from '../types/event';
 
+// FIXED: Changed matchId type to number
 interface CommentSectionProps {
     matchId: number;
     isDark: boolean;
@@ -13,7 +14,8 @@ const CommentSection = ({ matchId, isDark }: CommentSectionProps) => {
     const [newComment, setNewComment] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [expandedReplies, setExpandedReplies] = useState<Set<number>>(new Set());
+    // FIXED: Changed Set type to string for comment IDs
+    const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
 
     const cardBg = isDark ? 'bg-[#121212] border-zinc-800' : 'bg-white border-zinc-200';
     const textColor = isDark ? 'text-zinc-100' : 'text-zinc-900';
@@ -58,27 +60,29 @@ const CommentSection = ({ matchId, isDark }: CommentSectionProps) => {
         }
     };
 
-    const handleLikeComment = async (commentId: number) => {
+    const handleLikeComment = async (commentId: string) => {
         try {
             await commentAPI.likeComment(commentId);
+            // FIXED: Now mapping based on publicCommentId, not matchId
             setComments(comments.map((c) =>
-                c.matchId === commentId ? { ...c, likes: c.likes + 1 } : c
+                c.publicCommentId === commentId ? { ...c, likes: c.likes + 1 } : c
             ));
         } catch (err) {
             console.error('Failed to like comment', err);
         }
     };
 
-    const handleDeleteComment = async (commentId: number) => {
+    const handleDeleteComment = async (commentId: string) => {
         try {
             await commentAPI.deleteComment(commentId);
-            setComments(comments.filter((c) => c.matchId !== commentId));
+            // FIXED: Filtering out based on publicCommentId
+            setComments(comments.filter((c) => c.publicCommentId !== commentId));
         } catch (err) {
             console.error('Failed to delete comment', err);
         }
     };
 
-    const toggleReplies = (commentId: number) => {
+    const toggleReplies = (commentId: string) => {
         const newExpanded = new Set(expandedReplies);
         if (newExpanded.has(commentId)) {
             newExpanded.delete(commentId);
@@ -146,7 +150,8 @@ const CommentSection = ({ matchId, isDark }: CommentSectionProps) => {
                                     <button className={`p-2 rounded-lg ${isDark ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}>
                                         <Edit2 className="w-4 h-4" />
                                     </button>
-                                    <button onClick={() => handleDeleteComment(comment.matchId)} className={`p-2 rounded-lg ${isDark ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}>
+                                    {/* FIXED: Passed publicCommentId instead of matchId */}
+                                    <button onClick={() => handleDeleteComment(comment.publicCommentId)} className={`p-2 rounded-lg ${isDark ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}>
                                         <Trash2 className="w-4 h-4 text-red-500" />
                                     </button>
                                 </div>
@@ -157,15 +162,17 @@ const CommentSection = ({ matchId, isDark }: CommentSectionProps) => {
 
                             {/* Comment Actions */}
                             <div className="flex gap-4 text-sm">
+                                {/* FIXED: Passed publicCommentId instead of matchId */}
                                 <button
-                                    onClick={() => handleLikeComment(comment.matchId)}
+                                    onClick={() => handleLikeComment(comment.publicCommentId)}
                                     className={`flex items-center gap-2 ${subTextColor} hover:text-red-500 transition-colors`}
                                 >
                                     <Heart className="w-4 h-4" />
                                     {comment.likes}
                                 </button>
+                                {/* FIXED: Passed publicCommentId instead of matchId */}
                                 <button
-                                    onClick={() => toggleReplies(comment.matchId)}
+                                    onClick={() => toggleReplies(comment.publicCommentId)}
                                     className={`flex items-center gap-2 ${subTextColor} hover:text-purple-500 transition-colors`}
                                 >
                                     <MessageCircle className="w-4 h-4" />

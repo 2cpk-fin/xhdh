@@ -31,8 +31,8 @@ const LeaderboardPage = () => {
             try {
                 // Parallel fetch for tags and university metadata
                 const [tagsRes, unisRes] = await Promise.all([
-                    api.get('/tags/all'),
-                    api.get('/universities/all') // Hits UniversityLeaderboardController
+                    api.get('/api/tags/all'),
+                    api.get('/api/universities/all') // Hits UniversityLeaderboardController
                 ]);
                 setTags(tagsRes.data);
                 setUniversities(unisRes.data);

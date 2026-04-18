@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Trophy, Users, Clock, ChevronDown } from 'lucide-react';
-import { eventMatchAPI } from '../api/eventService';
-import type { ScheduleMatchResponse } from '../types/event';
+import { Trophy, Users, ChevronDown } from 'lucide-react';
+import { eventMatchAPI } from '../api/eventService.ts';
+import type { ScheduleMatchResponse } from '../types/event.ts';
 import CommentSection from './CommentSection';
 
 interface EventMatchesProps {
@@ -174,7 +174,7 @@ const EventMatches = ({ isDark }: EventMatchesProps) => {
             {/* Comments Section for Selected Match */}
             {selectedMatch && (
                 <div>
-                    <CommentSection matchId={selectedMatch.publicMatchId as any} isDark={isDark} />
+                    <CommentSection matchId={selectedMatch.matchId} isDark={isDark} />
                 </div>
             )}
         </div>
