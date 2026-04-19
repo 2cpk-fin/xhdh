@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.xhdh.xhdh.application.dto.authentication.AuthRequest;
 import com.xhdh.xhdh.application.dto.authentication.LogoutRequest;
+import com.xhdh.xhdh.application.dto.authentication.LogoutResponse;
 import com.xhdh.xhdh.application.services.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +20,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<com.xhdh.xhdh.application.dto.AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request, HttpServletRequest httpRequest){
+    public ResponseEntity<AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request, HttpServletRequest httpRequest){
         return ResponseEntity.ok(authService.authenticate(request,httpRequest));
     }
 
@@ -29,8 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logoutRequest(@RequestBody LogoutRequest logoutRequest){
-        authService.logout(logoutRequest);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LogoutResponse> logoutRequest(@RequestBody LogoutRequest logoutRequest, HttpServletRequest httpRequest){
+        return ResponseEntity.ok(authService.logout(logoutRequest, httpRequest));
     }
 }

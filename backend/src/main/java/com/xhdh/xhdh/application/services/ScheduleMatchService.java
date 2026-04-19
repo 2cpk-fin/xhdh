@@ -1,12 +1,12 @@
 package com.xhdh.xhdh.application.services;
 
-import com.xhdh.xhdh.application.dto.matches.MatchParticipantResponse;
-import com.xhdh.xhdh.application.dto.matches.MatchRequest;
-import com.xhdh.xhdh.application.dto.matches.MatchResponse;
-import com.xhdh.xhdh.domain.models.Match;
-import com.xhdh.xhdh.domain.models.MatchParticipant;
-import com.xhdh.xhdh.domain.models.Status;
-import com.xhdh.xhdh.domain.models.University;
+import com.xhdh.xhdh.application.dto.match.ParticipantResponse;
+import com.xhdh.xhdh.application.dto.match.ScheduleMatchRequest;
+import com.xhdh.xhdh.application.dto.match.ScheduleMatchResponse;
+import com.xhdh.xhdh.domain.models.match.Match;
+import com.xhdh.xhdh.domain.models.match.MatchParticipant;
+import com.xhdh.xhdh.domain.models.match.Status;
+import com.xhdh.xhdh.domain.models.search.University;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.MatchRepository;
 import com.xhdh.xhdh.infrastructure.repositories.jpa.UniversityRepository;
 
@@ -14,11 +14,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,15 +32,15 @@ public class ScheduleMatchService {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    private Match buildMatch(MatchRequest matchRequest) {
+    private Match buildMatch(ScheduleMatchRequest scheduleMatchRequest) {
         Match newMatch = Match.builder()
-                .title(matchRequest.getTitle())
+                .title(scheduleMatchRequest.getTitle())
                 .status(Status.NOT_STARTED)
-                .startTime(matchRequest.getStartTime())
-                .endTime(matchRequest.getEndTime())
+                .startTime(scheduleMatchRequest.getStartTime())
+                .endTime(scheduleMatchRequest.getEndTime())
                 .build();
 
-        List<MatchParticipant> participants = matchRequest.getParticipants()
+        List<MatchParticipant> participants = scheduleMatchRequest.getParticipants()
                 .stream()
                 .map(universityName -> {
                     MatchParticipant participant = new MatchParticipant();
@@ -57,15 +58,20 @@ public class ScheduleMatchService {
         return newMatch;
     }
 
-    private void buildMatchInRedis(MatchRequest matchRequest) {
-        for (String participant : matchRequest.getParticipants()) {
-            redisTemplate.opsForZSet().add("leaderboard:match:" + matchRequest.getId(), participant, 0);
+    private void buildMatchInRedis(ScheduleMatchRequest scheduleMatchRequest, Long matchId) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        String matchKey = String.valueOf(match.getId());
+
+        for (String participant : scheduleMatchRequest.getParticipants()) {
+            redisTemplate.opsForZSet().add("leaderboard:match:" + matchKey, participant, 0);
         }
     }
 
-    private MatchResponse buildMatchResponse(Match match) {
-        return MatchResponse.builder()
-                .id(match.getId())
+    private ScheduleMatchResponse buildMatchResponse(Match match) {
+        return ScheduleMatchResponse.builder()
+                .publicMatchId(match.getPublicMatchId())
+                .matchId(match.getId())
                 .title(match.getTitle())
                 .status(String.valueOf(match.getStatus()))
                 .participants(buildParticipantResponses(match))
@@ -74,65 +80,101 @@ public class ScheduleMatchService {
                 .build();
     }
 
-    private List<MatchParticipantResponse> buildParticipantResponses(Match match) {
+    private List<ParticipantResponse> buildParticipantResponses(Match match) {
         return match.getParticipants()
                 .stream()
-                .map(MatchParticipantResponse::new)
+                .map(ParticipantResponse::new)
                 .toList();
     }
 
-    private void updateEloToParticipants(Match match) {
-        List<MatchParticipant> participants = match.getParticipants();
-        if (participants == null || participants.isEmpty()) return;
+    private void divideGroup(Match match) {
+        String key = getMatchKey(String.valueOf(match.getId()));
+        var typedTuples = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
-        // 1. Sort participants by rank (ascending: 1 is best)
-        participants.sort(Comparator.comparingInt(MatchParticipant::getRank));
+        if (typedTuples == null || typedTuples.isEmpty()) return;
 
-        int total = participants.size();
-        int firstGroupSize = total / 3;
+        List<ZSetOperations.TypedTuple<Object>> list = new ArrayList<>(typedTuples);
+        syncVotesToDatabase(match, list);
 
-        // In case of small numbers, ensure we have at least 1 in each group if possible
-        int lastGroupSize = total - firstGroupSize;
+        int totalSize = list.size();
+        int groupSize = totalSize / 3;
+        int extra = totalSize % 3;
 
-        // 2. Define base reward
-        // We want Sum(G1) + Sum(G3) = 0.
-        // Let's say base change is 20 points.
+        int endGroup1 = groupSize + (extra > 0 ? 1 : 0);
+        int endGroup2 = endGroup1 + groupSize + (extra > 1 ? 1 : 0);
+
+        // Call the group processing function for each segment
+        calculateAndApplyGroupElo(list.subList(0, endGroup1), 1.0);
+        calculateAndApplyGroupElo(list.subList(endGroup1, endGroup2),  0.0);
+        calculateAndApplyGroupElo(list.subList(endGroup2, totalSize), -1.0);
+
+        redisTemplate.delete(key);
+    }
+
+    private void syncVotesToDatabase(Match match, List<ZSetOperations.TypedTuple<Object>> results) {
+        for (int rank = 0; rank < results.size(); rank++) {
+            var tuple = results.get(rank);
+            String universityName = (String) tuple.getValue();
+            int finalVotes = (int) Math.round(tuple.getScore() != null ? tuple.getScore() : 0.0);
+
+            int currentRank = rank + 1;
+
+            match.getParticipants().stream()
+                    .filter(p -> p.getUniversity().getName().equals(universityName))
+                    .findFirst()
+                    .ifPresent(participant -> {
+                        participant.setTotalVotes(finalVotes);
+                        participant.setRank(currentRank);
+                    });
+        }
+        matchRepository.save(match);
+    }
+
+    private void calculateAndApplyGroupElo(List<ZSetOperations.TypedTuple<Object>> group, double modifier) {
+        if (group.isEmpty()) return;
         double baseReward = 20.0;
 
-        for (int i = 0; i < total; i++) {
-            MatchParticipant participant = participants.get(i);
-            University university = participant.getUniversity();
-            int currentElo = university.getElo();
-            double eloChange = 0;
+        double sigmaV = group.stream()
+                .mapToDouble(tuple -> tuple.getScore() != null ? tuple.getScore() : 0.0)
+                .sum();
 
-            if (i < firstGroupSize) {
-                // GROUP 1: Increase
-                eloChange = baseReward;
+        for (var tuple : group) {
+            String universityName = (String) tuple.getValue();
+            double vi = tuple.getScore() != null ? tuple.getScore() : 0.0;
 
-                // Apply Rank Multiplier for Top 1
-                if (i == 0) { // Top 1
-                    eloChange *=  1.5;
-                }
-                else {
-                    // Scaling multiplier from 1.4 down to 1.1 for the rest of Group 1
-                    double multiplier = 1.0 + (0.5 * (double)(firstGroupSize - i) / firstGroupSize);
-                    eloChange *= Math.max(1.0, multiplier);
-                }
-            }
-            else if (i >= lastGroupSize) {
-                // GROUP 3: Decrease
-                // To satisfy Sum = 0, Group 3 total must equal Group 1 total
-                // We calculate the proportional drain here
-                eloChange = -baseReward;
+            // Formula implementation: ((vi / sigmaV) + modifier) * baseReward
+            double eloChange = ((sigmaV == 0 ? 0 : vi / sigmaV) + modifier) * baseReward;
 
-                // Rank logic: Lower rank (worst) is unchanged (multiplier 1.0)
-                // Higher rank within Group 3 gets hit slightly harder?
-                // Or keep it simple as per your request: Lowest is unchanged (x1.0)
-            }
+            applyEloToUniversity(universityName, (int) Math.round(eloChange));
+        }
+    }
 
-            university.setElo((int) (currentElo + eloChange));
+    private void applyEloToUniversity(String universityName, int eloChange) {
+        University university = universityRepository.findByName(universityName);
+        if (university != null) {
+            university.setElo(university.getElo() + eloChange);
             universityRepository.save(university);
         }
+    }
+
+    public void vote(String universityName, String matchId) {
+        Match match = matchRepository.findById(Long.parseLong(matchId))
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+
+        if (match.getStatus().equals(Status.PENDING)) {
+            String key = getMatchKey(matchId);
+            redisTemplate.opsForZSet().incrementScore(key, universityName, 1);
+        }
+        else if (match.getStatus().equals(Status.NOT_STARTED)) {
+            throw new RuntimeException("Match has not started yet");
+        }
+        else {
+            throw new RuntimeException("Match has already ended");
+        }
+    }
+
+    private String getMatchKey(String matchId) {
+        return "leaderboard:match:" + matchId;
     }
 
     @Scheduled(fixedRate = 3600000)
@@ -140,24 +182,26 @@ public class ScheduleMatchService {
     protected void changeStatus() {
         for (Match match : matchRepository.findAllNotFinishedMatch()) {
             Instant now = Instant.now();
-            if (match.getEndTime().isAfter(now)) {
+            if (now.isAfter(Instant.from(match.getEndTime()))) {
                 match.setStatus(Status.FINISHED);
-                updateEloToParticipants(match);
+                matchRepository.save(match);
+                divideGroup(match);
             }
-            else if (match.getStartTime().isAfter(now)) {
+            else if (now.isAfter(Instant.from(match.getStartTime()))) {
                 match.setStatus(Status.PENDING);
+                matchRepository.save(match);
             }
         }
     }
 
-    public List<MatchResponse> getAllMatches() {
+    public List<ScheduleMatchResponse> getAllMatches() {
         return matchRepository.findAll()
                 .stream()
                 .map(this::buildMatchResponse)
                 .toList();
     }
 
-    public List<MatchResponse> getAllNotStartedMatches() {
+    public List<ScheduleMatchResponse> getAllNotStartedMatches() {
         return matchRepository.findAll()
                 .stream()
                 .filter(match -> "NOT_STARTED".equals(String.valueOf(match.getStatus())))
@@ -165,7 +209,7 @@ public class ScheduleMatchService {
                 .toList();
     }
 
-    public List<MatchResponse> getAllPendingMatches() {
+    public List<ScheduleMatchResponse> getAllPendingMatches() {
         return matchRepository.findAll()
                 .stream()
                 .filter(match -> "PENDING".equals(String.valueOf(match.getStatus())))
@@ -173,7 +217,7 @@ public class ScheduleMatchService {
                 .toList();
     }
 
-    public List<MatchResponse> getAllFinishedMatches() {
+    public List<ScheduleMatchResponse> getAllFinishedMatches() {
         return matchRepository.findAll()
                 .stream()
                 .filter(match -> "FINISHED".equals(String.valueOf(match.getStatus())))
@@ -181,23 +225,25 @@ public class ScheduleMatchService {
                 .toList();
     }
 
-    public List<MatchParticipantResponse> getAllParticipants(long id) {
+    public List<ParticipantResponse> getAllParticipants(long id) {
         Match match = matchRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Match not found"));
 
         return  match.getParticipants()
                 .stream()
-                .map(MatchParticipantResponse::new)
+                .map(ParticipantResponse::new)
                 .toList();
     }
 
-    public MatchResponse createMatch(MatchRequest matchRequest) {
-        buildMatchInRedis(matchRequest);
-        return buildMatchResponse(matchRepository.save(buildMatch(matchRequest)));
+    public ScheduleMatchResponse createMatch(ScheduleMatchRequest scheduleMatchRequest) {
+        Match newMatch = buildMatch(scheduleMatchRequest);
+        matchRepository.save(newMatch);
+        buildMatchInRedis(scheduleMatchRequest, newMatch.getId());
+        return buildMatchResponse(newMatch);
     }
 
-    public MatchResponse updateMatchById(long id, MatchRequest matchRequest) {
-        Match newMatch = buildMatch(matchRequest);
+    public ScheduleMatchResponse updateMatchById(long id, ScheduleMatchRequest scheduleMatchRequest) {
+        Match newMatch = buildMatch(scheduleMatchRequest);
         newMatch.setId(id);
         return buildMatchResponse(matchRepository.save(newMatch));
     }

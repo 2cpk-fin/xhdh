@@ -1,6 +1,6 @@
 package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
-import com.xhdh.xhdh.domain.models.SoloMatch;
+import com.xhdh.xhdh.domain.models.match.SoloMatch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

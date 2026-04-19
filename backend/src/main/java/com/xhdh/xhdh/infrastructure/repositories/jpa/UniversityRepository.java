@@ -1,15 +1,15 @@
 package com.xhdh.xhdh.infrastructure.repositories.jpa;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.xhdh.xhdh.domain.models.University;
+import com.xhdh.xhdh.domain.models.search.University;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
@@ -34,5 +34,7 @@ public interface UniversityRepository extends JpaRepository<University, Long>{
                    "WHERE u1.id = :universityId AND u2.id <> :universityId", nativeQuery = true)
     List<University> findAllOpponentsWithSharedTag(@Param("universityId") long universityId);
 
-    Optional<University> findByPublicUniversityId(UUID publicUniversityId);
+    @Query("SELECT u FROM University u")
+    Page<University> findUniversityList(Pageable pageable);
+
 }
