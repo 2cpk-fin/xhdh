@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.xhdh</groupId>
-	<artifactId>xhdh</artifactId>
+	<artifactId>UniversityRankingApp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>xhdh</name>
 	<description>Modern Spring Boot API</description>
@@ -19,7 +19,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<jjwt.version>0.11.5</jjwt.version>
-		<springdoc.version>2.5.0</springdoc.version>
+		<springdoc.version>2.8.6</springdoc.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 	</properties>
 
@@ -28,6 +28,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -47,12 +48,14 @@
 			<artifactId>jjwt-api</artifactId>
 			<version>${jjwt.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-impl</artifactId>
 			<version>${jjwt.version}</version>
 			<scope>runtime</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
