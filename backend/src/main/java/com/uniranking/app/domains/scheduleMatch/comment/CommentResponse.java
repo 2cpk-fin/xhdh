@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonPropertyOrder({"id", "username", "matchId", "commentDate", "likes", "parentId", "content"})
+@JsonPropertyOrder({ "id", "username", "matchId", "commentDate", "likes", "parentId", "content" })
 public class CommentResponse {
     private UUID id;
 

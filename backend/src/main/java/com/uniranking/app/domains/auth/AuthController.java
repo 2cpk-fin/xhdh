@@ -14,17 +14,18 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request, HttpServletRequest httpRequest){
-        return ResponseEntity.ok(authService.authenticate(request,httpRequest));
+    public ResponseEntity<AuthResponse> loginRequest(@Valid @RequestBody AuthRequest request,
+            HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(authService.authenticate(request, httpRequest));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody String refreshToken, HttpServletRequest httpRequest){
-        return ResponseEntity.ok(authService.refreshToken(refreshToken,httpRequest));
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody String refreshToken, HttpServletRequest httpRequest) {
+        return ResponseEntity.ok(authService.refreshToken(refreshToken, httpRequest));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<LogoutResponse> logoutRequest(@RequestBody LogoutRequest logoutRequest){
+    public ResponseEntity<LogoutResponse> logoutRequest(@RequestBody LogoutRequest logoutRequest) {
         return ResponseEntity.ok(authService.logout(logoutRequest));
     }
 }

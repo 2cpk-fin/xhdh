@@ -48,7 +48,8 @@ public class ScheduleMatchService {
         String key = getMatchKey(String.valueOf(scheduleMatch.getId()));
         var typedTuples = redisTemplate.opsForZSet().reverseRangeWithScores(key, 0, -1);
 
-        if (typedTuples == null || typedTuples.isEmpty()) return;
+        if (typedTuples == null || typedTuples.isEmpty())
+            return;
 
         List<ZSetOperations.TypedTuple<Object>> list = new ArrayList<>(typedTuples);
         syncVotesToDatabase(scheduleMatch, list);
@@ -62,7 +63,7 @@ public class ScheduleMatchService {
 
         // Call the group processing function for each segment
         calculateAndApplyGroupElo(list.subList(0, endGroup1), 1.0);
-        calculateAndApplyGroupElo(list.subList(endGroup1, endGroup2),  0.0);
+        calculateAndApplyGroupElo(list.subList(endGroup1, endGroup2), 0.0);
         calculateAndApplyGroupElo(list.subList(endGroup2, totalSize), -1.0);
 
         redisTemplate.delete(key);
@@ -88,7 +89,8 @@ public class ScheduleMatchService {
     }
 
     private void calculateAndApplyGroupElo(List<ZSetOperations.TypedTuple<Object>> group, double modifier) {
-        if (group.isEmpty()) return;
+        if (group.isEmpty())
+            return;
         double baseReward = 20.0;
 
         double sigmaV = group.stream()
@@ -118,11 +120,9 @@ public class ScheduleMatchService {
         if (scheduleMatch.getStatus().equals(Status.PENDING)) {
             String key = getMatchKey(matchId);
             redisTemplate.opsForZSet().incrementScore(key, universityName, 1);
-        }
-        else if (scheduleMatch.getStatus().equals(Status.NOT_STARTED)) {
+        } else if (scheduleMatch.getStatus().equals(Status.NOT_STARTED)) {
             throw new RuntimeException("Match has not started yet");
-        }
-        else {
+        } else {
             throw new RuntimeException("Match has already ended");
         }
     }
@@ -137,8 +137,7 @@ public class ScheduleMatchService {
                 scheduleMatch.setStatus(Status.FINISHED);
                 scheduleMatchRepository.save(scheduleMatch);
                 divideGroup(scheduleMatch);
-            }
-            else if (now.isAfter(scheduleMatch.getStartTime().toInstant(ZoneOffset.UTC))) {
+            } else if (now.isAfter(scheduleMatch.getStartTime().toInstant(ZoneOffset.UTC))) {
                 scheduleMatch.setStatus(Status.PENDING);
                 scheduleMatchRepository.save(scheduleMatch);
             }

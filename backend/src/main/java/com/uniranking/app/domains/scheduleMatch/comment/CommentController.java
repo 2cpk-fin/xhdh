@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/events/match/comments")
+@RequestMapping(path = "/api/events/match/comments")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
@@ -47,10 +47,7 @@ public class CommentController {
     @PatchMapping("/{id}")
     public ResponseEntity<CommentResponse> updateComment(
             @PathVariable Long id,
-            @RequestBody
-            @NotBlank(message = "The content cannot be empty")
-            @Size(max = 4500, message = "Too long! Max limit is roughly 750 words.")
-            String newContent) {
+            @RequestBody @NotBlank(message = "The content cannot be empty") @Size(max = 4500, message = "Too long! Max limit is roughly 750 words.") String newContent) {
         CommentResponse newComment = commentService.updateComment(id, newContent);
         return new ResponseEntity<>(newComment, HttpStatus.OK);
     }

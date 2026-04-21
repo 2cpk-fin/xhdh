@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/events/match")
+@RequestMapping(path = "/api/events/match")
 @RequiredArgsConstructor
 public class ScheduleMatchController {
     private final ScheduleMatchService scheduleMatchService;

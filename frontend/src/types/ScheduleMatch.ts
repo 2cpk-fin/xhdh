@@ -29,7 +29,7 @@ export interface ScheduleMatchRequest {
 }
 
 export interface ScheduleMatchResponse {
-    publicMatchId: string; // UUID mapped to string
+    id: string; // UUID mapped to string
     title: string;
     status: MatchStatus;
     participants: ScheduleParticipantResponse[];
@@ -51,6 +51,6 @@ export interface CommentResponse {
     matchId: string; // UUID mapped to string
     commentDate: string; // ISO DateTime string
     likes: number;
-    parentId: number | null; // Null if it's a top-level comment
+    parentId: string | null; // Null if it's a top-level comment
     content: string;
 }

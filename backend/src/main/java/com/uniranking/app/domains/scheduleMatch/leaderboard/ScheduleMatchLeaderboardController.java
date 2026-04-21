@@ -14,8 +14,8 @@ import java.util.List;
 public class ScheduleMatchLeaderboardController {
     private final ScheduleMatchLeaderboardService scheduleMatchLeaderboardService;
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<List<ScheduleParticipantResponse>> showLeaderboard(@RequestParam @PathVariable String id) {
-        return new ResponseEntity<>(scheduleMatchLeaderboardService.showLeaderboard(id), HttpStatus.OK);
+    @GetMapping(path = "/{matchId}")
+    public ResponseEntity<List<ScheduleParticipantResponse>> showLeaderboard(@PathVariable String matchId) {
+        return new ResponseEntity<>(scheduleMatchLeaderboardService.showLeaderboard(matchId), HttpStatus.OK);
     }
 }
