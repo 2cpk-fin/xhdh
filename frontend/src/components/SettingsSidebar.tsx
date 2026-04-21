@@ -11,6 +11,25 @@ const SettingsSidebar = () => {
     const navigate = useNavigate();
     const menuRef = useRef<HTMLDivElement>(null);
 
+ const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refreshToken');
+      const accessToken = localStorage.getItem('accessToken');
+      if (refreshToken) {
+        await api.post('/auth/logout', {
+          refreshToken: refreshToken,
+          accessToken: accessToken,
+        });
+      }
+    } catch (err) {
+      console.error('Logout failed', err);
+    } finally {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      navigate('/login');
+    }
+  };
+
     useEffect(() => {
         const syncTheme = () => {
             const fromStorage = (localStorage.getItem('theme') as 'light' | 'dark') ?? 'light';
