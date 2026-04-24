@@ -1,5 +1,6 @@
 package com.uniranking.app.domains.user;
 
+import com.uniranking.app.domains.auth.RefreshTokenService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,35 +19,45 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RefreshTokenService refreshTokenService;
 
-    public UserResponse getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + username));
+    public UserResponse getUserByRefreshToken(String refreshToken) {
+        String email = refreshTokenService.getEmailFromToken(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with username: " + email));
         return userMapper.userToResponse(user);
     }
 
     @Transactional
-    public String updateEmail(Long id, String newEmail) {
+    public UserResponse updateUsername(Long id, String newUsername) {
+        userRepository.updateUsername(id, newUsername);
+        User updatedUser = findById(id);
+        return userMapper.userToResponse(updatedUser);
+    }
+
+    @Transactional
+    public UserResponse updateEmail(Long id, String newEmail) {
         if (userRepository.existsByEmail(newEmail)) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
-        User user = findById(id);
-        user.setEmail(newEmail);
-        return "Update email successful!";
+        userRepository.updateEmail(id, newEmail);
+        User updatedUser = findById(id);
+        return userMapper.userToResponse(updatedUser);
     }
 
     @Transactional
-    public String updatePassword(Long id, String newPassword) {
-        User user = findById(id);
-        user.setPassword(passwordEncoder.encode(newPassword));
-        return "Update password successful!";
+    public UserResponse updatePassword(Long id, String newPassword) {
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        userRepository.updatePassword(id, encodedPassword);
+        User updatedUser = findById(id);
+        return userMapper.userToResponse(updatedUser);
     }
 
     @Transactional
-    public String updateProfileImage(Long id, String imageUrl) {
-        User user = findById(id);
-        user.setProfileImageUrl(imageUrl);
-        return "Update profile image successful!";
+    public UserResponse updateProfileImage(Long id, byte[] image) {
+        userRepository.updateProfileImage(id, image);
+        User updatedUser = findById(id);
+        return userMapper.userToResponse(updatedUser);
     }
 
     @Transactional

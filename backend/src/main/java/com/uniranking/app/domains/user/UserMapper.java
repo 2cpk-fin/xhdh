@@ -7,12 +7,22 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring", imports = { UUID.class, Instant.class, AuthProvider.class })
-public interface UserMapper {
+public abstract class UserMapper {
+    public UserResponse userToResponse(User user) {
+        if (user == null) return null;
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "publicUserId", target = "publicId")
-    UserResponse userToResponse(User user);
+        UserResponse response = new UserResponse();
+        response.setId(user.getId());
+        response.setPublicUserId(user.getPublicUserId());
+        response.setEmail(user.getEmail());
+        response.setUsername(user.getDisplayUsername());
 
+        if (user.getProfileImage() != null) {
+            response.setProfileImage(user.getProfileImage());
+        }
+
+        return response;
+    }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
@@ -21,6 +31,6 @@ public interface UserMapper {
     @Mapping(target = "createdAt", expression = "java(Instant.now())")
     @Mapping(target = "authProvider", expression = "java(AuthProvider.GOOGLE)")
     @Mapping(target = "username", source = "name")
-    @Mapping(target = "profileImageUrl", source = "pfp")
-    User oAuthToUser(String email, String name, String pfp);
+    @Mapping(target = "profileImage", source = "pfp")
+    public abstract User oAuthToUser(String email, String name, byte[] pfp);
 }

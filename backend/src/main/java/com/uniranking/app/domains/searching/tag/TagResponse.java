@@ -5,19 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonPropertyOrder({ "id", "publicId", "name", "universities" })
+@JsonPropertyOrder({ "id", "publicId", "name" })
 public class TagResponse {
     private long id;
 
     private UUID publicId;
 
     private String name;
-
-    private List<String> universities;
 }

@@ -1,6 +1,7 @@
 package com.uniranking.app.domains.searching.university;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.uniranking.app.domains.searching.tag.TagResponse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,7 +22,7 @@ public class UniversityResponse {
 
     private String abbreviation;
 
-    private List<String> tags;
+    private List<TagResponse> tags;
 
     private int elo;
 }

@@ -7,6 +7,5 @@ import org.mapstruct.Mapping;
 public interface TagMapper {
     @Mapping(source = "id", target = "id")
     @Mapping(source = "publicTagId", target = "publicId")
-    @Mapping(target = "universities", ignore = true)
     TagResponse toTagResponse(Tag tag);
 }

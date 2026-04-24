@@ -81,26 +81,26 @@ public class RefreshTokenService {
 
     // Delete the token
     public void deleteRefreshToken(String token) {
-    String tokenKey = REDIS_PREFIX + token;
-    
-    // Retrieve the token data so we know WHICH user this belongs to
-    RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
-    
-    if (refreshToken != null) {
-        // Delete the User -> Token mapping (the "index")
-        String userMappingKey = USER_RT_PREFIX + refreshToken.getUserId();
-        redisTemplate.delete(userMappingKey);
-        
-        // Delete the actual Token data
-        redisTemplate.delete(tokenKey);
-        
-        System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserId());
+        String tokenKey = REDIS_PREFIX + token;
+
+        // Retrieve the token data so we know WHICH user this belongs to
+        RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
+
+        if (refreshToken != null) {
+            // Delete the User -> Token mapping (the "index")
+            String userMappingKey = USER_RT_PREFIX + refreshToken.getUserId();
+            redisTemplate.delete(userMappingKey);
+
+            // Delete the actual Token data
+            redisTemplate.delete(tokenKey);
+
+            System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserId());
+        }
+        else {
+            // Fallback: Just try to delete the token key anyway if the data is already gone
+            redisTemplate.delete(tokenKey);
+        }
     }
-    else {
-        // Fallback: Just try to delete the token key anyway if the data is already gone
-        redisTemplate.delete(tokenKey);
-    }
-}
 
     public void blackListAccessToken(String accessToken){
         Date expiration = jwtService.extractExpiration(accessToken);
@@ -112,5 +112,16 @@ public class RefreshTokenService {
 
     public boolean isAccessTokenBlacklisted(String accessToken){
         return redisTemplate.hasKey("bl:" + accessToken);
+    }
+
+    public String getEmailFromToken(String token) {
+        String tokenKey = REDIS_PREFIX + token;
+        RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
+
+        if (refreshToken == null) {
+            throw new RuntimeException("Session invalid or expired");
+        }
+
+        return refreshToken.getEmail();
     }
 }

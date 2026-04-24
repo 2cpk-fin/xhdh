@@ -1,7 +1,6 @@
 package com.uniranking.app.domains.searching.university;
 
-import com.uniranking.app.domains.searching.tag.Tag;
-import com.uniranking.app.domains.searching.tag.TagRepository;
+import com.uniranking.app.domains.searching.tag.*;
 
 import lombok.RequiredArgsConstructor;
 
@@ -10,39 +9,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UniversityService {
-    private final TagRepository tagRepository;
-
     private final UniversityRepository universityRepository;
 
     private final UniversityMapper universityMapper;
+
+    private final TagService tagService;
 
     // Helper function
     private UniversityResponse mapToResponseWithTags(University university) {
         if (university == null) return null;
         UniversityResponse response = universityMapper.toUniversityResponse(university);
-        response.setTags(showAllTagsInUniversity(university.getName()));
+        response.setTags(tagService.showAllTagsInUniversity(university.getId()));
         return response;
     }
 
-    public Page<UniversityResponse> getUniversityList(Pageable pageable) {
-        return universityRepository.findUniversityList(pageable)
+    public Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Long> tagIds) {
+        return universityRepository.findByInput(pageable, input, tagIds)
                 .map(this::mapToResponseWithTags);
-    }
-
-    public UniversityResponse getUniversityByName(String universityName) {
-        University university = universityRepository.findByName(universityName);
-        return mapToResponseWithTags(university);
-    }
-
-    public List<String> showAllTagsInUniversity(String universityName) {
-        return tagRepository.findAllByUniversityName(universityName)
-                .stream()
-                .map(Tag::getName)
-                .collect(Collectors.toList());
     }
 }

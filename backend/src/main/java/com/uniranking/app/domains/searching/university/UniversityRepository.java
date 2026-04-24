@@ -12,15 +12,15 @@ import java.util.List;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
-
-    @Query("SELECT u FROM University u")
-    Page<University> findUniversityList(Pageable pageable);
-
-    @Query("SELECT u FROM University u WHERE u.name = :universityName OR u.abbreviation = :universityName ")
-    University findByName(@Param("universityName") String universityName);
-
-    @Query("SELECT u FROM University u JOIN FETCH u.tags t WHERE t.name = :tagName")
-    List<University> findAllByTagName(@Param("tagName") String tagName);
+    @Query("SELECT DISTINCT u FROM University u " +
+            "LEFT JOIN u.tags t " +
+            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CAST(CONCAT('%', :input, '%') AS text))) " +
+            "AND (:tagIds IS NULL OR t.id IN :tagIds)")
+    Page<University> findByInput(
+            Pageable pageable,
+            @Param("input") String input,
+            @Param("tagIds") List<Long> tagIds
+    );
 
     @Query(value = "SELECT * FROM universities u WHERE EXISTS (" +
                    "  SELECT 1 FROM university_tags ut1 " +
@@ -37,5 +37,5 @@ public interface UniversityRepository extends JpaRepository<University, Long>{
     List<University> findAllOpponentsWithSharedTag(@Param("universityId") long universityId);
 
 
-
+    University findByName(String universityName);
 }

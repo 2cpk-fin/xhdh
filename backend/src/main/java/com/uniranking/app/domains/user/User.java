@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import com.uniranking.app.domains.auth.AuthProvider;
 import com.uniranking.app.domains.scheduleMatch.comment.Comment;
-import org.hibernate.validator.constraints.URL;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,9 +42,9 @@ public class User implements UserDetails{
     @Column(name = "password")
     private String password;
 
-    @URL
-    @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    @Lob
+    @Column(name = "profile_image")
+    private byte[] profileImage;
 
     @Column(name = "created_at")
     private Instant createdAt;
@@ -57,6 +56,10 @@ public class User implements UserDetails{
     @Override
     public String getUsername(){
         return this.email;
+    }
+
+    public String getDisplayUsername() {
+        return this.username;
     }
 
     @Override

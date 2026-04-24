@@ -9,12 +9,8 @@ import java.util.UUID;
 @Setter
 public class UserResponse {
     private long id;
-
-    private UUID publicId;
-
+    private UUID publicUserId;
     private String username;
-
     private String email;
-
-    private String profileImageUrl;
+    private byte[] profileImage;
 }
