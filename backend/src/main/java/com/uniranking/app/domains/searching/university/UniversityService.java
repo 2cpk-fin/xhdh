@@ -1,7 +1,5 @@
 package com.uniranking.app.domains.searching.university;
 
-import com.uniranking.app.domains.searching.tag.*;
-
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;

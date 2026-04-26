@@ -1,0 +1,18 @@
+newupdate.md
+ws.md
+README.md
+xhdh.iml
+
+# Root ignore
+.idea/
+*.iml
+target/
+**/target/
+.vscode/
+
+# Frontend ignore
+frontend/uniranking-app/node_modules/
+
+# Backend ignore
+backend/target/
+backend/.mvn/
