@@ -12,20 +12,26 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Repository
-public interface CommentRepository extends JpaRepository<Comment,Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("SELECT c FROM Comment c WHERE c.scheduleMatch.id = :matchId AND c.parent IS NULL")
+    @Query("SELECT c FROM Comment c JOIN FETCH c.user WHERE c.scheduleMatch.id = :matchId AND c.parent IS NULL")
     Page<Comment> findAllTopComments(@Param("matchId") Long matchId, Pageable pageable);
 
-    @Query(value = "SELECT c FROM Comment c " +
-            "JOIN FETCH c.user " +
-            "JOIN FETCH c.scheduleMatch " +
-            "WHERE c.scheduleMatch.id = :matchId AND c.parent IS NULL",
-            countQuery = "SELECT count(c) FROM Comment c WHERE c.match.id = :matchId AND c.parent IS NULL")
-    List<Comment> findByAllSubcommentsByParentId(@Param("parentId") Long parentId);
+    @Query("SELECT c FROM Comment c JOIN FETCH c.user WHERE c.parent.id = :parentId")
+    List<Comment> findAllSubcommentsByParentId(@Param("parentId") Long parentId);
 
     @Modifying
     @Transactional
     @Query("UPDATE Comment c SET c.likes = c.likes + 1 WHERE c.id = :id")
     void incrementLikes(@Param("id") Long id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Comment c SET c.replyCount = c.replyCount + 1 WHERE c.id = :id")
+    void incrementReplyCount(@Param("id") Long id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Comment c SET c.replyCount = c.replyCount - 1 WHERE c.id = :id AND c.replyCount > 0")
+    void decrementReplyCount(@Param("id") Long id);
 }

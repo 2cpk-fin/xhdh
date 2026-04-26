@@ -1,6 +1,24 @@
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+
+// You can extract this into its own file in your components folder later if you want to reuse it elsewhere!
+const NavBox = ({ title, description, to }: { title: string; description: string; to: string }) => {
+    return (
+        <Link
+            to={to}
+            className="block p-6 bg-white border border-zinc-200 rounded-2xl shadow-sm hover:shadow-md hover:border-zinc-300 transition-all active:scale-[0.98] group"
+        >
+            <h3 className="text-xl font-bold text-zinc-900 mb-2 group-hover:text-black transition-colors">
+                {title}
+            </h3>
+            <p className="text-sm font-medium text-zinc-500 leading-relaxed">
+                {description}
+            </p>
+        </Link>
+    );
+};
 
 const HomePage = () => {
     return (
@@ -22,7 +40,15 @@ const HomePage = () => {
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            Content's here!
+                            {/* The new NavBox component replacing the text */}
+                            <NavBox
+                                to="/solo"
+                                title="Solo Match Arena"
+                                description="Pit two universities against each other in a 1v1 duel and vote for the winner."
+                            />
+
+                            {/* You can easily add more boxes here later like this: */}
+                            {/* <NavBox to="/leaderboard" title="Global Rankings" description="View the top universities..." /> */}
                         </div>
 
                     </div>

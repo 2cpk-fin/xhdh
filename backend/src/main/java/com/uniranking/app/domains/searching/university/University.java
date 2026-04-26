@@ -44,5 +44,5 @@ public class University {
     private List<Tag> tags = new ArrayList<>();
 
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ScheduleParticipant> participants = new ArrayList<>();
+    private List<ScheduleParticipant> participants;
 }

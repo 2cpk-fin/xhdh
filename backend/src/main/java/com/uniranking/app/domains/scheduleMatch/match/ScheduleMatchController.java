@@ -15,11 +15,6 @@ import java.util.List;
 public class ScheduleMatchController {
     private final ScheduleMatchService scheduleMatchService;
 
-    @GetMapping(path = "/all")
-    public ResponseEntity<List<ScheduleMatchResponse>> getAllScheduledMatches() {
-        return new ResponseEntity<>(scheduleMatchService.getAllMatches(), HttpStatus.OK);
-    }
-
     // Upcoming matches
     @GetMapping(path = "/all/not-started")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledMatchesNotStarted() {
@@ -59,11 +54,11 @@ public class ScheduleMatchController {
         return new ResponseEntity<>(scheduleMatchService.updateMatchById(id, scheduleMatchRequest), HttpStatus.OK);
     }
 
-    @PatchMapping(path = "/votes/{matchId}")
+    @PatchMapping(path = "/votes/{publicMatchId}")
     public void vote(
-            @PathVariable String matchId,
-            @RequestParam String universityName) {
-        scheduleMatchService.vote(universityName, matchId);
+            @PathVariable String publicMatchId,
+            @RequestParam Long universityId) {
+        scheduleMatchService.vote(universityId, publicMatchId);
     }
 
     // Secret route (for admin only)

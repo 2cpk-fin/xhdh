@@ -17,7 +17,6 @@ public abstract class CommentMapper {
     @Autowired
     protected CommentRepository commentRepository;
 
-    // Request -> Entity
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "publicCommentId", ignore = true)
     @Mapping(target = "commentDate", expression = "java(java.time.LocalDateTime.now())")
@@ -38,16 +37,20 @@ public abstract class CommentMapper {
                 .orElseThrow(() -> new RuntimeException("Match not found")));
 
         if (request.getParentId() != null) {
-            comment.setParent(commentRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found")));
+            Comment parent = commentRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+
+            // Prevent 3-layer nesting: the parent must be a top-level comment.
+            // If the parent itself has a parent, the request is trying to reply to a reply.
+            if (parent.getParent() != null) {
+                throw new RuntimeException("Cannot reply to a reply — only one level of nesting is allowed");
+            }
+
+            comment.setParent(parent);
         }
     }
 
-    // Entity -> Response
     @Mapping(source = "user.username", target = "username")
-    @Mapping(source = "scheduleMatch.id", target = "matchId")
-    @Mapping(source = "scheduleMatch.publicMatchId", target = "publicMatchId")
-    @Mapping(source = "parent.id", target = "parentId")
-    @Mapping(source = "parent.publicCommentId", target = "publicParentId")
+    @Mapping(source = "parent", target = "parent")
     public abstract CommentResponse toCommentResponse(Comment comment);
 }

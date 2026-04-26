@@ -17,18 +17,8 @@ public class UniversityService {
 
     private final UniversityMapper universityMapper;
 
-    private final TagService tagService;
-
-    // Helper function
-    private UniversityResponse mapToResponseWithTags(University university) {
-        if (university == null) return null;
-        UniversityResponse response = universityMapper.toUniversityResponse(university);
-        response.setTags(tagService.showAllTagsInUniversity(university.getId()));
-        return response;
-    }
-
     public Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Long> tagIds) {
         return universityRepository.findByInput(pageable, input, tagIds)
-                .map(this::mapToResponseWithTags);
+                .map(universityMapper::mapToResponseWithTags);
     }
 }

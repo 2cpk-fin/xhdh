@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
-import authApi from '../apis/authApi';
+import authApi from '../api/authApi';
 import type { LoginRequest } from '../types/auth';
 
 // Import the separated components

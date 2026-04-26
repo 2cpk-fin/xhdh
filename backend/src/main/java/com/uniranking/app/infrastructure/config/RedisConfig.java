@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -43,5 +45,19 @@ public class RedisConfig {
         
         template.afterPropertiesSet();
         return template;
+    }
+
+    // Redis is like a radio station. When things happen (like a key expiring)
+    // Redis broadcasts a message on specific channel
+    // By default, Spring don't listen to the radio
+    // The RedisMessageListenerContainer is actually the Radio Receiver.
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer(); // This thing subscribes to that channel
+        container.setConnectionFactory(connectionFactory);
+        RedisConnection connection = connectionFactory.getConnection();
+        connection.setConfig("notify-keyspace-events", "Ex"); // This tell Redis to publish a message to a channel whenever any key expires
+        connection.close();
+        return container;
     }
 }

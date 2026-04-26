@@ -2,6 +2,7 @@ package com.uniranking.app.domains.soloMatch;
 
 import java.util.UUID;
 
+import com.uniranking.app.domains.searching.university.UniversityResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SoloMatchResponse {
     private UUID publicMatchId;
-
-    private long uni1Id;
-    private long uni2Id;
-
-    private UUID publicUni1Id;
-    private UUID publicUni2Id;
+    private UniversityResponse university1;
+    private UniversityResponse university2;
 }

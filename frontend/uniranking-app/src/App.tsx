@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
 import SearchPage from './pages/SearchPage';
+import SoloMatchPage from './pages/SoloMatchPage';
 
 function App() {
     return (
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
 
                 <Route path="/home" element={<HomePage />} />
+                <Route path="/solo" element={<SoloMatchPage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
             </Routes>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import userApi from '../apis/userApi';
+import userApi from '../api/userApi';
 import { AxiosError } from 'axios';
 import type { UserResponse } from '../types/user';
 

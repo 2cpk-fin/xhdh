@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
-import { tagApi } from '../apis/tagApi'
+import { tagApi } from '../api/tagApi'
 import type { TagResponse } from '../types/tag'
 
 type Props = {
@@ -56,8 +56,8 @@ export default function SearchBox({ onSearch }: Props) {
                             type="button"
                             onClick={() => toggleTag(tag.id)}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:scale-105 active:scale-95 ${selectedTagIds.includes(tag.id)
-                                    ? 'bg-green-500 border-green-500 text-white shadow-sm shadow-green-200'
-                                    : 'bg-white border-zinc-200 text-zinc-500 hover:border-purple-300 hover:text-purple-600'
+                                ? 'bg-green-500 border-green-500 text-white shadow-sm shadow-green-200'
+                                : 'bg-white border-zinc-200 text-zinc-500 hover:border-purple-300 hover:text-purple-600'
                                 }`}
                         >
                             {tag.name}

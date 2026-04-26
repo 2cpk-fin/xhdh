@@ -10,10 +10,12 @@ import lombok.Setter;
 @Setter
 public class RegisterRequest {
     @NotBlank(message = "Username is required")
+    @Size(max = 255, message = "Email too long!")
     private String username;
 
     @Email(message = "Invalid email format") 
     @NotBlank(message = "Email is required")
+    @Size(max = 255, message = "Email too long!")
     private String email;
 
     @Size(min = 8, message= "Password must be at least 8 characters")

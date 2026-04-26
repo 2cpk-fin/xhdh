@@ -20,8 +20,8 @@ public class SoloMatchController {
     }
 
     @PostMapping(path = "/choose")
-    public ResponseEntity<SoloMatchReport> chooseSoloMatch(@RequestParam UUID matchUUID, @RequestParam Long winnerId) {
-        SoloMatchReport report = soloMatchService.chooseSoloMatch(matchUUID, winnerId);
+    public ResponseEntity<SoloMatchReport> chooseWinner(@RequestParam UUID publicMatchId, @RequestParam Long winnerId) {
+        SoloMatchReport report = soloMatchService.chooseWinner(publicMatchId, winnerId);
         return ResponseEntity.ok(report);
     }
 }

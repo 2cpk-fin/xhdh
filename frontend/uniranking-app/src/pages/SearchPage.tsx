@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { universityApi } from '../apis/universityApi'
+import { universityApi } from '../api/universityApi'
 import type { UniversityResponse } from '../types/university'
 import Header from '../components/Header'
 import NavBar from '../components/NavBar'

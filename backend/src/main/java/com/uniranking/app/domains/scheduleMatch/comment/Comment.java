@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,23 +27,19 @@ public class Comment {
     @ColumnDefault("gen_random_uuid()")
     private UUID publicCommentId;
 
-    // Many comments -> One user
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // Many comments -> One match
     @ManyToOne
     @JoinColumn(name = "match_id", nullable = false)
     private ScheduleMatch scheduleMatch;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime commentDate;
 
     @ColumnDefault("0")
     private Long likes = 0L;
 
-    // One comment only have one parent and one comment can have many sub-comments
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Comment parent;

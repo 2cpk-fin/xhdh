@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import com.uniranking.app.domains.searching.university.UniversityMapper;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
+import com.uniranking.app.domains.searching.university.UniversityResponse;
 import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,12 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SoloMatchService {
-    private final RedisTemplate<String, Object> redisTemplate;
     private final UniversityRepository universityRepository;
+    private final UniversityMapper universityMapper;
+
     private final EloCalculator eloCalc = new EloCalculator();
 
+    private final RedisTemplate<String, Object> redisTemplate;
     private static final String REDIS_PREFIX = "solo_match:";
 
     private University selectWeightedOpponent(University uni1, List<University> candidates) {
@@ -37,10 +41,10 @@ public class SoloMatchService {
 
         double randomVal = Math.random() * totalWeight;
         double currentSum = 0;
-        for (University uB : candidates) {
-            currentSum += weights.get(uB);
+        for (University uni2 : candidates) {
+            currentSum += weights.get(uni2);
             if (randomVal <= currentSum)
-                return uB;
+                return uni2;
         }
         return candidates.getFirst();
     }
@@ -49,6 +53,7 @@ public class SoloMatchService {
         // Generate two random universities
         University uni1 = universityRepository.findRandom();
         List<University> candidates = universityRepository.findAllOpponentsWithSharedTag(uni1.getId());
+        if (candidates.isEmpty()) return null;
         University uni2 = selectWeightedOpponent(uni1, candidates);
 
         // Create the solo match
@@ -59,11 +64,13 @@ public class SoloMatchService {
         redisTemplate.opsForValue().set(REDIS_PREFIX + publicMatchId, soloMatch, 3, TimeUnit.MINUTES);
 
         // Return the response
-        return new SoloMatchResponse(publicMatchId, uni1.getId(), uni2.getId(), uni1.getPublicUniversityId(), uni2.getPublicUniversityId());
+        UniversityResponse uni1Response = universityMapper.mapToResponseWithTags(uni1);
+        UniversityResponse uni2Response = universityMapper.mapToResponseWithTags(uni2);
+        return new SoloMatchResponse(publicMatchId, uni1Response, uni2Response);
     }
 
     @Transactional
-    public SoloMatchReport chooseSoloMatch(UUID publicMatchId, Long winnerId) {
+    public SoloMatchReport chooseWinner(UUID publicMatchId, Long winnerId) {
         // Fetch from Redis
         SoloMatch soloMatch = (SoloMatch) redisTemplate.opsForValue().get(REDIS_PREFIX + publicMatchId);
         if (soloMatch == null) throw new RuntimeException("Match expired!");
@@ -77,7 +84,9 @@ public class SoloMatchService {
 
         // Set new elo and update the DB
         int winnerEloNew = eloCalc.calculateSoloChange(winner.getElo(), loser.getElo(), true);
+        int winnerEloChange = winnerEloNew - winner.getElo();
         int loserEloNew = eloCalc.calculateSoloChange(loser.getElo(), winner.getElo(), false);
+        int loserEloChange = loser.getElo() - loserEloNew;
 
         winner.setElo(winnerEloNew);
         loser.setElo(loserEloNew);
@@ -88,6 +97,9 @@ public class SoloMatchService {
         // Clean up Redis
         redisTemplate.delete(REDIS_PREFIX + publicMatchId);
 
-        return new SoloMatchReport(winner.getId(), winner.getPublicUniversityId(),loser.getId(), loser.getPublicUniversityId());
+        // Return the response
+        UniversityResponse winnerResponse = universityMapper.mapToResponseWithTags(winner);
+        UniversityResponse loserResponse = universityMapper.mapToResponseWithTags(loser);
+        return new SoloMatchReport(winnerResponse, winnerEloChange, loserResponse, loserEloChange);
     }
 }

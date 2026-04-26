@@ -32,11 +32,11 @@ public class User implements UserDetails{
     public UUID publicUserId;
 
     @NotBlank(message = "Username is required")
-    @Column(name = "username")
+    @Column(name = "username", nullable = false)
     private String username;
 
     @NotBlank(message = "Email is required")
-    @Column(name = "email", unique = true)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     @Column(name = "password")
