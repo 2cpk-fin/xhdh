@@ -75,11 +75,11 @@ export default function SearchPage() {
 
                 {/* Main content — offset by navbar width */}
                 <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
-                    <div className="flex-1 max-w-3xl w-full mx-auto px-6 py-8 space-y-6">
+                    <div className="flex-1 max-w-5xl w-full mx-auto px-6 py-8 space-y-6">
 
                         {/* Page title */}
                         <div>
-                            <h1 className="text-2xl font-black text-zinc-800">University Rankings</h1>
+                            <h1 className="text-3xl font-black text-zinc-800">University Rankings</h1>
                             <p className="text-sm text-zinc-400 font-medium mt-1">
                                 Search and filter universities by name, abbreviation, or category
                             </p>

@@ -10,10 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +26,7 @@ public class AfterMatchCalculator {
                 redisTemplate.opsForZSet().reverseRangeWithScores(leaderboardKey, 0, -1);
         if (results == null || results.isEmpty()) return;
 
-        ScheduleMatch match = scheduleMatchRepository.findByPublicMatchId(publicMatchId);
+        ScheduleMatch match = scheduleMatchRepository.findByPublicMatchId(UUID.fromString(publicMatchId));
         if (match == null) return;
 
         List<ZSetOperations.TypedTuple<Object>> list = new ArrayList<>(results);

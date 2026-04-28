@@ -50,12 +50,15 @@ api.interceptors.response.use(
 
                     originalRequest.headers.Authorization = `Bearer ${newToken}`;
                     return api(originalRequest);
-                } catch (refreshError) {
-                    localStorage.clear();
-                    window.location.href = '/login'; // Hard reload only if refresh fails
+                }
+                catch (refreshError) {
+                    console.log(refreshError);
+                    // localStorage.clear();
+                    // window.location.href = '/login'; // Hard reload only if refresh fails
                     return Promise.reject(refreshError);
                 }
-            } else {
+            }
+            else {
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('token'); // Remove old key for backward compatibility
                 window.location.href = '/login'; // Hard reload if no refresh token exists

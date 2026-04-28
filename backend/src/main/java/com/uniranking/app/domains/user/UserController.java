@@ -18,9 +18,15 @@ public class UserController {
     // — refresh tokens must never travel as query params (they appear in server logs,
     //   browser history, and proxy logs). POST body keeps them out of the URL entirely.
     @PostMapping("/me")
-    public ResponseEntity<UserResponse> getUserByRefreshToken(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
-        return ResponseEntity.ok(userService.getUserByRefreshToken(refreshToken));
+    public ResponseEntity<?> getUserByRefreshToken(@RequestBody Map<String, String> body) {
+        try {
+            String refreshToken = body.get("refreshToken");
+            UserResponse response = userService.getUserByRefreshToken(refreshToken);
+            return ResponseEntity.ok(response);
+        }
+        catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @PatchMapping("/{id}/username")
@@ -44,13 +50,18 @@ public class UserController {
     @PatchMapping("/{id}/profile-image")
     public ResponseEntity<UserResponse> updateProfileImage(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String base64Image = body.get("imageProfile");
-        String cleanBase64 = base64Image.substring(base64Image.indexOf(",") + 1);
-        byte[] imageBytes = Base64.getDecoder().decode(cleanBase64);
-        return new ResponseEntity<>(userService.updateProfileImage(id, imageBytes), HttpStatus.OK);
+        if (base64Image == null) return ResponseEntity.badRequest().build();
+        // Pass the Base64 string directly — no decoding needed
+        return new ResponseEntity<>(userService.updateProfileImage(id, base64Image), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
+        }
+        catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

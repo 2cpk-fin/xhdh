@@ -37,9 +37,6 @@ public class Comment {
 
     private LocalDateTime commentDate;
 
-    @ColumnDefault("0")
-    private Long likes = 0L;
-
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Comment parent;
@@ -49,7 +46,4 @@ public class Comment {
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
-
-    @ColumnDefault("0")
-    private Long replyCount = 0L;
 }

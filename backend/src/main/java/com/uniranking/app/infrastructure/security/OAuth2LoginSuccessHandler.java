@@ -36,7 +36,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         assert googleUser != null;
         String email = googleUser.getAttribute("email");
         String name = googleUser.getAttribute("name");
-        byte[] pfp = googleUser.getAttribute("picture");
+        String pfp = googleUser.getAttribute("picture");
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {

@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import com.uniranking.app.domains.searching.university.UniversityMapper;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
 import com.uniranking.app.domains.searching.university.UniversityResponse;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -78,9 +79,9 @@ public class SoloMatchService {
         // Identity Winner and Loser
         Long loserId = winnerId.equals(soloMatch.getUni1Id()) ? soloMatch.getUni2Id() : soloMatch.getUni1Id();
         University winner = universityRepository.findById(winnerId)
-                .orElseThrow(() -> new RuntimeException("Winner not found!"));
+                .orElseThrow(() -> new EntityNotFoundException("Winner not found!"));
         University loser = universityRepository.findById(loserId)
-                .orElseThrow(() -> new RuntimeException("Loser not found!"));
+                .orElseThrow(() -> new EntityNotFoundException("Loser not found!"));
 
         // Set new elo and update the DB
         int winnerEloNew = eloCalc.calculateSoloChange(winner.getElo(), loser.getElo(), true);

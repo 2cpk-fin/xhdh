@@ -42,9 +42,9 @@ public class User implements UserDetails{
     @Column(name = "password")
     private String password;
 
-    @Lob
-    @Column(name = "profile_image")
-    private byte[] profileImage;
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "profile_image", columnDefinition = "TEXT")
+    private String profileImage;
 
     @Column(name = "created_at")
     private Instant createdAt;

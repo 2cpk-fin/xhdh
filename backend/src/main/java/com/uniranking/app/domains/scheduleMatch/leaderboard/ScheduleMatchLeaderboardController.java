@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/schdule/match/leaderboard")
+@RequestMapping(path = "/api/schedule/match/leaderboard")
 @RequiredArgsConstructor
 public class ScheduleMatchLeaderboardController {
     private final ScheduleMatchLeaderboardService scheduleMatchLeaderboardService;

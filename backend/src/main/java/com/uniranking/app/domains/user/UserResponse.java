@@ -12,5 +12,5 @@ public class UserResponse {
     private UUID publicUserId;
     private String username;
     private String email;
-    private byte[] profileImage;
+    private String profileImage;
 }

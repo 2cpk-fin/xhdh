@@ -6,8 +6,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface ScheduleMatchRepository extends JpaRepository<ScheduleMatch, Long> {
@@ -22,11 +24,12 @@ public interface ScheduleMatchRepository extends JpaRepository<ScheduleMatch, Lo
     List<ScheduleMatch> findAllFinishedMatch();
 
     @Query("SELECT m FROM ScheduleMatch m WHERE m.publicMatchId = :publicMatchId")
-    ScheduleMatch findByPublicMatchId(@Param("publicMatchId") String publicMatchId);
+    ScheduleMatch findByPublicMatchId(@Param("publicMatchId") UUID publicMatchId);
 
     @Modifying
-    @Query("UPDATE ScheduleMatch m SET m.status = :newStatus WHERE m.publicMatchId = :id AND m.status = :expectedStatus")
-    int compareAndUpdateStatus(@Param("id") String id,
+    @Transactional
+    @Query("UPDATE ScheduleMatch m SET m.status = :newStatus WHERE m.publicMatchId = :publicMatchId AND m.status = :expectedStatus")
+    int compareAndUpdateStatus(@Param("publicMatchId") UUID publicMatchId,
                                @Param("expectedStatus") Status expectedStatus,
                                @Param("newStatus") Status newStatus);
 }

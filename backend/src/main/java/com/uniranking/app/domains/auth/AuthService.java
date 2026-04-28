@@ -47,7 +47,7 @@ public class AuthService {
 
         // Return the Response
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(savedUser.getUsername());
+        authResponse.setUsername(savedUser.getDisplayUsername());
         authResponse.setEmail(savedUser.getEmail());
         authResponse.setToken(jwtToken);
         authResponse.setRefreshToken(refreshToken.getToken());
@@ -74,7 +74,7 @@ public class AuthService {
 
         // Return the Response
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(user.getUsername());
+        authResponse.setUsername(user.getDisplayUsername());
         authResponse.setEmail(user.getEmail());
         authResponse.setToken(jwtToken);
         authResponse.setRefreshToken(refreshToken.getToken());
@@ -104,7 +104,7 @@ public class AuthService {
 
         // Return the Response
         AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(user.getUsername());
+        authResponse.setUsername(user.getDisplayUsername());
         authResponse.setEmail(user.getEmail());
         authResponse.setToken(newJwt);
         authResponse.setRefreshToken(newRefreshToken.getToken());

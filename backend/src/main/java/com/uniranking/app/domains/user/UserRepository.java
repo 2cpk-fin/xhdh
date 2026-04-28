@@ -3,6 +3,7 @@ package com.uniranking.app.domains.user;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.uniranking.app.domains.auth.UserSummary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
     Optional<User> findByEmail(String email);
 
     Optional<User> findByPublicUserId(UUID publicUserId);
+
+    Optional<UserSummary> findSummaryByEmail(String email);
 
     @Modifying
     @Query("UPDATE User u SET u.username = :username WHERE u.id = :id")
@@ -33,5 +36,5 @@ public interface UserRepository extends JpaRepository<User, Long>{
     @Modifying
     @Transactional
     @Query("UPDATE User u SET u.profileImage = :image WHERE u.id = :id")
-    void updateProfileImage(@Param("id") Long id, @Param("image") byte[] image);
+    void updateProfileImage(@Param("id") Long id, @Param("image") String image);
 }

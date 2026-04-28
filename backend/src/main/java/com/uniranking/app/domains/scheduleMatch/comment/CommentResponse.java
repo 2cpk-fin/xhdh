@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonPropertyOrder({ "id", "publicCommentId", "username", "commentDate", "likes", "parent", "content", "replyCount" })
+@JsonPropertyOrder({ "id", "publicCommentId", "username", "commentDate", "parent", "content" })
 public class CommentResponse {
     private Long id;
     private UUID publicCommentId;
@@ -19,8 +19,6 @@ public class CommentResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime commentDate;
 
-    private Long likes;
     private CommentResponse parent;
     private String content;
-    private Long replyCount;
 }

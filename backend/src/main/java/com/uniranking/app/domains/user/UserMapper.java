@@ -9,8 +9,6 @@ import java.util.UUID;
 @Mapper(componentModel = "spring", imports = { UUID.class, Instant.class, AuthProvider.class })
 public abstract class UserMapper {
     public UserResponse userToResponse(User user) {
-        if (user == null) return null;
-
         UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setPublicUserId(user.getPublicUserId());
@@ -32,5 +30,5 @@ public abstract class UserMapper {
     @Mapping(target = "authProvider", expression = "java(AuthProvider.GOOGLE)")
     @Mapping(target = "username", source = "name")
     @Mapping(target = "profileImage", source = "pfp")
-    public abstract User oAuthToUser(String email, String name, byte[] pfp);
+    public abstract User oAuthToUser(String email, String name, String pfp);
 }

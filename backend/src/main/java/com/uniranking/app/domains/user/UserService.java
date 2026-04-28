@@ -21,10 +21,11 @@ public class UserService implements UserDetailsService {
     private final UserMapper userMapper;
     private final RefreshTokenService refreshTokenService;
 
+    @Transactional(readOnly = true)
     public UserResponse getUserByRefreshToken(String refreshToken) {
         String email = refreshTokenService.getEmailFromToken(refreshToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with username: " + email));
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
         return userMapper.userToResponse(user);
     }
 
@@ -54,8 +55,8 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserResponse updateProfileImage(Long id, byte[] image) {
-        userRepository.updateProfileImage(id, image);
+    public UserResponse updateProfileImage(Long id, String base64Image) {
+        userRepository.updateProfileImage(id, base64Image);
         User updatedUser = findById(id);
         return userMapper.userToResponse(updatedUser);
     }

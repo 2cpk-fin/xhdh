@@ -6,6 +6,7 @@ import com.uniranking.app.domains.searching.university.UniversityMapper;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class ScheduleMatchLeaderboardService {
 
     private static final String LEADERBOARD_PREFIX = "leaderboard:match:";
 
+    @Cacheable(value = "leaderboardCache", key = "#publicMatchId", cacheManager = "cacheManager10Seconds")
     public List<ScheduleParticipantResponse> showLeaderboard(String publicMatchId) {
         String leaderboardKey = LEADERBOARD_PREFIX + publicMatchId;
         Set<ZSetOperations.TypedTuple<Object>> participants = redisTemplate.opsForZSet().reverseRangeWithScores(leaderboardKey, 0, -1);

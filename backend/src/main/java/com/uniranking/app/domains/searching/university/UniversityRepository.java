@@ -12,12 +12,10 @@ import java.util.List;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
-    @Query(nativeQuery = true, value = """
-    SELECT DISTINCT u.* FROM universities u
-    LEFT JOIN universities_tags ut ON u.id = ut.university_id
-    WHERE (:input IS NULL OR u.name ILIKE CONCAT('%', :input, '%'))
-      AND (:tagIds IS NULL OR ut.tag_id IN :tagIds)
-    """)
+    @Query("SELECT DISTINCT u FROM University u " +
+            "LEFT JOIN u.tags t " +
+            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CAST(CONCAT('%', :input, '%') AS text))) " +
+            "AND (:tagIds IS NULL OR t.id IN :tagIds)")
     Page<University> findByInput(
             Pageable pageable,
             @Param("input") String input,

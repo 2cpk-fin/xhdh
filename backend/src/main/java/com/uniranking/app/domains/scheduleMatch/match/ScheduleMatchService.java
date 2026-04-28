@@ -6,6 +6,7 @@ import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantR
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -47,11 +48,13 @@ public class ScheduleMatchService {
         }
     }
 
-    public void vote(Long universityId, String publicMatchId) {
+    public void vote(Long universityId, String publicMatchId, Authentication authentication) {
         String matchKey = String.valueOf(publicMatchId);
         String statusKey = STATUS_PREFIX + matchKey;
         String leaderboardKey = LEADERBOARD_PREFIX + matchKey;
+        String voterTrackerKey = "voters:" + matchKey;
 
+        // Validate the match status for voting
         String currentStatus = (String) redisTemplate.opsForValue().get(statusKey);
         if (currentStatus == null) {
             throw new RuntimeException("Match not found or already finished");
@@ -59,8 +62,26 @@ public class ScheduleMatchService {
         else if (Status.NOT_STARTED.name().equals(currentStatus)) {
             throw new RuntimeException("Match has not started yet");
         }
+
+        // Get existing vote
+        String userId = authentication.getName();
+        Object voteObj = redisTemplate.opsForHash().get(voterTrackerKey, userId);
+        Long oldUniversityId = (voteObj != null) ? Long.valueOf(voteObj.toString()) : null;
+
+        if (oldUniversityId == null) {
+            // First time voting
+            redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
+            redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
+        }
+        else if (!oldUniversityId.equals(universityId)) {
+            // Changing vote
+            redisTemplate.opsForZSet().incrementScore(leaderboardKey, oldUniversityId, -1.0);
+            redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
+            // Update the tracker
+            redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
+        }
         else {
-            redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1);
+            throw new RuntimeException("You already voted for this university!");
         }
     }
 
@@ -101,7 +122,7 @@ public class ScheduleMatchService {
         LocalDateTime startTime = scheduleMatchRequest.getStartTime();
         LocalDateTime endTime = scheduleMatchRequest.getEndTime();
 
-        if (startTime.isBefore(now.plusDays(1))) {
+        if (startTime.isBefore(now)) {
             throw new RuntimeException("Start time must be at least 1 day later than the current time.");
         }
         if (endTime.isBefore(startTime.plusDays(1))) {
@@ -116,12 +137,16 @@ public class ScheduleMatchService {
     }
 
     public ScheduleMatchResponse updateMatchById(long id, ScheduleMatchRequest scheduleMatchRequest) {
-        ScheduleMatch updatedMatch = scheduleMatchMapper.toScheduleMatch(scheduleMatchRequest);
-        updatedMatch.setId(id);
-        return scheduleMatchMapper.toScheduleMatchResponse(scheduleMatchRepository.save(updatedMatch));
+        ScheduleMatch existingMatch = scheduleMatchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
+        scheduleMatchMapper.updateMatchFromRequest(scheduleMatchRequest, existingMatch);
+        ScheduleMatch savedMatch = scheduleMatchRepository.save(existingMatch);
+        return scheduleMatchMapper.toScheduleMatchResponse(scheduleMatchRepository.save(savedMatch));
     }
 
     public String deleteMatchById(long id) {
+        scheduleMatchRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
         scheduleMatchRepository.deleteById(id);
         return "The match with id " + id + " has been deleted";
     }

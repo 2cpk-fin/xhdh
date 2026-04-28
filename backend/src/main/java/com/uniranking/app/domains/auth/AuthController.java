@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -29,7 +31,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody String refreshToken, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(authService.refreshToken(refreshToken, httpRequest));
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body, HttpServletRequest httpRequest) {
+        String token = body.get("refreshToken");
+        return ResponseEntity.ok(authService.refreshToken(token, httpRequest));
     }
 }
+

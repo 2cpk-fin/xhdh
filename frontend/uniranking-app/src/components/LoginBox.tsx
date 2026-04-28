@@ -32,7 +32,12 @@ const LoginBox: React.FC<LoginBoxProps> = ({ formData, loading, handleChange, ha
                 <p className="text-sm font-medium text-zinc-500 mt-2">Sign in to the global university community</p>
             </div>
 
-            <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200/80 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-zinc-900 mb-6">
+            {/* FIX: disable button while loading to prevent double-clicks */}
+            <button
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200/80 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-zinc-900 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
                 <GoogleIcon /> Continue with Google
             </button>
 
@@ -47,7 +52,7 @@ const LoginBox: React.FC<LoginBoxProps> = ({ formData, loading, handleChange, ha
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-purple-600 transition-colors" />
                     <input
                         name="email"
-                        type="text"
+                        type="email" // FIX: was type="text" — now enables browser email validation and correct mobile keyboard
                         placeholder="Academic Email"
                         className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/50 outline-none focus:border-purple-500/50 focus:bg-white transition-all font-medium text-zinc-900 placeholder:text-zinc-400"
                         value={formData.email}

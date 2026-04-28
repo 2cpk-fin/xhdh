@@ -5,10 +5,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 // KeyExpirationEventMessageListener receives each message, which contains the name of the key that just expired — not the value (it's already gone)
 @Component
@@ -20,7 +20,7 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
     private final RedisTemplate<String, Object> redisTemplate;
     private final AfterMatchCalculator afterMatchCalculator;
 
-    private static final String STATUS_PREFIX = "status:match";
+    private static final String STATUS_PREFIX = "status:match:";
     private static final String LEADERBOARD_PREFIX = "leaderboard:match:";
 
 
@@ -45,14 +45,14 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
             String publicMatchId = expiredKey.replace(STATUS_PREFIX, "");
 
             // Try to atomically claim NOT_STARTED → PENDING
-            int updatedToStart = scheduleMatchRepository.compareAndUpdateStatus(publicMatchId, Status.NOT_STARTED, Status.PENDING);
+            int updatedToStart = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId), Status.NOT_STARTED, Status.PENDING);
             if (updatedToStart == 1) {
                 startMatch(publicMatchId);
                 return;
             }
 
             // Try to atomically claim PENDING → FINISHED
-            int updatedToFinish = scheduleMatchRepository.compareAndUpdateStatus(publicMatchId, Status.PENDING, Status.FINISHED);
+            int updatedToFinish = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId), Status.PENDING, Status.FINISHED);
             if (updatedToFinish == 1) {
                 syncFinalResults(publicMatchId);
             }
@@ -60,7 +60,7 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
     }
 
     private void startMatch(String publicMatchId) {
-        ScheduleMatch match = scheduleMatchRepository.findByPublicMatchId(publicMatchId);
+        ScheduleMatch match = scheduleMatchRepository.findByPublicMatchId(UUID.fromString(publicMatchId));
         if (match == null) return;
 
         long secondsToEnd = Duration.between(LocalDateTime.now(), match.getEndTime()).getSeconds();
@@ -70,7 +70,6 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
         redisTemplate.opsForValue().set(statusKey, Status.PENDING.name(), ttl);
     }
 
-    @Transactional
     protected void syncFinalResults(String publicMatchId) {
         String leaderboardKey = LEADERBOARD_PREFIX + publicMatchId;
 

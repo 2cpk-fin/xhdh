@@ -55,9 +55,11 @@ public class RedisConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer(); // This thing subscribes to that channel
         container.setConnectionFactory(connectionFactory);
-        RedisConnection connection = connectionFactory.getConnection();
-        connection.setConfig("notify-keyspace-events", "Ex"); // This tell Redis to publish a message to a channel whenever any key expires
-        connection.close();
+        // This is for local only, Spring automatically config it
+        // For Upstash, we need to config manually
+        // RedisConnection connection = connectionFactory.getConnection();
+        // connection.setConfig("notify-keyspace-events", "Ex"); (This tell Redis to publish a message to a channel whenever any key expires)
+        // connection.close();
         return container;
     }
 }

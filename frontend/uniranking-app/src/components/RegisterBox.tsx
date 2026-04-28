@@ -32,8 +32,14 @@ const RegisterBox: React.FC<RegisterBoxProps> = ({ formData, loading, handleChan
                 <p className="text-sm font-medium opacity-50 mt-2">Join the academic evaluation community</p>
             </div>
 
-            <button onClick={handleGoogleSignup} className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 mb-6">
-                <GoogleIcon /> Sign up with Google
+            {/* FIX: disable button while loading to prevent double-clicks during OAuth redirect */}
+            <button
+                onClick={handleGoogleSignup}
+                disabled={loading}
+                className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {loading ? <Loader2 className="w-5 h-5 mr-3 animate-spin" /> : <GoogleIcon />}
+                Sign up with Google
             </button>
 
             <div className="relative flex items-center gap-4 mb-8">
@@ -59,7 +65,7 @@ const RegisterBox: React.FC<RegisterBoxProps> = ({ formData, loading, handleChan
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-green-500 transition-all" />
                     <input
                         name="email"
-                        type="text"
+                        type="email" // FIX: was type="text" — now enables browser email validation and correct mobile keyboard
                         placeholder="Academic Email"
                         className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200 bg-zinc-50 outline-none focus:border-green-500/50 transition-all font-medium text-zinc-900"
                         value={formData.email}

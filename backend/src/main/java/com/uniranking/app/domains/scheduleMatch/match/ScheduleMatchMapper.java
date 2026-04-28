@@ -53,4 +53,6 @@ public abstract class ScheduleMatchMapper {
         }
         match.setParticipants(participants);
     }
+
+    public abstract void updateMatchFromRequest(ScheduleMatchRequest request, @MappingTarget ScheduleMatch match);
 }
