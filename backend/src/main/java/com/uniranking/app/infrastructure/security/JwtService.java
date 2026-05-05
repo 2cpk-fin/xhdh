@@ -25,10 +25,12 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         String displayName = ((User) userDetails).getDisplayUsername();
+        String role = ((User) userDetails).getRole().name();
 
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("username", displayName)
+                .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiry))
                 .signWith(getKey())

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -47,8 +46,10 @@ public class SoloMatchServiceTests {
 
     @BeforeEach
     public void setUp() {
-        university1 = University.builder().id(1L).name("University of Engineering and Technology").abbreviation("UET").elo(1000).build();
-        university2 = University.builder().id(2L).name("Hanoi University of Science and Technology").abbreviation("HUST").elo(1100).build();
+        university1 = University.builder().id(1L).name("University of Engineering and Technology").abbreviation("UET")
+                .elo(1000).build();
+        university2 = University.builder().id(2L).name("Hanoi University of Science and Technology")
+                .abbreviation("HUST").elo(1100).build();
         university3 = University.builder().id(3L).name("Hanoi Medical University").abbreviation("HMU").elo(900).build();
         university4 = University.builder().id(4L).name("FPT University").abbreviation("FPT").elo(1200).build();
 

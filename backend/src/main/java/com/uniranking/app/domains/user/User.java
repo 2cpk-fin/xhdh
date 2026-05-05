@@ -54,6 +54,10 @@ public class User implements UserDetails {
     @Builder.Default
     private AuthProvider authProvider = AuthProvider.LOCAL;
 
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Role role = Role.USER;
+
     @Override
     public String getUsername() {
         return this.email;

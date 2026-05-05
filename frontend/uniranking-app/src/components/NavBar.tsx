@@ -1,12 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavItem from './NavItem';
 import authApi from '../api/authApi';
-import { Home, Search, Newspaper, UserCircle, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Home, Search, Newspaper, UserCircle, LogOut, PanelLeftClose, PanelLeftOpen, ShieldAlert } from 'lucide-react';
+import { isAdmin } from '../utils/jwt-decode';
 
 const NavBar = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [adminStatus, setAdminStatus] = useState(false);
     const navigate = useNavigate();
+
+    // Check admin status on component mount
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setAdminStatus(isAdmin());
+    }, []);
 
     const handleLogout = async () => {
         const accessToken = localStorage.getItem('accessToken') || '';
@@ -39,6 +47,17 @@ const NavBar = () => {
                     <NavItem to="/home" icon={<Home size={20} />} label="Home" isCollapsed={isCollapsed} />
                     <NavItem to="/search" icon={<Search size={20} />} label="Search" isCollapsed={isCollapsed} />
                     <NavItem to="/news" icon={<Newspaper size={20} />} label="News" isCollapsed={isCollapsed} />
+
+                    {/* Conditionally render the Control Room item */}
+                    {adminStatus && (
+                        <NavItem
+                            to="/control-room"
+                            icon={<ShieldAlert size={20} />}
+                            label="Control Room"
+                            isCollapsed={isCollapsed}
+                        />
+                    )}
+
                     <NavItem to="/profile" icon={<UserCircle size={20} />} label="Profile" isCollapsed={isCollapsed} />
                 </nav>
             </div>

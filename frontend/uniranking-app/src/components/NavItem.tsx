@@ -5,11 +5,13 @@ interface NavItemProps {
     icon: React.ReactNode;
     label: string;
     isCollapsed?: boolean;
+    end?: boolean;
 }
 
-const NavItem: React.FC<NavItemProps> = ({ to, icon, label, isCollapsed }) => (
+const NavItem: React.FC<NavItemProps> = ({ to, icon, label, isCollapsed, end }) => (
     <NavLink
         to={to}
+        end={end}
         className={({ isActive }) => `group flex items-center h-12 px-4 rounded-2xl transition-all duration-300 ease-in-out ${isActive
             ? 'bg-purple-50 border border-purple-100 text-purple-600 shadow-sm'
             : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 border border-transparent'

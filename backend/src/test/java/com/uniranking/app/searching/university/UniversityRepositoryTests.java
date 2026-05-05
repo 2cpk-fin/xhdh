@@ -69,10 +69,13 @@ public class UniversityRepositoryTests {
 
     @Test
     public void findByOneTag_ReturnPageOfUniversities() {
+        // Arrange
         List<Long> searchList = List.of(medicalTag.getId());
 
+        // Act
         Page<University> result = universityRepository.findByInput(pageRequest, null, searchList);
 
+        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.getTotalElements());
         Assertions.assertEquals("HMU", result.getContent().get(0).getAbbreviation());

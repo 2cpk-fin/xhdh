@@ -1,5 +1,5 @@
 export type TagResponse = {
     id: number;
-    publicId: string;
+    publicTagId: string;
     name: string;
 }

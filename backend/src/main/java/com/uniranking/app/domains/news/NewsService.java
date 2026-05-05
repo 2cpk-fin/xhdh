@@ -7,14 +7,16 @@ import org.jsoup.select.Elements;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class NewsService {
 
     private static final int DEFAULT_PAGE_SIZE = 10;
 
-    @Cacheable(value = "newsCache")
+    @Cacheable(value = "news")
     public NewsResponse getNewsPage(int page) {
         List<Article> allArticles = getAllNews();
 
@@ -34,12 +36,12 @@ public class NewsService {
         );
     }
 
-    public List<Article> getAllNews() {
+    private List<Article> getAllNews() {
         List<Article> allNews = new ArrayList<>();
 
         allNews.addAll(fetchTuoiTreNews());
-        allNews.addAll(fetchVNURNews());
         allNews.addAll(fetchMOETNews());
+        allNews.addAll(fetchGiaoDucThoiDaiNews());
 
         return allNews;
     }
@@ -70,56 +72,92 @@ public class NewsService {
                         .build());
             }
         } catch (Exception e) {
-            System.err.println("TT crawl failed: " + e.getMessage());
-        }
-        return articles;
-    }
-
-    private List<Article> fetchVNURNews() {
-        List<Article> articles = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect("https://vnur.vn/tin-tuc/")
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-                    .timeout(10000)
-                    .get();
-
-            Elements items = doc.select(".elementor-post");
-
-            for (Element el : items) {
-                articles.add(Article.builder()
-                        .title(el.select(".elementor-post__title").text())
-                        .url(el.select("a").attr("href"))
-                        .imageUrl(el.select("img").attr("src"))
-                        .description(el.select(".elementor-post__excerpt").text())
-                        .source("VNUR")
-                        .build());
-            }
-        } catch (Exception e) {
-            System.err.println("VNUR crawl failed: " + e.getMessage());
+            System.err.println("Tuoi tre crawl failed: " + e.getMessage());
         }
         return articles;
     }
 
     private List<Article> fetchMOETNews() {
         List<Article> articles = new ArrayList<>();
+        String[] targetUrls = {
+                "https://moet.gov.vn/tin-tuc/tin-tong-hop2/huong-dan-tuyen-sinh-trinh-do-dai-hoc-trinh-do-cao-dang-nganh-giao-duc-mam-non-nam-2026.html",
+                "https://moet.gov.vn/tin-tuc-cot-phai/chuong-trinh-giao-duc-pho-thong"
+        };
+
+        for (String url : targetUrls) {
+            try {
+                Document doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                        .timeout(15000)
+                        .get();
+
+                String title = doc.title();
+
+                String imageUrl = doc.select("meta[property=og:image]").attr("content");
+                if (imageUrl.isEmpty()) {
+                    imageUrl = doc.select("#main-content img, .article-content img, img").attr("abs:src");
+                }
+
+                articles.add(Article.builder()
+                        .title(title)
+                        .url(url)
+                        .imageUrl(imageUrl)
+                        .source("MOET")
+                        .build());
+            } catch (Exception e) {
+                System.err.println("MOET crawl failed for " + url + ": " + e.getMessage());
+            }
+        }
+        return articles;
+    }
+
+    private List<Article> fetchGiaoDucThoiDaiNews() {
+        List<Article> articles = new ArrayList<>();
         try {
-            Document doc = Jsoup.connect("https://moet.gov.vn/tintuc/Pages/tin-tong-hop.aspx")
-                    .userAgent("Mozilla/5.0")
+            Document doc = Jsoup.connect("https://giaoducthoidai.vn/giao-duc/")
+                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .timeout(15000)
                     .get();
 
-            Elements items = doc.select(".news-item");
-            for (Element el : items) {
-                Element linkEl = el.selectFirst("a");
-                if (linkEl != null) {
+            Elements articleElements = doc.select("article");
+
+            for (Element articleEl : articleElements) {
+                Element titleEl = articleEl.selectFirst(".story__title a, h2 a, h3 a");
+                if (titleEl == null) {
+                    titleEl = articleEl.selectFirst("a[href]");
+                }
+                if (titleEl == null) continue;
+
+                String title = titleEl.text().trim();
+                String url = titleEl.absUrl("href");
+
+                Element imgEl = articleEl.selectFirst("picture img, img");
+                String imageUrl = null;
+                if (imgEl != null) {
+                    imageUrl = imgEl.hasAttr("data-src") ? imgEl.absUrl("data-src") : imgEl.absUrl("src");
+                }
+
+                if (!title.isEmpty() && url.contains("giaoducthoidai.vn")) {
                     articles.add(Article.builder()
-                            .title(linkEl.text())
-                            .url("https://moet.gov.vn" + linkEl.attr("href"))
-                            .source("MOET")
+                            .title(title)
+                            .url(url)
+                            .imageUrl(imageUrl)
+                            .source("Giáo dục & Thời đại")
                             .build());
                 }
             }
+
+            articles = new ArrayList<>(articles.stream()
+                    .collect(Collectors.toMap(
+                            Article::getUrl,
+                            a -> a,
+                            (a, b) -> a,
+                            LinkedHashMap::new
+                    ))
+                    .values());
+
         } catch (Exception e) {
-            System.err.println("MOET crawl failed: " + e.getMessage());
+            System.err.println("Giao Duc Thoi Dai crawl failed: " + e.getMessage());
         }
         return articles;
     }

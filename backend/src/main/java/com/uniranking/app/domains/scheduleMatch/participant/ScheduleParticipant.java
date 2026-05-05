@@ -23,14 +23,12 @@ public class ScheduleParticipant {
     private Long id;
 
     @ColumnDefault("0")
-    @Builder.Default
     private long totalVotes = 0;
 
     @ColumnDefault("1")
-    @Builder.Default
     private int rank = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne()
     @JoinColumn(name = "match_id", nullable = false)
     @JsonIgnoreProperties("participants")
     private ScheduleMatch scheduleMatch;
