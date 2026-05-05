@@ -7,12 +7,15 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
@@ -29,10 +32,9 @@ public class RedisConfig {
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
         mapper.activateDefaultTyping(
-            LaissezFaireSubTypeValidator.instance, 
-            ObjectMapper.DefaultTyping.NON_FINAL, 
-            JsonTypeInfo.As.PROPERTY
-        );
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY);
 
         // The translator from Java Object to JSON
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(mapper);
@@ -42,7 +44,7 @@ public class RedisConfig {
         template.setValueSerializer(serializer);
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(serializer);
-        
+
         template.afterPropertiesSet();
         return template;
     }
@@ -53,13 +55,24 @@ public class RedisConfig {
     // The RedisMessageListenerContainer is actually the Radio Receiver.
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory) {
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer(); // This thing subscribes to that channel
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer(); // This thing subscribes to that
+                                                                                       // channel
         container.setConnectionFactory(connectionFactory);
         // This is for local only, Spring automatically config it
         // For Upstash, we need to config manually
         // RedisConnection connection = connectionFactory.getConnection();
-        // connection.setConfig("notify-keyspace-events", "Ex"); (This tell Redis to publish a message to a channel whenever any key expires)
+        // connection.setConfig("notify-keyspace-events", "Ex"); (This tell Redis to
+        // publish a message to a channel whenever any key expires)
         // connection.close();
         return container;
+    }
+
+    @Bean
+    public RedisCacheConfiguration cacheConfiguration() {
+        return RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30))
+                .disableCachingNullValues()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair
+                        .fromSerializer(new GenericJackson2JsonRedisSerializer()));
     }
 }

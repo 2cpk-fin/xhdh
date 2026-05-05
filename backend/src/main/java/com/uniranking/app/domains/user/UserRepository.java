@@ -1,9 +1,7 @@
 package com.uniranking.app.domains.user;
 
 import java.util.Optional;
-import java.util.UUID;
 
-import com.uniranking.app.domains.auth.UserSummary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,24 +15,23 @@ public interface UserRepository extends JpaRepository<User, Long>{
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByPublicUserId(UUID publicUserId);
-
-    Optional<UserSummary> findSummaryByEmail(String email);
-
-    @Modifying
+    @Modifying(clearAutomatically = true) // Update -> Clear cache -> Re-fetch if you read again
+    @Transactional
     @Query("UPDATE User u SET u.username = :username WHERE u.id = :id")
-    void updateUsername(@Param("id") Long id, @Param("username") String username);
+    int updateUsername(@Param("id") Long id, @Param("username") String username);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("UPDATE User u SET u.email = :email WHERE u.id = :id")
-    void updateEmail(@Param("id") Long id, @Param("email") String email);
+    int updateEmail(@Param("id") Long id, @Param("email") String email);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("UPDATE User u SET u.password = :password WHERE u.id = :id")
-    void updatePassword(@Param("id") Long id, @Param("password") String password);
+    int updatePassword(@Param("id") Long id, @Param("password") String password);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE User u SET u.profileImage = :image WHERE u.id = :id")
-    void updateProfileImage(@Param("id") Long id, @Param("image") String image);
+    int updateProfileImage(@Param("id") Long id, @Param("image") String image);
 }

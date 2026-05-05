@@ -26,7 +26,7 @@ public interface ScheduleMatchRepository extends JpaRepository<ScheduleMatch, Lo
     @Query("SELECT m FROM ScheduleMatch m WHERE m.publicMatchId = :publicMatchId")
     ScheduleMatch findByPublicMatchId(@Param("publicMatchId") UUID publicMatchId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE ScheduleMatch m SET m.status = :newStatus WHERE m.publicMatchId = :publicMatchId AND m.status = :expectedStatus")
     int compareAndUpdateStatus(@Param("publicMatchId") UUID publicMatchId,

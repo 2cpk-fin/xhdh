@@ -1,4 +1,5 @@
 import type { ScheduleMatchResponse } from '../types/scheduleMatch'
+import { CalendarClock, ChevronRight } from 'lucide-react'
 
 type Props = {
     match: ScheduleMatchResponse
@@ -20,10 +21,10 @@ export default function UpcomingMatchItem({ match, onClick }: Props) {
                        hover:border-purple-300 hover:shadow-md hover:bg-purple-50/40
                        active:scale-[0.99] transition-all duration-200 group"
         >
-            {/* Clock icon indicator */}
+            {/* Clock icon */}
             <span className="flex-shrink-0 w-8 h-8 rounded-xl bg-purple-50 border border-purple-100
-                             flex items-center justify-center text-purple-500 text-sm font-black">
-                ⏰
+                             flex items-center justify-center text-purple-500">
+                <CalendarClock className="w-4 h-4" />
             </span>
 
             <div className="flex-1 min-w-0">
@@ -41,8 +42,8 @@ export default function UpcomingMatchItem({ match, onClick }: Props) {
                 Soon
             </span>
 
-            <span className="flex-shrink-0 text-zinc-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all text-lg">
-                →
+            <span className="flex-shrink-0 text-zinc-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5 h-5" />
             </span>
         </button>
     )

@@ -16,7 +16,6 @@ public class UniversityService {
     private final UniversityMapper universityMapper;
 
     public Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Long> tagIds) {
-        return universityRepository.findByInput(pageable, input, tagIds)
-                .map(universityMapper::mapToResponseWithTags);
+        return universityRepository.findByInput(pageable, input, tagIds).map(universityMapper::mapToResponseWithTags);
     }
 }

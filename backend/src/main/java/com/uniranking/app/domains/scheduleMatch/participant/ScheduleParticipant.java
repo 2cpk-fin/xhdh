@@ -5,14 +5,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.searching.university.University;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "participants")
 @DynamicInsert
 public class ScheduleParticipant {
@@ -21,9 +23,11 @@ public class ScheduleParticipant {
     private Long id;
 
     @ColumnDefault("0")
+    @Builder.Default
     private long totalVotes = 0;
 
     @ColumnDefault("1")
+    @Builder.Default
     private int rank = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)

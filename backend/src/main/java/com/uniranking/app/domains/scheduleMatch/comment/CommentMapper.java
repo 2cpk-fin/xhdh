@@ -3,6 +3,7 @@ package com.uniranking.app.domains.scheduleMatch.comment;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
 import com.uniranking.app.domains.user.User;
+import com.uniranking.app.domains.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,9 @@ public class CommentMapper {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private UserMapper userMapper;
 
     public Comment toComment(CommentRequest request, User authenticatedUser) {
         if (request == null) return null;
@@ -33,6 +37,9 @@ public class CommentMapper {
         if (request.getParentId() != null) {
             Comment parent = commentRepository.findById(request.getParentId())
                     .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            if (parent.getParent() != null) {
+                throw new RuntimeException("There should be two layer only");
+            }
             comment.setParent(parent);
         }
 
@@ -48,10 +55,7 @@ public class CommentMapper {
         response.setPublicCommentId(comment.getPublicCommentId());
         response.setCommentDate(comment.getCommentDate());
         response.setContent(comment.getContent());
-
-        if (comment.getUser() != null) {
-            response.setUsername(comment.getUser().getDisplayUsername());
-        }
+        response.setUser(userMapper.userToResponse(comment.getUser()));
 
         // Recursive call to map the parent using the same logic
         if (comment.getParent() != null) {

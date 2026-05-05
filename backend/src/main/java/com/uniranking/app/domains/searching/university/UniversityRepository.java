@@ -40,5 +40,5 @@ public interface UniversityRepository extends JpaRepository<University, Long>{
     WHERE u.id != :universityId
     AND u.id IN (SELECT university_id FROM OpponentIds)
     """)
-    List<University> findAllOpponentsWithSharedTag(@Param("universityId") long universityId);
+    List<University> findAllOpponentsWithSharedTag(@Param("universityId") Long universityId);
 }

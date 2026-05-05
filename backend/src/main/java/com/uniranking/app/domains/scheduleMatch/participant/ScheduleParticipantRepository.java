@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScheduleParticipantRepository extends JpaRepository<ScheduleParticipant, Long> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE ScheduleParticipant mp " +
             "SET mp.totalVotes = :totalVotes " +
@@ -20,7 +20,7 @@ public interface ScheduleParticipantRepository extends JpaRepository<SchedulePar
                           @Param("matchId") long matchId,
                           @Param("totalVotes") long totalVotes);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE ScheduleParticipant mp " +
             "SET mp.rank = :rank " +

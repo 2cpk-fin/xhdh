@@ -4,6 +4,8 @@ import RegisterPage from './pages/RegisterPage';
 import AuthCallback from './pages/AuthCallback';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/ProfilePage';
+import NewsPage from './pages/NewsPage';
+import SupportPage from './pages/SupportPage';
 import SearchPage from './pages/SearchPage';
 import SoloMatchPage from './pages/SoloMatchPage';
 import ScheduleMatchPage from './pages/ScheduleMatchPage';
@@ -22,7 +24,10 @@ function App() {
                 <Route path="/solo" element={<SoloMatchPage />} />
                 <Route path="/schedule" element={<ScheduleMatchPage />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/news" element={<NewsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+
+                <Route path="/support" element={<SupportPage />} />
             </Routes>
         </Router>
     );

@@ -8,10 +8,13 @@ interface ProfileBoxProps {
 
 const ProfileBox = ({ user }: ProfileBoxProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [imgError, setImgError] = useState(false);
 
-    const imageSrc = user.profileImage
-        ? `data:image/jpeg;base64,${user.profileImage}`
-        : '';
+    const imageSrc = user.profileImage && !imgError
+        ? (user.profileImage.startsWith('data:') || user.profileImage.startsWith('http')
+            ? user.profileImage
+            : `data:image/jpeg;base64,${user.profileImage}`)
+        : null;
 
     return (
         <>
@@ -22,7 +25,12 @@ const ProfileBox = ({ user }: ProfileBoxProps) => {
                     <div className="relative shrink-0 cursor-pointer group/avatar" onClick={() => imageSrc && setIsModalOpen(true)}>
                         <div className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-zinc-100 dark:border-zinc-800 p-1 bg-white dark:bg-zinc-900 shadow-sm transition-all group-hover/avatar:border-purple-400">
                             {imageSrc ? (
-                                <img src={imageSrc} alt="Profile" className="w-full h-full object-cover rounded-xl transition-transform group-hover/avatar:scale-105" />
+                                <img
+                                    src={imageSrc}
+                                    alt="Profile"
+                                    onError={() => setImgError(true)}
+                                    className="w-full h-full object-cover rounded-xl transition-transform group-hover/avatar:scale-105"
+                                />
                             ) : (
                                 <div className="w-full h-full bg-zinc-50 dark:bg-zinc-950 rounded-xl flex items-center justify-center">
                                     <UserIcon className="w-8 h-8 text-zinc-300 dark:text-zinc-700" />
@@ -46,7 +54,7 @@ const ProfileBox = ({ user }: ProfileBoxProps) => {
                 </div>
             </div>
 
-            {isModalOpen && (
+            {isModalOpen && imageSrc && (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-in fade-in duration-200"
                     onClick={() => setIsModalOpen(false)}

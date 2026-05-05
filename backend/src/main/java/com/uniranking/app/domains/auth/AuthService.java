@@ -90,7 +90,7 @@ public class AuthService {
         refreshTokenService.verifyMetaData(refreshToken, httpRequest);
 
         // Find the user via the refresh token
-        User user = userRepository.findByPublicUserId(refreshToken.getUserId())
+        User user = userRepository.findByEmail(refreshToken.getEmail())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Give them a new JWt

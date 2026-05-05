@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    @Query("SELECT c FROM Comment c WHERE c.scheduleMatch.id = :matchId")
-    Page<Comment> findByMatch(@Param("matchId") long matchId, Pageable pageable);
+
+    @Query("SELECT c FROM Comment c WHERE :matchId IS NOT NULL AND c.scheduleMatch.id = :matchId")
+    Page<Comment> findByMatch(@Param("matchId") Long matchId, Pageable pageable);
+
 }

@@ -4,8 +4,8 @@ import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,9 +14,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "comments")
-@NoArgsConstructor
 @DynamicInsert
 public class Comment {
     @Id
@@ -24,8 +26,9 @@ public class Comment {
     private Long id;
 
     @Column(name = "public_comment_id", updatable = false, nullable = false)
-    @ColumnDefault("gen_random_uuid()")
-    private UUID publicCommentId;
+    @UuidGenerator
+    @Builder.Default
+    private UUID publicCommentId = UUID.randomUUID();
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -42,6 +45,7 @@ public class Comment {
     private Comment parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Comment> children = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT", nullable = false)

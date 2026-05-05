@@ -1,5 +1,6 @@
 package com.uniranking.app.infrastructure.security;
 
+import com.uniranking.app.domains.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -23,8 +24,11 @@ public class JwtService {
     private long jwtExpiry;
 
     public String generateToken(UserDetails userDetails) {
+        String displayName = ((User) userDetails).getDisplayUsername();
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
+                .claim("username", displayName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiry))
                 .signWith(getKey())

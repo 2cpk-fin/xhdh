@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Base64;
 import java.util.Map;
 
 @RestController
@@ -15,16 +14,17 @@ public class UserController {
 
     private final UserService userService;
 
-    // — refresh tokens must never travel as query params (they appear in server logs,
-    //   browser history, and proxy logs). POST body keeps them out of the URL entirely.
+    // — refresh tokens must never travel as query params (they appear in server
+    // logs,
+    // browser history, and proxy logs). POST body keeps them out of the URL
+    // entirely.
     @PostMapping("/me")
     public ResponseEntity<?> getUserByRefreshToken(@RequestBody Map<String, String> body) {
         try {
             String refreshToken = body.get("refreshToken");
             UserResponse response = userService.getUserByRefreshToken(refreshToken);
             return ResponseEntity.ok(response);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
@@ -48,9 +48,11 @@ public class UserController {
     }
 
     @PatchMapping("/{id}/profile-image")
-    public ResponseEntity<UserResponse> updateProfileImage(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<UserResponse> updateProfileImage(@PathVariable Long id,
+            @RequestBody Map<String, String> body) {
         String base64Image = body.get("imageProfile");
-        if (base64Image == null) return ResponseEntity.badRequest().build();
+        if (base64Image == null)
+            return ResponseEntity.badRequest().build();
         // Pass the Base64 string directly — no decoding needed
         return new ResponseEntity<>(userService.updateProfileImage(id, base64Image), HttpStatus.OK);
     }
@@ -59,8 +61,7 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }

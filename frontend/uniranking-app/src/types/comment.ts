@@ -1,3 +1,5 @@
+import type { UserResponse } from "./user";
+
 export type CommentRequest = {
     matchId: number;
     parentId?: number;
@@ -7,7 +9,7 @@ export type CommentRequest = {
 export type CommentResponse = {
     id: number;
     publicCommentId: string;
-    username: string;
+    user: UserResponse;
     commentDate: string;
     parent: CommentResponse;
     content: string;

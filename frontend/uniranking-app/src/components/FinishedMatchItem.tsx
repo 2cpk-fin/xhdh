@@ -1,4 +1,5 @@
 import type { ScheduleMatchResponse } from '../types/scheduleMatch'
+import { Trophy, ChevronRight } from 'lucide-react'
 
 type Props = {
     match: ScheduleMatchResponse
@@ -20,10 +21,10 @@ export default function FinishedMatchItem({ match, onClick }: Props) {
                        hover:border-zinc-300 hover:shadow-md hover:bg-zinc-50
                        active:scale-[0.99] transition-all duration-200 group"
         >
-            {/* Trophy indicator */}
+            {/* Trophy icon */}
             <span className="flex-shrink-0 w-8 h-8 rounded-xl bg-zinc-50 border border-zinc-200
-                             flex items-center justify-center text-sm">
-                🏆
+                             flex items-center justify-center text-zinc-500">
+                <Trophy className="w-4 h-4" />
             </span>
 
             <div className="flex-1 min-w-0">
@@ -41,8 +42,8 @@ export default function FinishedMatchItem({ match, onClick }: Props) {
                 Ended
             </span>
 
-            <span className="flex-shrink-0 text-zinc-300 group-hover:text-zinc-500 group-hover:translate-x-1 transition-all text-lg">
-                →
+            <span className="flex-shrink-0 text-zinc-300 group-hover:text-zinc-500 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5 h-5" />
             </span>
         </button>
     )

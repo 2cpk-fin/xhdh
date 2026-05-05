@@ -3,8 +3,15 @@ import { scheduleMatchApi } from '../api/scheduleMatchApi'
 import type { ScheduleMatchResponse } from '../types/scheduleMatch'
 import UpcomingMatchItem from './UpcomingMatchItem'
 import ParticipantSection from './ParticipantSection'
+import CommentSection from './CommentSection'
+import { ArrowLeft, PlayCircle, StopCircle, CalendarClock } from 'lucide-react'
 
-export default function UpcomingMatchSection() {
+type Props = {
+    hidden?: boolean;
+    onToggle?: (isExpanded: boolean) => void;
+}
+
+export default function UpcomingMatchSection({ hidden, onToggle }: Props = {}) {
     const [matches, setMatches] = useState<ScheduleMatchResponse[]>([])
     const [selected, setSelected] = useState<ScheduleMatchResponse | null>(null)
     const [loading, setLoading] = useState(true)
@@ -17,15 +24,27 @@ export default function UpcomingMatchSection() {
             .finally(() => setLoading(false))
     }, [])
 
+    if (hidden) return null;
+
+    const handleSelect = (match: ScheduleMatchResponse) => {
+        setSelected(match);
+        if (onToggle) onToggle(true);
+    };
+
+    const handleBack = () => {
+        setSelected(null);
+        if (onToggle) onToggle(false);
+    };
+
     if (selected) {
         return (
-            <div>
+            <div className="animate-fadeUp">
                 <button
-                    onClick={() => setSelected(null)}
+                    onClick={handleBack}
                     className="mb-6 inline-flex items-center gap-1.5 text-sm font-bold
                                text-zinc-400 hover:text-purple-600 transition-colors"
                 >
-                    ← Back
+                    <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
                 <div className="mb-8 pb-6 border-b border-zinc-200">
@@ -36,12 +55,20 @@ export default function UpcomingMatchSection() {
                     </div>
                     <h1 className="text-3xl font-black text-zinc-800 mb-2">{selected.title}</h1>
                     <div className="flex items-center gap-4 text-sm font-medium text-zinc-400">
-                        <span>▶ Starts {new Date(selected.startTime).toLocaleString()}</span>
-                        <span>⏹ Ends {new Date(selected.endTime).toLocaleString()}</span>
+                        <span className="flex items-center gap-1.5">
+                            <PlayCircle className="w-4 h-4" /> Starts {new Date(selected.startTime).toLocaleString()}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                            <StopCircle className="w-4 h-4" /> Ends {new Date(selected.endTime).toLocaleString()}
+                        </span>
                     </div>
                 </div>
 
                 <ParticipantSection matchId={selected.id} mode="upcoming" />
+
+                <div className="mt-10 pt-8 border-t border-zinc-200">
+                    <CommentSection matchId={selected.id} />
+                </div>
             </div>
         )
     }
@@ -49,7 +76,7 @@ export default function UpcomingMatchSection() {
     return (
         <section>
             <div className="flex items-center gap-2 mb-4">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-400 flex-shrink-0" />
+                <CalendarClock className="w-5 h-5 text-purple-500" />
                 <h2 className="text-lg font-black text-zinc-800 tracking-tight">Upcoming</h2>
             </div>
 
@@ -66,7 +93,7 @@ export default function UpcomingMatchSection() {
                     <UpcomingMatchItem
                         key={match.publicMatchId}
                         match={match}
-                        onClick={setSelected}
+                        onClick={handleSelect}
                     />
                 ))}
             </div>

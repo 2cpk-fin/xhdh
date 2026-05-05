@@ -5,8 +5,8 @@ import com.uniranking.app.domains.scheduleMatch.comment.Comment;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +16,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "matches")
 @DynamicInsert
@@ -24,9 +26,9 @@ public class ScheduleMatch {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "public_match_id", updatable = false, nullable = false)
-    @ColumnDefault("gen_random_uuid()")
-    private UUID publicMatchId = UUID.randomUUID();
+    @Column(name = "public_match_id", updatable = false, nullable = false, columnDefinition = "UUID")
+    @UuidGenerator
+    private UUID publicMatchId;
 
     private String title;
 
@@ -37,10 +39,12 @@ public class ScheduleMatch {
     // One match can have many participants
     @OneToMany(mappedBy = "scheduleMatch", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("rank ASC")
+    @Builder.Default
     private List<ScheduleParticipant> participants = new ArrayList<>();
 
     // One match can have many comments
     @OneToMany(mappedBy = "scheduleMatch", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     // pattern: Year-Month-Day Hour:00

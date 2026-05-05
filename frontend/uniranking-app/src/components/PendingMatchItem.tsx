@@ -1,4 +1,5 @@
 import type { ScheduleMatchResponse } from '../types/scheduleMatch'
+import { Radio, ChevronRight, PlayCircle, StopCircle } from 'lucide-react'
 
 type Props = {
     match: ScheduleMatchResponse
@@ -20,10 +21,9 @@ export default function PendingMatchItem({ match, onClick }: Props) {
                        hover:border-purple-300 hover:shadow-md hover:bg-purple-50/40
                        active:scale-[0.99] transition-all duration-200 group"
         >
-            {/* Live pulse dot */}
-            <span className="relative flex-shrink-0">
-                <span className="block w-2.5 h-2.5 rounded-full bg-green-500" />
-                <span className="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-60" />
+            {/* Live icon */}
+            <span className="flex-shrink-0 flex items-center justify-center w-8 h-8">
+                <Radio className="w-5 h-5 text-green-500 animate-pulse" />
             </span>
 
             {/* Body */}
@@ -31,10 +31,16 @@ export default function PendingMatchItem({ match, onClick }: Props) {
                 <p className="font-black text-zinc-800 text-base truncate group-hover:text-purple-700 transition-colors">
                     {match.title}
                 </p>
-                <div className="flex items-center gap-2 mt-0.5 text-xs font-medium text-zinc-400">
-                    <span>▶ {fmt(match.startTime)}</span>
+                <div className="flex items-center gap-3 mt-1.5 text-xs font-medium text-zinc-400">
+                    <span className="flex items-center gap-1">
+                        <PlayCircle className="w-3.5 h-3.5" />
+                        {fmt(match.startTime)}
+                    </span>
                     <span className="text-zinc-300">—</span>
-                    <span>⏹ {fmt(match.endTime)}</span>
+                    <span className="flex items-center gap-1">
+                        <StopCircle className="w-3.5 h-3.5" />
+                        {fmt(match.endTime)}
+                    </span>
                 </div>
             </div>
 
@@ -46,8 +52,8 @@ export default function PendingMatchItem({ match, onClick }: Props) {
             </span>
 
             {/* Arrow */}
-            <span className="flex-shrink-0 text-zinc-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all text-lg">
-                →
+            <span className="flex-shrink-0 text-zinc-300 group-hover:text-purple-500 group-hover:translate-x-1 transition-all">
+                <ChevronRight className="w-5 h-5" />
             </span>
         </button>
     )
