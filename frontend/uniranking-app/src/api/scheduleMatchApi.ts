@@ -34,17 +34,17 @@ export const scheduleMatchApi = {
     },
 
     createMatch: async (request: ScheduleMatchRequest): Promise<ScheduleMatchResponse> => {
-        const { data } = await api.post<ScheduleMatchResponse>('/schedule/match', request);
+        const { data } = await api.post<ScheduleMatchResponse>('/schedule/match/admin/create', request);
         return data;
     },
 
     updateMatch: async (id: number, request: ScheduleMatchRequest): Promise<ScheduleMatchResponse> => {
-        const { data } = await api.patch<ScheduleMatchResponse>(`/schedule/match/${id}`, request);
+        const { data } = await api.patch<ScheduleMatchResponse>(`/schedule/match/admin/update/${id}`, request);
         return data;
     },
 
     deleteMatch: async (id: number): Promise<string> => {
-        const { data } = await api.delete<string>(`/schedule/match/${id}`);
+        const { data } = await api.delete<string>(`/schedule/match/admin/delete/${id}`);
         return data;
     },
 }

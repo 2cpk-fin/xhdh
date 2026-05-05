@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,16 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @Nonnull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        final String jwt;
         final String authHeader = request.getHeader("Authorization");
 
-        // 1. Exit early if no token
+        // Exit early if no token
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.substring(7).trim();
+        // Extract the token
+        jwt = authHeader.substring(7).trim();
 
+        // Check if the token is blacklisted
         if(refreshTokenService.isAccessTokenBlacklisted(jwt)){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
@@ -50,11 +54,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String userEmail = jwtService.extractUsername(jwt);
+            final String role = jwtService.extractClaim(jwt, claims -> claims.get("role", String.class));
 
             if (userEmail != null && jwtService.isTokenValid(jwt, userEmail)) {
+                // Create the granted authority
+                List<GrantedAuthority> grantedAuthorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+
+                // Create the authentication token
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userEmail, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
+                        userEmail,
+                        null,
+                        grantedAuthorities
                 );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
@@ -63,7 +75,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // We do NOT stop the chain here; we just don't set the Authentication
         }
 
-        // 2. This is the ONLY place doFilter is called if a token was present
+        // This is the ONLY place doFilter is called if a token was present
         filterChain.doFilter(request, response);
     }
 }

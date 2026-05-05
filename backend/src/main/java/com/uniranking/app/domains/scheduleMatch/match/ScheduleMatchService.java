@@ -1,22 +1,27 @@
 package com.uniranking.app.domains.scheduleMatch.match;
 
+import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantMapper;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantResponse;
+import com.uniranking.app.domains.searching.university.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleMatchService {
     private final ScheduleMatchRepository scheduleMatchRepository;
+    private final UniversityRepository universityRepository;
 
     private final ScheduleMatchMapper scheduleMatchMapper;
     private final ScheduleParticipantMapper scheduleParticipantMapper;
@@ -25,10 +30,7 @@ public class ScheduleMatchService {
     private static final String STATUS_PREFIX = "status:match:";
     private static final String LEADERBOARD_PREFIX = "leaderboard:match:";
 
-    private void buildMatchInRedis(ScheduleMatchRequest request, Long matchId) {
-        ScheduleMatch scheduleMatch = scheduleMatchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-
+    private void buildMatchInRedis(ScheduleMatchRequest request, ScheduleMatch scheduleMatch) {
         String matchKey = String.valueOf(scheduleMatch.getPublicMatchId());
         String statusKey = STATUS_PREFIX + matchKey;
         String leaderboardKey = LEADERBOARD_PREFIX + matchKey;
@@ -37,8 +39,7 @@ public class ScheduleMatchService {
         // Until the end time
         long secondsToStart = java.time.Duration.between(
                 LocalDateTime.now(),
-                request.getStartTime()
-        ).getSeconds();
+                request.getStartTime()).getSeconds();
         Duration ttl = Duration.ofSeconds(Math.max(secondsToStart, 1));
         redisTemplate.opsForValue().set(statusKey, Status.NOT_STARTED.name(), ttl);
 
@@ -58,8 +59,7 @@ public class ScheduleMatchService {
         String currentStatus = (String) redisTemplate.opsForValue().get(statusKey);
         if (currentStatus == null) {
             throw new RuntimeException("Match not found or already finished");
-        }
-        else if (Status.NOT_STARTED.name().equals(currentStatus)) {
+        } else if (Status.NOT_STARTED.name().equals(currentStatus)) {
             throw new RuntimeException("Match has not started yet");
         }
 
@@ -72,15 +72,13 @@ public class ScheduleMatchService {
             // First time voting
             redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
-        }
-        else if (!oldUniversityId.equals(universityId)) {
+        } else if (!oldUniversityId.equals(universityId)) {
             // Changing vote
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, oldUniversityId, -1.0);
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
             // Update the tracker
             redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
-        }
-        else {
+        } else {
             throw new RuntimeException("You already voted for this university!");
         }
     }
@@ -116,6 +114,7 @@ public class ScheduleMatchService {
                 .toList();
     }
 
+    @Transactional
     public ScheduleMatchResponse createMatch(ScheduleMatchRequest scheduleMatchRequest) {
         // Validate the time
         LocalDateTime now = LocalDateTime.now();
@@ -129,10 +128,29 @@ public class ScheduleMatchService {
             throw new RuntimeException("End time must be at least 1 day after the start time.");
         }
 
-        // Proceed the logic
+        // Create match without participants (mapper ignores them)
         ScheduleMatch newScheduleMatch = scheduleMatchMapper.toScheduleMatch(scheduleMatchRequest);
+
+        // Explicitly create and associate participants
+        List<ScheduleParticipant> participants = new ArrayList<>();
+        if (scheduleMatchRequest.getUniIds() != null && !scheduleMatchRequest.getUniIds().isEmpty()) {
+            for (Long uniId : scheduleMatchRequest.getUniIds()) {
+                ScheduleParticipant participant = new ScheduleParticipant();
+                participant.setScheduleMatch(newScheduleMatch);
+                participant.setUniversity(universityRepository.findById(uniId)
+                        .orElseThrow(() -> new RuntimeException("University with id " + uniId + " not found")));
+                participants.add(participant);
+            }
+        }
+
+        if (participants.size() < 2) {
+            throw new RuntimeException("A match must have at least 2 participants");
+        }
+
+        newScheduleMatch.setParticipants(participants);
         scheduleMatchRepository.save(newScheduleMatch);
-        buildMatchInRedis(scheduleMatchRequest, newScheduleMatch.getId());
+        buildMatchInRedis(scheduleMatchRequest, newScheduleMatch);
+
         return scheduleMatchMapper.toScheduleMatchResponse(newScheduleMatch);
     }
 
@@ -141,7 +159,7 @@ public class ScheduleMatchService {
                 .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
         scheduleMatchMapper.updateMatchFromRequest(scheduleMatchRequest, existingMatch);
         ScheduleMatch savedMatch = scheduleMatchRepository.save(existingMatch);
-        return scheduleMatchMapper.toScheduleMatchResponse(scheduleMatchRepository.save(savedMatch));
+        return scheduleMatchMapper.toScheduleMatchResponse(savedMatch);
     }
 
     public String deleteMatchById(long id) {

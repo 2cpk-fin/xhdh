@@ -1,6 +1,5 @@
 package com.uniranking.app.domains.soloMatch;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -27,11 +26,8 @@ public class SoloMatchController {
             SoloMatchReport report = soloMatchService.chooseWinner(publicMatchId, winnerId);
             return ResponseEntity.ok(report);
         }
-        catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
         catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.GONE).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

@@ -2,6 +2,7 @@ package com.uniranking.app.infrastructure.security;
 
 import java.io.IOException;
 
+import com.uniranking.app.domains.user.Role;
 import com.uniranking.app.domains.user.UserMapper;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     User newuser = userMapper.oAuthToUser(email, name, pfp);
+                    newuser.setRole(Role.USER);
                     return userRepository.save(newuser);
                 });
 

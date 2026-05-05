@@ -62,9 +62,8 @@ public class ScheduleMatchController {
     }
 
     // Secret route (for admin only)
-    @PostMapping
-    public ResponseEntity<?> createScheduledMatch(
-            @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
+    @PostMapping(path = "/admin/create")
+    public ResponseEntity<?> createScheduledMatch(@Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
         try {
             ScheduleMatchResponse response = scheduleMatchService.createMatch(scheduleMatchRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -75,7 +74,7 @@ public class ScheduleMatchController {
     }
 
     // Secret route(for admin only)
-    @PatchMapping(path = "/{id}")
+    @PatchMapping(path = "/admin/update/{id}")
     public ResponseEntity<?> updateScheduledMatch(
             @PathVariable long id,
             @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
@@ -89,7 +88,7 @@ public class ScheduleMatchController {
     }
 
     // Secret route (for admin only)
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/admin/delete/{id}")
     public ResponseEntity<String> deleteScheduledMatch(@PathVariable long id) {
         try {
             String message = scheduleMatchService.deleteMatchById(id);

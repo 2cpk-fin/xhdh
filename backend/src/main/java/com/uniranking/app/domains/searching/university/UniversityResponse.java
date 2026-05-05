@@ -12,11 +12,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonPropertyOrder({ "id", "publicId", "name", "abbreviation", "tags", "elo" })
+@JsonPropertyOrder({ "id", "publicUniversityId", "name", "abbreviation", "tags", "elo" })
 public class UniversityResponse {
     private long id;
 
-    private UUID publicId;
+    private UUID publicUniversityId;
 
     private String name;
 

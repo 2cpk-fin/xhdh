@@ -10,14 +10,11 @@ const AuthCallback = () => {
         const refreshToken = searchParams.get('refreshToken');
 
         if (token && refreshToken) {
-            // Save tokens to storage (match your authApi's expected logic)
-            localStorage.setItem('token', token);
+            localStorage.setItem('accessToken', token);
             localStorage.setItem('refreshToken', refreshToken);
 
-            // Redirect to home now that we are authenticated
             navigate('/home');
         } else {
-            // If tokens are missing, go back to login
             console.error("Auth failed: Missing tokens in URL");
             navigate('/login');
         }

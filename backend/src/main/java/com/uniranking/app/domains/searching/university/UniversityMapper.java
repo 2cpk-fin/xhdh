@@ -10,14 +10,15 @@ public abstract class UniversityMapper {
     @Autowired
     protected TagService tagService;
 
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "publicUniversityId", target = "publicId")
     @Mapping(target = "tags", ignore = true)
     public abstract UniversityResponse toUniversityResponse(University university);
 
     // main
     public UniversityResponse mapToResponseWithTags(University university) {
-        if (university == null) return null;
+        if (university == null) {
+            return null;
+        }
+
         UniversityResponse response = toUniversityResponse(university);
         response.setTags(tagService.showAllTagsInUniversity(university.getId()));
         return response;

@@ -39,12 +39,10 @@ public class ScheduleMatch {
     // One match can have many participants
     @OneToMany(mappedBy = "scheduleMatch", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("rank ASC")
-    @Builder.Default
     private List<ScheduleParticipant> participants = new ArrayList<>();
 
     // One match can have many comments
     @OneToMany(mappedBy = "scheduleMatch", cascade = CascadeType.ALL)
-    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
     // pattern: Year-Month-Day Hour:00
