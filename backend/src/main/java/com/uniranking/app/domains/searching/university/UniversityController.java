@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,5 +35,31 @@ public class UniversityController {
         Page<UniversityResponse> results = universityService.getUniversityListByInput(pageable, input, tagIds);
 
         return ResponseEntity.ok(results);
+    }
+
+    @PostMapping(path = "/admin/create")
+    public ResponseEntity<UniversityResponse> createUniversity(@RequestBody UniversityRequest universityRequest) {
+        return ResponseEntity.ok(universityService.createUniversity(universityRequest));
+    }
+
+    @PatchMapping(path = "/admin/update/{id}")
+    public ResponseEntity<?> updateUniversity(
+            @PathVariable Long id,
+            @RequestBody UniversityRequest universityRequest
+    ) {
+        try {
+            return ResponseEntity.ok(universityService.updateUniversityById(id, universityRequest));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping(path = "/admin/delete/{id}")
+    public ResponseEntity<String> deleteUniversity(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(universityService.deleteUniversityById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 }

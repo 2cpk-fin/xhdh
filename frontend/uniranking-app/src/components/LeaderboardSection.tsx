@@ -9,7 +9,9 @@ type Props = {
 export default function LeaderboardSection({ publicMatchId }: Props) {
     const [participants, setParticipants] = useState<ScheduleParticipantResponse[]>([])
     const [loading, setLoading] = useState(true)
-    const [votingId, setVotingId] = useState<number | null>(null)
+
+    // The "Lock" state: Prevents the race condition that caused negative votes
+    const [isProcessingVote, setIsProcessingVote] = useState(false)
     const [votedId, setVotedId] = useState<number | null>(null)
     const [error, setError] = useState<string | null>(null)
 
@@ -18,8 +20,12 @@ export default function LeaderboardSection({ publicMatchId }: Props) {
 
         const fetchLeaderboard = async () => {
             try {
+                // Ensure your scheduleMatchApi uses the path: /api/schedule/match/leaderboard/{publicMatchId}
                 const data = await scheduleMatchApi.getLeaderboard(publicMatchId)
-                if (!cancelled) setParticipants(data)
+                if (!cancelled) {
+                    setParticipants(data)
+                    setError(null)
+                }
             } catch {
                 if (!cancelled) setError('Failed to load leaderboard.')
             } finally {
@@ -27,39 +33,61 @@ export default function LeaderboardSection({ publicMatchId }: Props) {
             }
         }
 
+        // Fetch exactly ONCE on load.
         fetchLeaderboard()
-        const interval = setInterval(fetchLeaderboard, 5000)
+
+        // Notice: No setInterval! The network is now completely silent.
+
         return () => {
             cancelled = true
-            clearInterval(interval)
         }
     }, [publicMatchId])
 
     const handleVote = async (universityId: number) => {
-        if (votedId === universityId) return;
+        // If they already voted for this, OR if a vote is currently processing, do nothing.
+        if (votedId === universityId || isProcessingVote) return;
 
         setError(null);
-        setVotingId(universityId);
+        setIsProcessingVote(true); // Lock the entire UI instantly
 
-        // OPTIMISTIC UPDATE: Assume success to make the UI snappy
         const previousParticipants = [...participants];
-        setParticipants(prev => prev.map(p =>
-            p.universityResponse.id === universityId
-                ? { ...p, totalVotes: p.totalVotes + 1 }
-                : p
-        ));
+
+        // Optimistic update: instantly show the new vote locally
+        setParticipants(prev => {
+            const updated = prev.map(p => {
+                // If changing vote, subtract from the old one (preventing negative numbers)
+                if (p.universityResponse.id === votedId) {
+                    return { ...p, totalVotes: Math.max(0, p.totalVotes - 1) }
+                }
+                // Add to the newly clicked one
+                if (p.universityResponse.id === universityId) {
+                    return { ...p, totalVotes: p.totalVotes + 1 }
+                }
+                return p;
+            });
+
+            // Re-sort so the UI updates the ranking visually
+            updated.sort((a, b) => b.totalVotes - a.totalVotes);
+            return updated.map((p, index) => ({ ...p, rank: index + 1 }));
+        });
 
         try {
             await scheduleMatchApi.vote(publicMatchId, universityId);
             setVotedId(universityId);
+
+            // Fetch fresh data immediately to ensure we are perfectly in sync with the backend
+            const freshData = await scheduleMatchApi.getLeaderboard(publicMatchId);
+            setParticipants(freshData);
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            // ROLLBACK: If it fails (e.g., "Already voted"), reset the numbers
+            // Rollback if the API fails
             setParticipants(previousParticipants);
             const errMsg = err.response?.data || 'Vote failed.';
             setError(errMsg);
         } finally {
-            setVotingId(null);
+            // Unlock the UI
+            setIsProcessingVote(false);
         }
     }
 
@@ -87,7 +115,6 @@ export default function LeaderboardSection({ publicMatchId }: Props) {
                     const uniId = p.universityResponse.id
                     const pct = Math.round((p.totalVotes / maxVotes) * 100)
                     const isVoted = votedId === uniId
-                    const isVoting = votingId === uniId
                     const isFirst = i === 0
 
                     return (
@@ -102,7 +129,7 @@ export default function LeaderboardSection({ publicMatchId }: Props) {
                             {/* Rank */}
                             <span className={`text-xl font-black w-8 flex-shrink-0 tabular-nums
                                              ${isFirst ? 'text-purple-600' : 'text-zinc-300'}`}>
-                                #{i + 1}
+                                #{p.rank}
                             </span>
 
                             {/* Name + bar */}
@@ -126,17 +153,18 @@ export default function LeaderboardSection({ publicMatchId }: Props) {
                             {/* Vote button */}
                             <button
                                 onClick={() => handleVote(uniId)}
-                                disabled={isVoting}
+                                // Disable ALL buttons if ANY vote is processing
+                                disabled={isProcessingVote}
                                 className={`flex-shrink-0 text-xs font-black tracking-wide px-4 py-1.5 rounded-xl
                                             border transition-all duration-200 min-w-[64px] text-center
                                             ${isVoted
                                         ? 'border-green-300 bg-green-50 text-green-600 cursor-default'
-                                        : isVoting
+                                        : isProcessingVote
                                             ? 'border-zinc-200 text-zinc-300 cursor-not-allowed'
                                             : 'border-purple-300 text-purple-600 hover:bg-purple-600 hover:text-white hover:shadow-md hover:shadow-purple-200 active:scale-95'
                                     }`}
                             >
-                                {isVoting ? '…' : isVoted ? '✓' : 'Vote'}
+                                {isProcessingVote && !isVoted ? '…' : isVoted ? '✓' : 'Vote'}
                             </button>
                         </li>
                     )

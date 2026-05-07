@@ -1,6 +1,8 @@
 package com.uniranking.app.domains.user;
 
 import com.uniranking.app.domains.auth.RefreshTokenService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -79,5 +81,13 @@ public class UserService implements UserDetailsService {
     private User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+    }
+
+    public Page<UserResponse> getAllUsers(int pageNo, int size) {
+        return userRepository.findAll(PageRequest.of(pageNo, size)).map(userMapper::userToResponse);
+    }
+
+    public Page<UserResponse> getUserByUsername(int pageNo, int size, String username) {
+        return userRepository.findByInput(PageRequest.of(pageNo, size), username).map(userMapper::userToResponse);
     }
 }

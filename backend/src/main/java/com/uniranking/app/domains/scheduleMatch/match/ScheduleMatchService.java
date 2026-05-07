@@ -7,6 +7,9 @@ import com.uniranking.app.domains.searching.university.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -49,6 +52,7 @@ public class ScheduleMatchService {
         }
     }
 
+    @CacheEvict(value = "leaderboard", key = "#publicMatchId")
     public void vote(Long universityId, String publicMatchId, Authentication authentication) {
         String matchKey = String.valueOf(publicMatchId);
         String statusKey = STATUS_PREFIX + matchKey;
@@ -83,6 +87,11 @@ public class ScheduleMatchService {
         }
     }
 
+    public Page<ScheduleMatchResponse> getAllMatches(int pageNo, int size) {
+        return scheduleMatchRepository.findAll(PageRequest.of(pageNo, size)).map(scheduleMatchMapper::toScheduleMatchResponse);
+    }
+
+
     public List<ScheduleMatchResponse> getAllNotStartedMatches() {
         return scheduleMatchRepository.findAllNotStartedMatch()
                 .stream()
@@ -114,6 +123,7 @@ public class ScheduleMatchService {
                 .toList();
     }
 
+    // For admin
     @Transactional
     public ScheduleMatchResponse createMatch(ScheduleMatchRequest scheduleMatchRequest) {
         // Validate the time

@@ -12,4 +12,5 @@ public class CommentUpdateRequest {
     @NotBlank(message = "The content cannot be empty")
     @Size(max = 4500, message = "Too long! Max limit is roughly 750 words.")
     private String content;
+
 }

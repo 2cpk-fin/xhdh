@@ -3,6 +3,7 @@ package com.uniranking.app.domains.scheduleMatch.match;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -62,6 +63,11 @@ public class ScheduleMatchController {
     }
 
     // Secret route (for admin only)
+    @GetMapping(path = "/admin/get")
+    public ResponseEntity<Page<ScheduleMatchResponse>> getAllMatches(@RequestParam int pageNo, @RequestParam int size) {
+        return ResponseEntity.ok(scheduleMatchService.getAllMatches(pageNo, size));
+    }
+
     @PostMapping(path = "/admin/create")
     public ResponseEntity<?> createScheduledMatch(@Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
         try {

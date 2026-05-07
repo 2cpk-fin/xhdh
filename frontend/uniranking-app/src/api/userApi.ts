@@ -1,5 +1,6 @@
 import api from './axios';
 import type { UserResponse } from '../types/user';
+import type { Page } from '../types/general';
 
 const userApi = {
     getUserByRefreshToken: async (refreshToken: string): Promise<UserResponse> => {
@@ -35,6 +36,26 @@ const userApi = {
     deleteUser: async (id: number): Promise<string> => {
         const response = await api.delete<string>(`/users/${id}`, {
             responseType: 'text'
+        });
+        return response.data;
+    },
+
+    getUserByUsername: async (pageNo: number, size: number, username: string): Promise<UserResponse> => {
+        const response = await api.get<UserResponse>(`/${username}`, {
+            params: {
+                pageNo,
+                size
+            }
+        });
+        return response.data;
+    },
+
+    getAllUser: async (pageNo: number, size: number): Promise<Page<UserResponse>> => {
+        const response = await api.get<Page<UserResponse>>(`/users/admin/get-all`, {
+            params: {
+                pageNo,
+                size
+            }
         });
         return response.data;
     }

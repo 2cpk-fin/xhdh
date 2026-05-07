@@ -11,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -28,47 +26,37 @@ public class CommentService {
     public CommentResponse createComment(CommentRequest commentRequest, Authentication authentication) {
         // Get the user first
         String email = authentication.getName();
-        Optional<User> currentUser = userRepository.findByEmail(email);
-        User user;
-
-        // Check if the user is existed or not
-        if (currentUser.isPresent()) {
-            user = currentUser.get();
-        }
-        else {
-            throw new EntityNotFoundException("User is not found");
-        }
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // Save their comments
-        Comment comment = commentMapper.toComment(commentRequest, user);
+        Comment comment = commentMapper.toComment(commentRequest, currentUser);
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toCommentResponse(savedComment);
     }
 
     @Transactional
     public CommentResponse updateComment(Long id, String newContent, Authentication authentication) {
-        Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment is not found"));
-
-        if (!comment.getUser().getEmail().equals(authentication.getName())) {
-            throw new AccessDeniedException("You do not have permission to edit this comment");
-        }
-
+        Comment comment = findById(id, authentication);
         comment.setContent(newContent);
         return commentMapper.toCommentResponse(commentRepository.save(comment));
     }
 
     @Transactional
     public String deleteComment(Long id, Authentication authentication) {
-        Comment comment = commentRepository.findById(id)
+        Comment comment = findById(id, authentication);
+        commentRepository.delete(comment);
+        return "Comment with id " + id + " has been deleted";
+    }
+
+    private Comment findById(Long id, Authentication authentication) {
+        Comment comment =  commentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Comment is not found"));
 
         if (!comment.getUser().getEmail().equals(authentication.getName())) {
             throw new AccessDeniedException("You do not have permission to delete this comment");
         }
 
-        commentRepository.delete(comment);
-
-        return "Comment with id " + id + " has been deleted";
+        return comment;
     }
 }

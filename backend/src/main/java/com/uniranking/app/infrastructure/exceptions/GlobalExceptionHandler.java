@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
+
     @ExceptionHandler(NotAuthenticated.class)
     public ResponseEntity<ErrorResponse> handleNotAuthenticated(NotAuthenticated ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
@@ -38,6 +39,7 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleUnknownUser(AuthenticationException ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
@@ -73,4 +75,47 @@ public class GlobalExceptionHandler {
 //            request.getRequestURI() );
 //        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 //    }
+
+    // Handle scraping
+    @ExceptionHandler(ScrapingException.class)
+    public ResponseEntity<ErrorResponse> handleScrapingException(ScrapingException ex, HttpServletRequest request){
+
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Failed to scrap",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SiteUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleSiteUnavailableException(SiteUnavailableException ex, HttpServletRequest request){
+
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Server unavailable",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+
+    @ExceptionHandler(ScrapingTimeoutException.class)
+    public ResponseEntity<ErrorResponse> handleSocketTimeoutException(ScrapingTimeoutException ex, HttpServletRequest request){
+
+        ErrorResponse error = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.GATEWAY_TIMEOUT.value(),
+                "Timeout",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.GATEWAY_TIMEOUT);
+    }
 }

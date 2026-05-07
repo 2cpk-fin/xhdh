@@ -1,6 +1,7 @@
 package com.uniranking.app.domains.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,5 +65,19 @@ public class UserController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<Page<UserResponse>> getUserByUsername(
+            @RequestParam int pageNo,
+            @RequestParam int size,
+            @PathVariable String username
+    ) {
+        return new ResponseEntity<>(userService.getUserByUsername(pageNo, size, username), HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/get-all")
+    public ResponseEntity<Page<UserResponse>> getAllUsers(@RequestParam int pageNo, @RequestParam int size) {
+        return ResponseEntity.ok(userService.getAllUsers(pageNo, size));
     }
 }

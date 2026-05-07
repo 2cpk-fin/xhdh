@@ -13,7 +13,9 @@ import AdminRoute from './components/AdminRoute';
 
 import ControlNavBar from './components/ControlNavBar';
 import ControlPage from './pages/ControlPage';
-import MatchControlPage from './pages/MatchControlPage';
+import MatchControlPage from './pages/admin/MatchControlPage';
+import UniversityControlPage from './pages/admin/UniversityControlPage';
+import UserControlPage from './pages/admin/UserControlPage';
 
 function App() {
     return (
@@ -48,6 +50,8 @@ function App() {
                     >
                         <Route index element={<ControlPage />} />
                         <Route path="matches" element={<MatchControlPage />} />
+                        <Route path="universities" element={<UniversityControlPage />} />
+                        <Route path="users" element={<UserControlPage />} />
                         {/* <Route path="users" element={<UserControlPage />} /> */}
                     </Route>
 
