@@ -1,4 +1,4 @@
-package com.uniranking.app.domains.auth;
+package com.uniranking.app.domains.auth.refreshToken;
 
 import java.time.Instant;
 import java.util.UUID;

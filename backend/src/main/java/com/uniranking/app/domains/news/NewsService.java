@@ -1,8 +1,8 @@
 package com.uniranking.app.domains.news;
 
-import com.uniranking.app.infrastructure.exceptions.ScrapingException;
-import com.uniranking.app.infrastructure.exceptions.ScrapingTimeoutException;
-import com.uniranking.app.infrastructure.exceptions.SiteUnavailableException;
+import com.uniranking.app.domains.news.exceptions.ScrapingException;
+import com.uniranking.app.domains.news.exceptions.ScrapingTimeoutException;
+import com.uniranking.app.domains.news.exceptions.SiteUnavailableException;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

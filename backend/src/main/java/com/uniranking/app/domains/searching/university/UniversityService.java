@@ -1,5 +1,6 @@
 package com.uniranking.app.domains.searching.university;
 
+import com.uniranking.app.domains.searching.exceptions.UniversityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -14,38 +15,45 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UniversityService {
-    private final UniversityRepository universityRepository;
 
+    private final UniversityRepository universityRepository;
     private final UniversityMapper universityMapper;
 
-    public Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Long> tagIds) {
-        return universityRepository.findByInput(pageable, input, tagIds).map(universityMapper::mapToResponseWithTags);
+    public Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Tag> tags) {
+        return universityRepository.findByInput(pageable, input, tags)
+                .map(universityMapper::toUniversityResponse);
     }
 
-    // NOTE: Redis does not speak Java, it speaks String -> beware of handling Java Object to Redis
     @Cacheable(value = "universities", key = "#id")
     public UniversityResponse getUniversityById(Long id) {
-        University university = universityRepository.findById(id).orElseThrow(() -> new RuntimeException("University not found"));
-        return universityMapper.mapToResponseWithTags(university);
+        University university = universityRepository.findById(id)
+                .orElseThrow(() -> new UniversityNotFoundException("University not found with ID: " + id));
+        return universityMapper.toUniversityResponse(university);
     }
 
-    @CacheEvict(value = "universities", key = "#id")
+    @CachePut(value = "universities", key = "#result.id")
     public UniversityResponse createUniversity(UniversityRequest universityRequest) {
-        University university = universityMapper.toUniversity(universityRequest, new University());
-        universityRepository.save(university);
-        return universityMapper.mapToResponseWithTags(university);
+        University university = universityMapper.toUniversity(universityRequest);
+        University savedUniversity = universityRepository.save(university);
+        return universityMapper.toUniversityResponse(savedUniversity);
     }
 
     @CachePut(value = "universities", key = "#id")
     public UniversityResponse updateUniversityById(Long id, UniversityRequest universityRequest) {
-        University university = universityRepository.findById(id).orElseThrow(() -> new RuntimeException("University not found"));
-        universityMapper.toUniversity(universityRequest, university);
-        universityRepository.save(university);
-        return universityMapper.mapToResponseWithTags(university);
+        University university = universityRepository.findById(id)
+                .orElseThrow(() -> new UniversityNotFoundException("University not found with ID: " + id));
+
+        universityMapper.updateUniversityFromRequest(universityRequest, university);
+        University savedUniversity = universityRepository.save(university);
+
+        return universityMapper.toUniversityResponse(savedUniversity);
     }
 
     @CacheEvict(value = "universities", key = "#id")
     public String deleteUniversityById(Long id) {
+        if (!universityRepository.existsById(id)) {
+            throw new UniversityNotFoundException("University not found with ID: " + id);
+        }
         universityRepository.deleteById(id);
         return "Deleted successfully!";
     }

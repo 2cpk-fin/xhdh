@@ -1,4 +1,4 @@
-package com.uniranking.app.domains.auth;
+package com.uniranking.app.domains.auth.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

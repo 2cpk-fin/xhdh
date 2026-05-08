@@ -1,21 +1,20 @@
-package com.uniranking.app.domains.auth;
+package com.uniranking.app.domains.auth.auth;
 
+import com.uniranking.app.domains.auth.exceptions.UserNotFoundException;
+import com.uniranking.app.domains.auth.refreshToken.RefreshToken;
+import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserMapper;
-import com.uniranking.app.infrastructure.exceptions.EmailAlreadyExistsException;
+import com.uniranking.app.domains.auth.exceptions.ExistedEmailException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import com.uniranking.app.domains.user.UserRepository;
 import com.uniranking.app.infrastructure.security.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +28,8 @@ public class AuthService {
     public AuthResponse register(RegisterRequest registerRequest, HttpServletRequest httpRequest) {
         // Check if the email is already existed
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new EmailAlreadyExistsException("This email is already taken by someone else");
-       }
+            throw new ExistedEmailException("This email is already taken by someone else");
+        }
 
         // Create new user
         User user = userMapper.registerRequestToUser(registerRequest);
@@ -41,40 +40,21 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser, httpRequest);
 
         // Return the Response
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(savedUser.getDisplayUsername());
-        authResponse.setEmail(savedUser.getEmail());
-        authResponse.setToken(jwtToken);
-        authResponse.setRefreshToken(refreshToken.getToken());
-
-        return authResponse;
+        return toAuthResponse(savedUser, jwtToken, refreshToken);
     }
 
     // Handle user login
     public AuthResponse login(LoginRequest loginRequest, HttpServletRequest httpRequest){
         // Boilerplate for finding user
         // In short, you give your email and password to this guy, and he'll check the database to verify you
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        // If something wrong, it will throw BadCredential exception
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+        User user = (User) authentication.getPrincipal();
 
-        // Ok, so you pass the test, now you can assign as a user
-        // We'll provide a JWT token for ya
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
-
-        // JWT Token is provided for you here!
         String jwtToken = jwtService.generateToken(user);
-
-        // We also provide you this refreshToken
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user, httpRequest);
 
-        // Return the Response
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(user.getDisplayUsername());
-        authResponse.setEmail(user.getEmail());
-        authResponse.setToken(jwtToken);
-        authResponse.setRefreshToken(refreshToken.getToken());
-
-        return authResponse;
+        return toAuthResponse(user, jwtToken, refreshToken);
     }
 
     public AuthResponse refreshToken(String token, HttpServletRequest httpRequest){
@@ -86,7 +66,7 @@ public class AuthService {
 
         // Find the user via the refresh token
         User user = userRepository.findByEmail(refreshToken.getEmail())
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Give them a new JWt
         String newJwt = jwtService.generateToken(user);
@@ -98,14 +78,7 @@ public class AuthService {
         RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user, httpRequest);
 
         // Return the Response
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setUsername(user.getDisplayUsername());
-        authResponse.setEmail(user.getEmail());
-        authResponse.setToken(newJwt);
-        authResponse.setRefreshToken(newRefreshToken.getToken());
-
-        return authResponse;
-          
+        return toAuthResponse(user, newJwt, newRefreshToken);
     }
 
     public LogoutResponse logout(LogoutRequest request){

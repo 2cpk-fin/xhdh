@@ -1,7 +1,7 @@
 package com.uniranking.app.domains.user;
 
-import com.uniranking.app.domains.auth.AuthProvider;
-import com.uniranking.app.domains.auth.RegisterRequest;
+import com.uniranking.app.domains.auth.auth.AuthProvider;
+import com.uniranking.app.domains.auth.auth.RegisterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +27,13 @@ public abstract class UserMapper {
     }
 
     public UserResponse userToResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setPublicUserId(user.getPublicUserId());
-        response.setEmail(user.getEmail());
-        response.setUsername(user.getDisplayUsername());
-
-        if (user.getProfileImage() != null) {
-            response.setProfileImage(user.getProfileImage());
-        }
-
-        return response;
+        return UserResponse.builder()
+                .id(user.getId())
+                .publicUserId(user.getPublicUserId())
+                .email(user.getEmail())
+                .username(user.getDisplayUsername())
+                .profileImage(user.getProfileImage())
+                .build();
     }
 
     @Mapping(target = "id", ignore = true)

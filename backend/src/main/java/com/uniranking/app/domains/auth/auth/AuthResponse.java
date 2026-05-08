@@ -1,4 +1,4 @@
-package com.uniranking.app.domains.auth;
+package com.uniranking.app.domains.auth.auth;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,12 +1,13 @@
 package com.uniranking.app.domains.scheduleMatch.comment;
 
+import com.uniranking.app.domains.auth.exceptions.UserNotFoundException;
+import com.uniranking.app.domains.scheduleMatch.exceptions.CommentNotFoundException;
+import com.uniranking.app.domains.scheduleMatch.exceptions.UnauthorizedCommentAccessException;
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class CommentService {
         // Get the user first
         String email = authentication.getName();
         User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Save their comments
         Comment comment = commentMapper.toComment(commentRequest, currentUser);
@@ -51,10 +52,10 @@ public class CommentService {
 
     private Comment findById(Long id, Authentication authentication) {
         Comment comment =  commentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Comment is not found"));
+                .orElseThrow(() -> new CommentNotFoundException("Comment is not found"));
 
         if (!comment.getUser().getEmail().equals(authentication.getName())) {
-            throw new AccessDeniedException("You do not have permission to delete this comment");
+            throw new UnauthorizedCommentAccessException("You do not have permission to delete this comment");
         }
 
         return comment;

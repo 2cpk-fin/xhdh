@@ -1,6 +1,6 @@
 package com.uniranking.app.searching.tag;
 
-import com.uniranking.app.domains.auth.RefreshTokenService;
+import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
 import com.uniranking.app.domains.searching.tag.TagController;
 import com.uniranking.app.domains.searching.tag.TagResponse;
 import com.uniranking.app.domains.searching.tag.TagService;

@@ -1,6 +1,6 @@
 package com.uniranking.app.searching.university;
 
-import com.uniranking.app.domains.auth.RefreshTokenService;
+import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
 import com.uniranking.app.domains.searching.university.UniversityController;
 import com.uniranking.app.domains.searching.university.UniversityResponse;
 import com.uniranking.app.domains.searching.university.UniversityService;

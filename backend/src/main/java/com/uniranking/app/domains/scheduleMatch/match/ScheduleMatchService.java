@@ -1,8 +1,10 @@
 package com.uniranking.app.domains.scheduleMatch.match;
 
+import com.uniranking.app.domains.scheduleMatch.exceptions.*;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantMapper;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantResponse;
+import com.uniranking.app.domains.searching.exceptions.UniversityNotFoundException;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -62,9 +64,10 @@ public class ScheduleMatchService {
         // Validate the match status for voting
         String currentStatus = (String) redisTemplate.opsForValue().get(statusKey);
         if (currentStatus == null) {
-            throw new RuntimeException("Match not found or already finished");
-        } else if (Status.NOT_STARTED.name().equals(currentStatus)) {
-            throw new RuntimeException("Match has not started yet");
+            throw new MatchNotFoundException("Match not found or already finished");
+        }
+        else if (Status.NOT_STARTED.name().equals(currentStatus)) {
+            throw new MatchNotStartedException("Match has not started yet");
         }
 
         // Get existing vote
@@ -76,14 +79,16 @@ public class ScheduleMatchService {
             // First time voting
             redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
-        } else if (!oldUniversityId.equals(universityId)) {
+        }
+        else if (!oldUniversityId.equals(universityId)) {
             // Changing vote
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, oldUniversityId, -1.0);
             redisTemplate.opsForZSet().incrementScore(leaderboardKey, universityId, 1.0);
             // Update the tracker
             redisTemplate.opsForHash().put(voterTrackerKey, userId, universityId.toString());
-        } else {
-            throw new RuntimeException("You already voted for this university!");
+        }
+        else {
+            throw new DuplicateVoteException("You already voted for this university!");
         }
     }
 
@@ -115,7 +120,7 @@ public class ScheduleMatchService {
 
     public List<ScheduleParticipantResponse> getAllParticipants(long id) {
         ScheduleMatch scheduleMatch = scheduleMatchRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
+                .orElseThrow(() -> new MatchNotFoundException("Match not found"));
 
         return scheduleMatch.getParticipants()
                 .stream()
@@ -132,10 +137,10 @@ public class ScheduleMatchService {
         LocalDateTime endTime = scheduleMatchRequest.getEndTime();
 
         if (startTime.isBefore(now)) {
-            throw new RuntimeException("Start time must be at least 1 day later than the current time.");
+            throw new InvalidMatchTimeException("Start time must be at least later than the current time.");
         }
         if (endTime.isBefore(startTime.plusDays(1))) {
-            throw new RuntimeException("End time must be at least 1 day after the start time.");
+            throw new InvalidMatchTimeException("End time must be at least 1 day after the start time.");
         }
 
         // Create match without participants (mapper ignores them)
@@ -148,13 +153,13 @@ public class ScheduleMatchService {
                 ScheduleParticipant participant = new ScheduleParticipant();
                 participant.setScheduleMatch(newScheduleMatch);
                 participant.setUniversity(universityRepository.findById(uniId)
-                        .orElseThrow(() -> new RuntimeException("University with id " + uniId + " not found")));
+                        .orElseThrow(() -> new UniversityNotFoundException("University with id " + uniId + " not found")));
                 participants.add(participant);
             }
         }
 
         if (participants.size() < 2) {
-            throw new RuntimeException("A match must have at least 2 participants");
+            throw new InvalidParticipantCountException("A match must have at least 2 participants");
         }
 
         newScheduleMatch.setParticipants(participants);
@@ -165,18 +170,19 @@ public class ScheduleMatchService {
     }
 
     public ScheduleMatchResponse updateMatchById(long id, ScheduleMatchRequest scheduleMatchRequest) {
-        ScheduleMatch existingMatch = scheduleMatchRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
+        ScheduleMatch existingMatch = findMatchById(id);
         scheduleMatchMapper.updateMatchFromRequest(scheduleMatchRequest, existingMatch);
         ScheduleMatch savedMatch = scheduleMatchRepository.save(existingMatch);
         return scheduleMatchMapper.toScheduleMatchResponse(savedMatch);
     }
 
     public String deleteMatchById(long id) {
-        scheduleMatchRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Match not found with id: " + id));
-        scheduleMatchRepository.deleteById(id);
+        ScheduleMatch existingMatch = findMatchById(id);
+        scheduleMatchRepository.delete(existingMatch);
         return "The match with id " + id + " has been deleted";
     }
 
+    private ScheduleMatch findMatchById(long id) {
+        return scheduleMatchRepository.findById(id).orElseThrow(() -> new MatchNotFoundException("Match not found with id: " + id));
+    }
 }

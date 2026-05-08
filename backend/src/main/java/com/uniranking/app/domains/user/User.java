@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-import com.uniranking.app.domains.auth.AuthProvider;
+import com.uniranking.app.domains.auth.auth.AuthProvider;
 import com.uniranking.app.domains.scheduleMatch.comment.Comment;
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;

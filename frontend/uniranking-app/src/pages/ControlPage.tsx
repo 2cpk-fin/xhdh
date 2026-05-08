@@ -47,32 +47,86 @@ const ControlPage = () => {
         // --- CORE (DEEP DARK SPHERE) ---
         // ==========================================
 
-        // 1. Dark core center (Black with deep purple emission)
         const coreSolidGeo = new THREE.SphereGeometry(0.2, 32, 32);
         const coreSolidMat = new THREE.MeshStandardMaterial({
-            color: 0x000000,
-            emissive: 0x1e1b4b,
-            emissiveIntensity: 0.8
+            color: 0xcf42d6,
+            emissive: 0xe30eed,
+            emissiveIntensity: 0.5,
         });
         const coreSolid = new THREE.Mesh(coreSolidGeo, coreSolidMat);
         sphereGroup.add(coreSolid);
 
+        // Lớp glow xếp chồng — 25 lớp từ 0.23 đến 0.48
+        Array.from({ length: 25 }, (_, i) => {
+            const t = i / 24; // 0 → 1
+            const r = 0.23 + t * (0.48 - 0.23);
+            const opacity = 0.35 * (1 - t) + 0.04 * t; // giảm dần từ 0.35 → 0.04
+            // Màu chuyển dần từ 0xe030f0 → 0x6a0090
+            const color = new THREE.Color().lerpColors(
+                new THREE.Color(0xe030f0),
+                new THREE.Color(0x6a0090),
+                t
+            );
+            return { r, opacity, color };
+        }).forEach(({ r, opacity, color }) => {
+            const geo = new THREE.SphereGeometry(r, 24, 24);
+            const mat = new THREE.MeshBasicMaterial({
+                color,
+                transparent: true,
+                opacity,
+                side: THREE.FrontSide,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+            });
+            sphereGroup.add(new THREE.Mesh(geo, mat));
+        });
+
+        // Lớp ngoài cùng mờ nhất (giữ nguyên)
+        [
+            { r: 0.65, opacity: 0.02, color: 0x4a0070 },
+        ].forEach(({ r, opacity, color }) => {
+            const geo = new THREE.SphereGeometry(r, 24, 24);
+            const mat = new THREE.MeshBasicMaterial({
+                color,
+                transparent: true,
+                opacity,
+                side: THREE.FrontSide,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+            });
+            sphereGroup.add(new THREE.Mesh(geo, mat));
+        });
 
         // ==========================================
         // --- NETWORK (PARTICLES & CONNECTIONS) ---
         // ==========================================
 
-        // Outer decorative structural lines
+        const NEON_PURPLE = 0xc026d3;
+        const NEON_BLUE = 0x00d4ff;
+
+        // Mỗi lớp mạng lưới có Group riêng để kéo độc lập
+        const net0p28Group = new THREE.Group(); // lồng lõi  — không kéo theo chuột
+        const net0p95Group = new THREE.Group(); // lớp 1 — nhanh nhất (4×)
+        const net1p2Group = new THREE.Group(); // lớp 2 — (3×)
+        const net1p5Group = new THREE.Group(); // lớp 3 — chậm nhất (2×)
+        sphereGroup.add(net0p28Group, net0p95Group, net1p2Group, net1p5Group);
+
         [
-            { r: 0.95, c: 0x7c3aed, d: 2, o: 0.6 },
-            { r: 1.2, c: 0x3b82f6, d: 1, o: 0.4 },
-            { r: 1.5, c: 0xd8b4fe, d: 1, o: 0.2 },
-        ].forEach(({ r, c, d, o }) => {
+            { r: 0.28, c: NEON_BLUE, d: 1, o: 0.9, target: net0p28Group },
+            { r: 0.95, c: NEON_PURPLE, d: 2, o: 0.6, target: net0p95Group },
+            { r: 1.2, c: NEON_BLUE, d: 1, o: 0.4, target: net1p2Group },
+            { r: 1.5, c: NEON_PURPLE, d: 1, o: 0.2, target: net1p5Group },
+        ].forEach(({ r, c, d, o, target }) => {
             const geo = new THREE.IcosahedronGeometry(r, d);
             const edges = new THREE.EdgesGeometry(geo);
-            sphereGroup.add(new THREE.LineSegments(
+            target.add(new THREE.LineSegments(
                 edges,
-                new THREE.LineBasicMaterial({ color: c, transparent: true, opacity: o })
+                new THREE.LineBasicMaterial({
+                    color: c,
+                    transparent: true,
+                    opacity: o,
+                    blending: THREE.AdditiveBlending,
+                })
             ));
         });
 
@@ -90,7 +144,14 @@ const ControlPage = () => {
         const pGeo = new THREE.BufferGeometry();
         pGeo.setAttribute('position', new THREE.BufferAttribute(pPos.slice(), 3));
         sphereGroup.add(new THREE.Points(pGeo,
-            new THREE.PointsMaterial({ color: 0xa855f7, size: 0.04, transparent: true, opacity: 0.8, sizeAttenuation: true })
+            new THREE.PointsMaterial({
+                color: NEON_PURPLE,
+                size: 0.04,
+                transparent: true,
+                opacity: 0.9,
+                sizeAttenuation: true,
+                blending: THREE.AdditiveBlending,
+            })
         ));
 
         // Network Edges (Connections)
@@ -107,7 +168,12 @@ const ControlPage = () => {
                         new THREE.Vector3(pPos[j * 3], pPos[j * 3 + 1], pPos[j * 3 + 2]),
                     ]);
                     sphereGroup.add(new THREE.Line(lg,
-                        new THREE.LineBasicMaterial({ color: 0x581c87, transparent: true, opacity: (1 - dist / 0.6) * 0.4 })
+                        new THREE.LineBasicMaterial({
+                            color: NEON_BLUE,
+                            transparent: true,
+                            opacity: (1 - dist / 0.6) * 0.5,
+                            blending: THREE.AdditiveBlending,
+                        })
                     ));
                     connCount++;
                 }
@@ -115,178 +181,147 @@ const ControlPage = () => {
         }
 
         // ==========================================
-        // --- ORBITAL RINGS ---
+        // --- ELECTRONS CHẠY TRÊN MẠNG LƯỚI ---
         // ==========================================
 
-        const ringDefs = [
-            { rx: 0, ry: 0, rz: 0, r: 1.9, count: 180 },
-            { rx: Math.PI / 2, ry: 0, rz: 0, r: 2.15, count: 220 },
-            { rx: Math.PI / 4, ry: Math.PI / 6, rz: 0, r: 2.4, count: 160 },
-            { rx: Math.PI / 3, ry: Math.PI / 3, rz: Math.PI / 5, r: 2.7, count: 250 },
-            { rx: Math.PI / 6, ry: Math.PI / 2, rz: Math.PI / 4, r: 3.0, count: 200 },
-            { rx: 0.9, ry: 1.2, rz: 0.5, r: 3.3, count: 300 },
+        // detail phải khớp với lớp render để electron nằm đúng trên cạnh
+        const icoEdges: {
+            from: THREE.Vector3;
+            to: THREE.Vector3;
+            radius: number;
+            color: number;
+            group: THREE.Group;
+        }[] = [];
+
+        [
+            { r: 0.95, color: NEON_PURPLE, detail: 2, group: net0p95Group },
+            { r: 1.2, color: NEON_BLUE, detail: 1, group: net1p2Group },
+        ].forEach(({ r, color, detail, group }) => {
+            const geo = new THREE.IcosahedronGeometry(r, detail);
+            const edgesGeo = new THREE.EdgesGeometry(geo);
+            const ePos = edgesGeo.getAttribute('position');
+            for (let i = 0; i < ePos.count; i += 2) {
+                icoEdges.push({
+                    from: new THREE.Vector3(ePos.getX(i), ePos.getY(i), ePos.getZ(i)),
+                    to: new THREE.Vector3(ePos.getX(i + 1), ePos.getY(i + 1), ePos.getZ(i + 1)),
+                    radius: r,
+                    color,
+                    group,
+                });
+            }
+            geo.dispose();
+            edgesGeo.dispose();
+        });
+
+        // Adjacency map
+        const adjMap = new Map<string, number[]>();
+        const vecKey = (v: THREE.Vector3) =>
+            `${v.x.toFixed(4)},${v.y.toFixed(4)},${v.z.toFixed(4)}`;
+
+        icoEdges.forEach((edge, idx) => {
+            const kf = vecKey(edge.from);
+            const kt = vecKey(edge.to);
+            if (!adjMap.has(kf)) adjMap.set(kf, []);
+            if (!adjMap.has(kt)) adjMap.set(kt, []);
+            adjMap.get(kf)!.push(idx);
+            adjMap.get(kt)!.push(idx);
+        });
+
+        // 96 electron — add vào group của lớp mạng tương ứng
+        const meshElectrons: {
+            mesh: THREE.Mesh;
+            edgeIdx: number;
+            t: number;
+            speed: number;
+            forward: boolean;
+        }[] = [];
+
+        for (let i = 0; i < 256; i++) {
+            const edgeIdx = Math.floor(Math.random() * icoEdges.length);
+            const edge = icoEdges[edgeIdx];
+
+            const eGeo = new THREE.SphereGeometry(0.005, 5, 5);
+            const eMat = new THREE.MeshBasicMaterial({
+                color: edge.color,
+                blending: THREE.AdditiveBlending,
+            });
+            const eMesh = new THREE.Mesh(eGeo, eMat);
+            // Add vào group của lớp → quay cùng lớp khi kéo chuột
+            edge.group.add(eMesh);
+
+            meshElectrons.push({
+                mesh: eMesh,
+                edgeIdx,
+                t: Math.random(),
+                speed: 0.008 + Math.random() * 0.008,
+                forward: Math.random() > 0.5,
+            });
+        }
+
+        // ==========================================
+        // --- ORBITAL RINGS (Simple Neon Lines) ---
+        // ==========================================
+
+        /* const ringDefs = [
+            { rx: 0, ry: 0, rz: 0, r: 3.8 },
+            { rx: Math.PI / 2, ry: 0, rz: 0, r: 4.3 },
+            { rx: Math.PI / 4, ry: Math.PI / 6, rz: 0, r: 4.8 },
+            { rx: Math.PI / 3, ry: Math.PI / 3, rz: Math.PI / 5, r: 5.4 },
+            { rx: Math.PI / 6, ry: Math.PI / 2, rz: Math.PI / 4, r: 6.0 },
+            { rx: 0.9, ry: 1.2, rz: 0.5, r: 6.6 },
         ];
 
-        const orbitData: any[] = [];
-        const blockyRingsGroup = new THREE.Group();
-        ringsGroup.add(blockyRingsGroup);
+        const orbitData: {
+            electronGroup: THREE.Group;
+            electron: THREE.Mesh;
+            radius: number;
+            electronSpeed: number;
+            phase: number;
+        }[] = [];
 
-        const standardBox = new THREE.BoxGeometry(1, 1, 1);
-
-        const palette = [
-            0x3b82f6,
-            0x7c3aed,
-            0x2563eb,
-            0x9333ea,
-            0x60a5fa,
-            0x6b21a8
-        ];
+        const SEGMENTS = 128;
 
         ringDefs.forEach((def, idx) => {
-            const ringGroup = new THREE.Group();
-            ringGroup.rotation.set(def.rx, def.ry, def.rz);
-            blockyRingsGroup.add(ringGroup);
-
-            for (let i = 0; i < def.count; i++) {
-                const angle = (i / def.count) * Math.PI * 2;
-                const spreadX = (Math.random() - 0.5) * 0.18;
-                const spreadY = (Math.random() - 0.5) * 0.18;
-                const spreadZ = (Math.random() - 0.5) * 0.18;
-
-                const x = Math.cos(angle) * def.r + spreadX;
-                const y = Math.sin(angle) * def.r + spreadY;
-                const z = spreadZ;
-
-                const scale = 0.02 + Math.random() * 0.08;
-
-                const colorIdx = (i + Math.floor(Math.random() * 3)) % palette.length;
-                const blockColor = palette[colorIdx];
-
-                const matChance = Math.random();
-                let mat;
-
-                if (matChance > 0.85) {
-                    mat = new THREE.MeshStandardMaterial({
-                        color: blockColor,
-                        emissive: blockColor,
-                        emissiveIntensity: 1.5,
-                    });
-                } else if (matChance > 0.65) {
-                    mat = new THREE.MeshPhysicalMaterial({
-                        color: blockColor,
-                        metalness: 0.1,
-                        roughness: 0.1,
-                        transmission: 0.9,
-                        transparent: true,
-                        opacity: 0.5
-                    });
-                } else {
-                    mat = new THREE.MeshStandardMaterial({
-                        color: blockColor,
-                        metalness: 0.8,
-                        roughness: 0.2,
-                    });
-                }
-
-                const mesh = new THREE.Mesh(standardBox, mat);
-                mesh.position.set(x, y, z);
-                mesh.scale.set(scale, scale, scale);
-
-                mesh.rotation.set(
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                );
-
-                ringGroup.add(mesh);
+            const points: THREE.Vector3[] = [];
+            for (let i = 0; i <= SEGMENTS; i++) {
+                const angle = (i / SEGMENTS) * Math.PI * 2;
+                points.push(new THREE.Vector3(
+                    Math.cos(angle) * def.r,
+                    Math.sin(angle) * def.r,
+                    0
+                ));
             }
-
-            for (let i = 0; i < def.count / 2; i++) {
-                const angle = (i / (def.count / 2)) * Math.PI * 2;
-                const innerR = def.r - 0.1;
-                const x = Math.cos(angle) * innerR;
-                const y = Math.sin(angle) * innerR;
-
-                const wireColor = palette[(i % 2 === 0) ? 0 : 3];
-                const wireGeo = new THREE.BoxGeometry(0.04, 0.04, 0.04);
-                const wireMat = new THREE.MeshBasicMaterial({
-                    color: wireColor,
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.3
-                });
-                const wire = new THREE.Mesh(wireGeo, wireMat);
-                wire.position.set(x + (Math.random() - 0.5) * 0.06, y + (Math.random() - 0.5) * 0.06, (Math.random() - 0.5) * 0.06);
-                ringGroup.add(wire);
-            }
-
-            const pGeo = new THREE.BufferGeometry();
-            const pCount = 120;
-            const pPos = new Float32Array(pCount * 3);
-            const pColors = new Float32Array(pCount * 3);
-
-            const colorBlue = new THREE.Color(0x3b82f6);
-            const colorPurple = new THREE.Color(0x9333ea);
-
-            for (let i = 0; i < pCount; i++) {
-                const angle = (Math.random() * Math.PI * 2);
-                const radius = def.r + (Math.random() - 0.5) * 0.35;
-                pPos[i * 3] = Math.cos(angle) * radius;
-                pPos[i * 3 + 1] = Math.sin(angle) * radius;
-                pPos[i * 3 + 2] = (Math.random() - 0.5) * 0.25;
-
-                const mixedColor = Math.random() > 0.5 ? colorBlue : colorPurple;
-                pColors[i * 3] = mixedColor.r;
-                pColors[i * 3 + 1] = mixedColor.g;
-                pColors[i * 3 + 2] = mixedColor.b;
-            }
-
-            pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-            pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
-
-            const pMat = new THREE.PointsMaterial({
-                size: 0.025,
-                vertexColors: true,
+            const ringGeo = new THREE.BufferGeometry().setFromPoints(points);
+            const ringMat = new THREE.LineBasicMaterial({
+                color: NEON_PURPLE,
                 transparent: true,
-                opacity: 0.6
+                opacity: 0.75,
+                blending: THREE.AdditiveBlending,
             });
-            const particles = new THREE.Points(pGeo, pMat);
-            ringGroup.add(particles);
+            const ring = new THREE.Line(ringGeo, ringMat);
+            ring.rotation.set(def.rx, def.ry, def.rz);
+            ringsGroup.add(ring);
 
-            const electronPath = new THREE.Group();
-            electronPath.rotation.set(def.rx, def.ry, def.rz);
-            blockyRingsGroup.add(electronPath);
+            const electronGroup = new THREE.Group();
+            electronGroup.rotation.set(def.rx, def.ry, def.rz);
+            ringsGroup.add(electronGroup);
 
-            const electronGeo = new THREE.BoxGeometry(0.12, 0.12, 0.12);
-            const electronMat = new THREE.MeshStandardMaterial({
-                color: 0xffffff,
-                emissive: 0xffffff,
-                emissiveIntensity: 2
+            const electronGeo = new THREE.SphereGeometry(0.045, 8, 8);
+            const electronMat = new THREE.MeshBasicMaterial({
+                color: 0xe879f9,
+                blending: THREE.AdditiveBlending,
             });
             const electron = new THREE.Mesh(electronGeo, electronMat);
-            electronPath.add(electron);
-
-            const electronGlowGeo = new THREE.BoxGeometry(0.18, 0.18, 0.18);
-            const electronGlowMat = new THREE.MeshBasicMaterial({
-                color: palette[idx % palette.length],
-                transparent: true,
-                opacity: 0.4,
-                blending: THREE.AdditiveBlending
-            });
-            const electronGlow = new THREE.Mesh(electronGlowGeo, electronGlowMat);
-            electronPath.add(electronGlow);
+            electronGroup.add(electron);
 
             orbitData.push({
-                group: ringGroup,
-                electronPath: electronPath,
-                electron: electron,
-                electronGlow: electronGlow,
+                electronGroup,
+                electron,
                 radius: def.r,
-                speed: 0.002 + idx * 0.0005,
                 electronSpeed: 0.004 + idx * 0.0015,
                 phase: (idx / ringDefs.length) * Math.PI * 2,
             });
-        });
+        }); */
 
         // ==========================================
         // --- INTERACTION & ANIMATION ---
@@ -297,6 +332,28 @@ const ControlPage = () => {
         let prevMouseY = 0;
         let ringVelX = 0;
         let ringVelY = 0;
+
+        // Áp dụng rotation phân tầng cho từng group
+        // Vành đai ngoài: 1× (chậm nhất)
+        // lớp r=1.5:      2×
+        // lớp r=1.2:      3×
+        // lớp r=0.95:     4× (= tốc độ vành đai cũ trước khi giảm)
+        const applyRotation = (velX: number, velY: number) => {
+            const layers: { group: THREE.Object3D; factor: number }[] = [
+                { group: ringsGroup, factor: 0.5 },
+                { group: net1p5Group, factor: 0.75 },
+                { group: net1p2Group, factor: 2 },
+                { group: net0p95Group, factor: 5 },
+                { group: net0p28Group, factor: 10 },
+            ];
+            layers.forEach(({ group, factor }) => {
+                const qx = new THREE.Quaternion();
+                const qy = new THREE.Quaternion();
+                qx.setFromAxisAngle(new THREE.Vector3(1, 0, 0), velX * factor);
+                qy.setFromAxisAngle(new THREE.Vector3(0, 1, 0), velY * factor);
+                group.quaternion.premultiply(qy).premultiply(qx);
+            });
+        };
 
         const onMouseDown = (e: MouseEvent) => {
             isDragging = true;
@@ -309,15 +366,10 @@ const ControlPage = () => {
             if (!isDragging) return;
             const dx = e.clientX - prevMouseX;
             const dy = e.clientY - prevMouseY;
-            ringVelX = dy * 0.006;
-            ringVelY = dx * 0.006;
-
-            const qx = new THREE.Quaternion();
-            const qy = new THREE.Quaternion();
-            qx.setFromAxisAngle(new THREE.Vector3(1, 0, 0), ringVelX);
-            qy.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ringVelY);
-            ringsGroup.quaternion.premultiply(qy).premultiply(qx);
-
+            // 0.003 = giảm đôi so với 0.006 cũ → vành đai chậm lại ×2
+            ringVelX = dy * 0.002;
+            ringVelY = dx * 0.002;
+            applyRotation(ringVelX, ringVelY);
             prevMouseX = e.clientX;
             prevMouseY = e.clientY;
         };
@@ -346,37 +398,68 @@ const ControlPage = () => {
             animId = requestAnimationFrame(animate);
             t += 0.016;
 
-            // Rotate the entire sphere group
+            // Rotate sphere group (lõi + lồng r=0.28 quay cùng)
             sphereGroup.rotation.y += 0.002;
             sphereGroup.rotation.x += 0.0003;
 
-            // Pulse the inner core globe slightly
+            // Pulse core
             const coreScale = 1 + Math.sin(t * 3) * 0.05;
             coreSolid.scale.set(coreScale, coreScale, coreScale);
 
+            // Inertia — giữ nguyên hệ số phân tầng
             if (!isDragging) {
                 ringVelX *= 0.94;
                 ringVelY *= 0.94;
                 if (Math.abs(ringVelX) > 0.00005 || Math.abs(ringVelY) > 0.00005) {
-                    const qx = new THREE.Quaternion();
-                    const qy = new THREE.Quaternion();
-                    qx.setFromAxisAngle(new THREE.Vector3(1, 0, 0), ringVelX);
-                    qy.setFromAxisAngle(new THREE.Vector3(0, 1, 0), ringVelY);
-                    ringsGroup.quaternion.premultiply(qy).premultiply(qx);
+                    applyRotation(ringVelX, ringVelY);
                 }
             }
 
-            orbitData.forEach((orb) => {
-                orb.group.rotation.z -= orb.speed;
+            // Electron chạy trên orbital rings
+            /* orbitData.forEach((orb) => {
                 const eAngle = t * orb.electronSpeed * 60 + orb.phase;
                 orb.electron.position.x = Math.cos(eAngle) * orb.radius;
                 orb.electron.position.y = Math.sin(eAngle) * orb.radius;
-                orb.electronGlow.position.copy(orb.electron.position);
-                orb.electron.rotation.x += 0.05;
-                orb.electron.rotation.y += 0.05;
-                const pulse = 1 + Math.sin(t * 8) * 0.15;
-                orb.electron.scale.set(pulse, pulse, pulse);
-                orb.electronGlow.scale.set(pulse, pulse, pulse);
+            }); */
+
+            // Electron trượt trên mạng lưới Icosahedron
+            meshElectrons.forEach((e) => {
+                e.t += e.forward ? e.speed : -e.speed;
+
+                if (e.t >= 1 || e.t <= 0) {
+                    const edge = icoEdges[e.edgeIdx];
+                    const currentVertex = e.t >= 1 ? edge.to : edge.from;
+                    const key = vecKey(currentVertex);
+
+                    const neighbors = (adjMap.get(key) || []).filter(
+                        (idx) =>
+                            idx !== e.edgeIdx &&
+                            icoEdges[idx].radius === edge.radius
+                    );
+
+                    if (neighbors.length > 0) {
+                        const nextIdx = neighbors[Math.floor(Math.random() * neighbors.length)];
+                        const nextEdge = icoEdges[nextIdx];
+                        const nextKey = vecKey(nextEdge.from);
+
+                        e.forward = nextKey === key;
+                        e.edgeIdx = nextIdx;
+                        e.t = nextKey === key ? 0 : 1;
+
+                        (e.mesh.material as THREE.MeshBasicMaterial).color.setHex(nextEdge.color);
+
+                        // Chuyển mesh sang group mới nếu khác lớp
+                        if (e.mesh.parent !== nextEdge.group) {
+                            nextEdge.group.attach(e.mesh);
+                        }
+                    } else {
+                        e.forward = !e.forward;
+                        e.t = Math.max(0, Math.min(1, e.t));
+                    }
+                }
+
+                const edge = icoEdges[e.edgeIdx];
+                e.mesh.position.lerpVectors(edge.from, edge.to, e.t);
             });
 
             renderer.render(scene, camera);
@@ -404,7 +487,7 @@ const ControlPage = () => {
                 width: '100%',
                 height: '100%',
                 minHeight: '100vh',
-                cursor: 'grab'
+                cursor: 'grab',
             }}
         />
     );

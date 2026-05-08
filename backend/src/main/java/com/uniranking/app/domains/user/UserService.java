@@ -1,6 +1,9 @@
 package com.uniranking.app.domains.user;
 
-import com.uniranking.app.domains.auth.RefreshTokenService;
+import com.uniranking.app.domains.auth.exceptions.UserNotFoundException;
+import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
+import com.uniranking.app.domains.auth.exceptions.ExistedEmailException;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,8 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.uniranking.app.infrastructure.exceptions.EmailAlreadyExistsException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +28,7 @@ public class UserService implements UserDetailsService {
     public UserResponse getUserByRefreshToken(String refreshToken) {
         String email = refreshTokenService.getEmailFromToken(refreshToken);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
         return userMapper.userToResponse(user);
     }
 
@@ -41,7 +42,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public UserResponse updateEmail(Long id, String newEmail) {
         if (userRepository.existsByEmail(newEmail)) {
-            throw new EmailAlreadyExistsException("Email already in use");
+            throw new ExistedEmailException("Email already in use");
         }
         userRepository.updateEmail(id, newEmail);
         User updatedUser = findById(id);
@@ -66,7 +67,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public String deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("Cannot delete: User not found with ID: " + id);
+            throw new UserNotFoundException("Cannot delete: User not found with ID: " + id);
         }
         userRepository.deleteById(id);
         return "Delete user successful!";
@@ -80,7 +81,7 @@ public class UserService implements UserDetailsService {
 
     private User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
     }
 
     public Page<UserResponse> getAllUsers(int pageNo, int size) {

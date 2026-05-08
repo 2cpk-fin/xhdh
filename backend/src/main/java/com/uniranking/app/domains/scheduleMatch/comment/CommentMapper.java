@@ -4,6 +4,11 @@ import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserMapper;
+// Import the custom exceptions
+import com.uniranking.app.domains.scheduleMatch.exceptions.MatchNotFoundException;
+import com.uniranking.app.domains.scheduleMatch.exceptions.CommentNotFoundException;
+import com.uniranking.app.domains.scheduleMatch.exceptions.MaxCommentDepthExceededException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,45 +28,44 @@ public class CommentMapper {
     public Comment toComment(CommentRequest request, User authenticatedUser) {
         if (request == null) return null;
 
-        Comment comment = new Comment();
-        comment.setContent(request.getContent());
-        comment.setUser(authenticatedUser);
-        comment.setCommentDate(LocalDateTime.now());
-
-        // Resolve Match
         ScheduleMatch match = scheduleMatchRepository.findById(request.getMatchId())
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-        comment.setScheduleMatch(match);
+                .orElseThrow(() -> new MatchNotFoundException("Match not found with ID: " + request.getMatchId()));
 
-        // Parent-Child Logic
+        Comment parent = null;
         if (request.getParentId() != null) {
-            Comment parent = commentRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            parent = commentRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new CommentNotFoundException("Parent comment not found with ID: " + request.getParentId()));
+
             if (parent.getParent() != null) {
-                throw new RuntimeException("There should be two layer only");
+                throw new MaxCommentDepthExceededException("Replies can only be one level deep.");
             }
-            comment.setParent(parent);
         }
 
-        return comment;
+        return Comment.builder()
+                .content(request.getContent())
+                .user(authenticatedUser)
+                .commentDate(LocalDateTime.now())
+                .scheduleMatch(match)
+                .parent(parent)
+                .build();
     }
 
     public CommentResponse toCommentResponse(Comment comment) {
         if (comment == null) return null;
 
-        CommentResponse response = new CommentResponse();
+        CommentResponse commentResponse = CommentResponse.builder()
+                .id(comment.getId())
+                .publicCommentId(comment.getPublicCommentId())
+                .commentDate(comment.getCommentDate())
+                .content(comment.getContent())
+                .user(userMapper.userToResponse(comment.getUser()))
+                .build();
 
-        response.setId(comment.getId());
-        response.setPublicCommentId(comment.getPublicCommentId());
-        response.setCommentDate(comment.getCommentDate());
-        response.setContent(comment.getContent());
-        response.setUser(userMapper.userToResponse(comment.getUser()));
 
-        // Recursive call to map the parent using the same logic
         if (comment.getParent() != null) {
-            response.setParent(toCommentResponse(comment.getParent()));
+            commentResponse.setParent(toCommentResponse(comment.getParent()));
         }
 
-        return response;
+        return commentResponse;
     }
 }

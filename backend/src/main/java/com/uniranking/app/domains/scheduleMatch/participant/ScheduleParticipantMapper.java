@@ -10,12 +10,10 @@ public class ScheduleParticipantMapper {
     private UniversityMapper universityMapper;
 
     public ScheduleParticipantResponse toScheduleParticipantResponse(ScheduleParticipant participant) {
-        ScheduleParticipantResponse scheduleParticipantResponse = new ScheduleParticipantResponse();
-
-        scheduleParticipantResponse.setUniversityResponse(universityMapper.mapToResponseWithTags(participant.getUniversity()));
-        scheduleParticipantResponse.setTotalVotes(participant.getTotalVotes());
-        scheduleParticipantResponse.setRank(participant.getRank());
-
-        return scheduleParticipantResponse;
+        return ScheduleParticipantResponse.builder()
+                .universityResponse(universityMapper.toUniversityResponse(participant.getUniversity()))
+                .totalVotes(participant.getTotalVotes())
+                .rank(participant.getRank())
+                .build();
     }
 }

@@ -1,4 +1,4 @@
-package com.uniranking.app.infrastructure.exceptions;
+package com.uniranking.app.domains.news.exceptions;
 
 // General
 public class ScrapingException extends RuntimeException {

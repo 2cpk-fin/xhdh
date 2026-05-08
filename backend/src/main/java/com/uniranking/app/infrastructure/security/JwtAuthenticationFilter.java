@@ -1,6 +1,6 @@
 package com.uniranking.app.infrastructure.security;
 
-import com.uniranking.app.domains.auth.RefreshTokenService;
+import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

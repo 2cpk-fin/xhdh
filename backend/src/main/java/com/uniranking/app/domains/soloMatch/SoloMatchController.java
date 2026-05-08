@@ -1,8 +1,6 @@
 package com.uniranking.app.domains.soloMatch;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +19,9 @@ public class SoloMatchController {
     }
 
     @PostMapping(path = "/choose")
-    public ResponseEntity<?> chooseWinner(@RequestParam UUID publicMatchId, @RequestParam Long winnerId) {
-        try {
-            SoloMatchReport report = soloMatchService.chooseWinner(publicMatchId, winnerId);
-            return ResponseEntity.ok(report);
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<SoloMatchReport> chooseWinner(
+            @RequestParam UUID publicMatchId,
+            @RequestParam Long winnerId) {
+        return ResponseEntity.ok(soloMatchService.chooseWinner(publicMatchId, winnerId));
     }
 }

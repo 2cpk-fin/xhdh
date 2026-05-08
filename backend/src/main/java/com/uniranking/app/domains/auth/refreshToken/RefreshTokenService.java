@@ -1,10 +1,14 @@
-package com.uniranking.app.domains.auth;
+package com.uniranking.app.domains.auth.refreshToken;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
+import com.uniranking.app.domains.auth.exceptions.InvalidSessionException;
+import com.uniranking.app.domains.auth.exceptions.RefreshTokenExpiredException;
+import com.uniranking.app.domains.auth.exceptions.RefreshTokenNotFoundException;
+import com.uniranking.app.domains.auth.exceptions.SuspiciousTokenUsageException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -57,11 +61,11 @@ public class RefreshTokenService {
     // Check if the token is old or fake
     public RefreshToken verifyRefreshToken(String token){
         RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(REDIS_PREFIX + token);
-        if(refreshToken == null){
-            throw new RuntimeException("Refresh token not found");
+        if (refreshToken == null){
+            throw new RefreshTokenNotFoundException("Refresh token not found");
         }
-        if(refreshToken.getExpiryDate().isBefore(Instant.now())){
-            throw new RuntimeException("Refresh token expired");
+        if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
+            throw new RefreshTokenExpiredException("Refresh token expired");
         }
         return refreshToken;
     }
@@ -71,11 +75,11 @@ public class RefreshTokenService {
         String currentIp = request.getRemoteAddr();
         String currentAg = request.getHeader("User-Agent");
 
-        if(!refreshToken.getIpAddress().equals(currentIp)){
-            throw new RuntimeException("Refresh token IP address does not match");
+        if (!refreshToken.getIpAddress().equals(currentIp)){
+            throw new SuspiciousTokenUsageException("Refresh token IP address does not match");
         }
-        if(!refreshToken.getUserAgent().equals(currentAg)){
-            throw new RuntimeException("Refresh token user agent does not match");
+        if (!refreshToken.getUserAgent().equals(currentAg)){
+            throw new SuspiciousTokenUsageException("Refresh token user agent does not match");
         }
     }
 
@@ -93,8 +97,6 @@ public class RefreshTokenService {
 
             // Delete the actual Token data
             redisTemplate.delete(tokenKey);
-
-            System.out.println("Successfully terminated session for User ID: " + refreshToken.getUserId());
         }
         else {
             // Fallback: Just try to delete the token key anyway if the data is already gone
@@ -105,7 +107,7 @@ public class RefreshTokenService {
     public void blackListAccessToken(String accessToken){
         Date expiration = jwtService.extractExpiration(accessToken);
         long ttl = expiration.getTime() - System.currentTimeMillis();
-        if(ttl > 0){
+        if (ttl > 0) {
             redisTemplate.opsForValue().set("bl:" + accessToken,"logout", Duration.ofMillis(ttl));
         }
     }
@@ -119,7 +121,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = (RefreshToken) redisTemplate.opsForValue().get(tokenKey);
 
         if (refreshToken == null) {
-            throw new RuntimeException("Session invalid or expired");
+            throw new InvalidSessionException("Session invalid or expired");
         }
 
         return refreshToken.getEmail();

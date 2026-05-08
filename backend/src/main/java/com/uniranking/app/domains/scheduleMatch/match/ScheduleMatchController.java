@@ -15,93 +15,69 @@ import java.util.List;
 @RequestMapping(path = "/api/schedule/match")
 @RequiredArgsConstructor
 public class ScheduleMatchController {
+
     private final ScheduleMatchService scheduleMatchService;
 
     // Upcoming matches
     @GetMapping(path = "/all/not-started")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledMatchesNotStarted() {
-        return new ResponseEntity<>(scheduleMatchService.getAllNotStartedMatches(), HttpStatus.OK);
+        return ResponseEntity.ok(scheduleMatchService.getAllNotStartedMatches());
     }
 
     // Current matches
     @GetMapping(path = "/all/pending")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledPendingMatches() {
-        return new ResponseEntity<>(scheduleMatchService.getAllPendingMatches(), HttpStatus.OK);
+        return ResponseEntity.ok(scheduleMatchService.getAllPendingMatches());
     }
 
     // History check (7 days)
     @GetMapping(path = "/all/finished")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledFinishedMatches() {
-        return new ResponseEntity<>(scheduleMatchService.getAllFinishedMatches(), HttpStatus.OK);
+        return ResponseEntity.ok(scheduleMatchService.getAllFinishedMatches());
     }
 
     // Get all the participants
     @GetMapping(path = "/{matchId}/participants")
     public ResponseEntity<List<ScheduleParticipantResponse>> getScheduledMatchParticipant(@PathVariable long matchId) {
-        return new ResponseEntity<>(scheduleMatchService.getAllParticipants(matchId), HttpStatus.OK);
+        return ResponseEntity.ok(scheduleMatchService.getAllParticipants(matchId));
     }
 
     @PatchMapping(path = "/votes")
-    public ResponseEntity<?> vote(
+    public ResponseEntity<Void> vote(
             @RequestParam String publicMatchId,
             @RequestParam Long universityId,
             Authentication authentication) {
-        // Validate the user first
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User must be logged in to vote");
-        }
 
-        try {
-            scheduleMatchService.vote(universityId, publicMatchId, authentication);
-            // Return 200 OK if vote success
-            return ResponseEntity.ok().build();
-        }
-        catch (RuntimeException e) {
-            // This catches "Already voted" or "Match not started" errors
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        scheduleMatchService.vote(universityId, publicMatchId, authentication);
+        return ResponseEntity.ok().build();
     }
 
     // Secret route (for admin only)
     @GetMapping(path = "/admin/get")
-    public ResponseEntity<Page<ScheduleMatchResponse>> getAllMatches(@RequestParam int pageNo, @RequestParam int size) {
+    public ResponseEntity<Page<ScheduleMatchResponse>> getAllMatches(
+            @RequestParam int pageNo,
+            @RequestParam int size) {
         return ResponseEntity.ok(scheduleMatchService.getAllMatches(pageNo, size));
     }
 
     @PostMapping(path = "/admin/create")
-    public ResponseEntity<?> createScheduledMatch(@Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
-        try {
-            ScheduleMatchResponse response = scheduleMatchService.createMatch(scheduleMatchRequest);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+    public ResponseEntity<ScheduleMatchResponse> createScheduledMatch(
+            @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(scheduleMatchService.createMatch(scheduleMatchRequest));
     }
 
     // Secret route(for admin only)
     @PatchMapping(path = "/admin/update/{id}")
-    public ResponseEntity<?> updateScheduledMatch(
+    public ResponseEntity<ScheduleMatchResponse> updateScheduledMatch(
             @PathVariable long id,
             @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
-        try {
-            ScheduleMatchResponse response = scheduleMatchService.updateMatchById(id, scheduleMatchRequest);
-            return ResponseEntity.ok(response);
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok(scheduleMatchService.updateMatchById(id, scheduleMatchRequest));
     }
 
     // Secret route (for admin only)
     @DeleteMapping(path = "/admin/delete/{id}")
     public ResponseEntity<String> deleteScheduledMatch(@PathVariable long id) {
-        try {
-            String message = scheduleMatchService.deleteMatchById(id);
-            return ResponseEntity.ok().body(message);
-        }
-        catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.ok(scheduleMatchService.deleteMatchById(id));
     }
 }
