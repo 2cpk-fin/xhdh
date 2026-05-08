@@ -1,6 +1,7 @@
 package com.uniranking.app.domains.auth;
 
 import com.uniranking.app.domains.user.User;
+import com.uniranking.app.domains.user.UserMapper;
 import com.uniranking.app.infrastructure.exceptions.EmailAlreadyExistsException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +24,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public AuthResponse register(RegisterRequest registerRequest, HttpServletRequest httpRequest) {
         // Check if the email is already existed
@@ -32,13 +33,7 @@ public class AuthService {
        }
 
         // Create new user
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setPublicUserId(UUID.randomUUID());
-        user.setCreatedAt(Instant.now());
-
+        User user = userMapper.registerRequestToUser(registerRequest);
         User savedUser = userRepository.save(user);
 
         // Provide JWT and refresh token for them
@@ -120,5 +115,14 @@ public class AuthService {
             refreshTokenService.blackListAccessToken(request.getAccessToken());
         }
         return new LogoutResponse("Logout successful");
+    }
+
+    private AuthResponse toAuthResponse(User user, String jwt, RefreshToken refreshToken) {
+        return AuthResponse.builder()
+                .username(user.getDisplayUsername())
+                .email(user.getEmail())
+                .token(jwt)
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 }

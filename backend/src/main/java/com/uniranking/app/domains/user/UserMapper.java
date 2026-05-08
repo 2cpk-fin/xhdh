@@ -1,13 +1,31 @@
 package com.uniranking.app.domains.user;
 
 import com.uniranking.app.domains.auth.AuthProvider;
+import com.uniranking.app.domains.auth.RegisterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.time.Instant;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring", imports = { UUID.class, Instant.class, AuthProvider.class })
 public abstract class UserMapper {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public User registerRequestToUser(RegisterRequest registerRequest) {
+        return User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .publicUserId(UUID.randomUUID())
+                .createdAt(Instant.now())
+                .build();
+    }
+
     public UserResponse userToResponse(User user) {
         UserResponse response = new UserResponse();
         response.setId(user.getId());

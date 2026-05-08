@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Authentication exceptions
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleExistingUser(EmailAlreadyExistsException ex, HttpServletRequest request){
         ErrorResponse error = new ErrorResponse(
