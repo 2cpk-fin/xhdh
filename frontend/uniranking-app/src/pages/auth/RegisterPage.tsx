@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import authApi from '../../api/authApi';
 import type { RegisterRequest } from '../../types/auth';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 import RegisterBox from './RegisterBox';
 import ErrorBox from '../../components/ErrorBox';
@@ -12,65 +13,50 @@ const RegisterPage = () => {
     const [isAnimateOut, setIsAnimateOut] = useState(false);
     const [isAnimateIn, setIsAnimateIn] = useState(false);
 
-    // State to hold the form
-    const [formData, setFormData] = useState<RegisterRequest>({
+    // Call hook here ONLY, and pass down to Box
+    const { isDarkMode, toggleDarkMode } = useDarkMode();
+
+    const [formData, setFormData] = useState<RegisterRequest & { confirmPassword?: string }>({
         username: '',
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: ''
     });
 
-    // Feedback states
     const [error, setError] = useState('');
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Fix: Use requestAnimationFrame to avoid synchronous setState cascading render
         const animationId = requestAnimationFrame(() => {
             setIsAnimateIn(true);
         });
         return () => cancelAnimationFrame(animationId);
     }, []);
 
-    // Handle change in the form
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        // Clear errors on typing
         if (validationErrors.length > 0 || error) {
             setValidationErrors([]);
             setError('');
         }
     };
 
-    // Google Register API
     const handleGoogleSignup = () => {
         const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
         window.location.href = `${baseUrl}/oauth2/authorization/google`;
     };
 
-    // Handle register call api
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
         setValidationErrors([]);
 
-        // Prioritized Validation Logic
         const errors: string[] = [];
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!formData.username.trim()) {
-            errors.push("Username is required.");
-        } else if (!formData.email.trim()) {
-            errors.push("Email is required.");
-        } else if (!emailRegex.test(formData.email)) {
-            errors.push("Please enter a valid academic email address.");
-        } else if (!formData.password) {
-            errors.push("Password is required.");
-        } else if (formData.password.length < 8) {
-            errors.push("Password is too short (minimum 8 characters).");
-        } else if (formData.password.length > 20) {
-            errors.push("Password is too long (maximum 20 characters).");
-        }
+        if (!formData.username.trim()) errors.push("Username is required.");
+        if (!formData.email.trim()) errors.push("Email is required.");
+        if (!formData.password) errors.push("Password is required.");
+        if (formData.password !== formData.confirmPassword) errors.push("Passwords do not match.");
 
         if (errors.length > 0) {
             setValidationErrors(errors);
@@ -78,12 +64,10 @@ const RegisterPage = () => {
         }
 
         setLoading(true);
-
         try {
             await authApi.register(formData);
             navigate('/login');
         } catch (err) {
-            // Replaced 'any' with typed Axios error
             const axiosError = err as AxiosError<{ message: string }>;
             setError(axiosError.response?.data?.message || 'Registration failed');
         } finally {
@@ -91,7 +75,6 @@ const RegisterPage = () => {
         }
     };
 
-    // UI Transition to Login
     const handleSignInLink = (e: React.MouseEvent) => {
         e.preventDefault();
         setIsAnimateOut(true);
@@ -107,11 +90,10 @@ const RegisterPage = () => {
 
     const combinedErrors = [...(error ? [error] : []), ...validationErrors];
 
-    // Circuit background logic
     const ComplexAnimatedCircuitry = useMemo(() => {
-        const strokeColor = "rgba(22, 163, 74, 0.1)";
-        const nodeColor = "#16a34a";
-        const flowColor = "#22c55e"; // Variable is now used in dots below
+        const strokeColor = isDarkMode ? "rgba(34, 197, 94, 0.15)" : "rgba(22, 163, 74, 0.1)";
+        const nodeColor = isDarkMode ? "#22c55e" : "#16a34a";
+        const flowColor = isDarkMode ? "#4ade80" : "#22c55e";
 
         const paths = [
             "M -600 100 H 600", "M -600 250 H 650", "M -600 400 H 550", "M -600 550 H 700",
@@ -130,40 +112,24 @@ const RegisterPage = () => {
                 ${isAnimateOut ? 'translate-x-full opacity-0' : isAnimateIn ? 'translate-x-0 opacity-80' : 'translate-x-full opacity-0'}`}>
                 <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="none">
                     <defs>
-                        <filter id="electronGlow">
+                        <filter id="electronGlowGreen">
                             <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
                             <feMerge>
-                                <feMergeNode in="coloredBlur" />
-                                <feMergeNode in="SourceGraphic" />
+                                <feMergeNode in="coloredBlur" /><feMergeNode in="SourceGraphic" />
                             </feMerge>
                         </filter>
                     </defs>
                     <g transform="rotate(-45 200 400)" stroke={strokeColor} strokeWidth="2" fill="none">
                         {paths.map((d, i) => <path key={`p-${i}`} d={d} />)}
 
-                        {/* Fix: Re-introduced flow dots to utilize flowColor (Now as a heavy swarm!) */}
-                        <g filter="url(#electronGlow)">
+                        <g filter="url(#electronGlowGreen)">
                             {paths.map((path, i) => (
                                 <React.Fragment key={`electrons-${i}`}>
-                                    {/* Fast electron */}
-                                    <circle r="2" fill={flowColor}>
-                                        <animateMotion path={path} dur={`${3 + (i % 3)}s`} begin={`${i * 0.4}s`} repeatCount="indefinite" />
+                                    <circle r="2.5" fill={flowColor}>
+                                        <animateMotion path={path} dur={`${3 + (i % 3)}s`} begin={`${i * 0.2}s`} repeatCount="indefinite" />
                                     </circle>
-                                    {/* Secondary slower electron */}
-                                    <circle r="1.5" fill="#4ade80">
+                                    <circle r="2" fill={isDarkMode ? "#86efac" : "#4ade80"}>
                                         <animateMotion path={path} dur={`${4 + (i % 2)}s`} begin={`${i * 0.2 + 1.5}s`} repeatCount="indefinite" />
-                                    </circle>
-                                    {/* Third dense electron */}
-                                    <circle r="2.5" fill="#86efac">
-                                        <animateMotion path={path} dur={`${2.5 + (i % 4)}s`} begin={`${i * 0.7 + 0.5}s`} repeatCount="indefinite" />
-                                    </circle>
-                                    {/* Fourth tiny trailing electron */}
-                                    <circle r="1" fill="#bbf7d0">
-                                        <animateMotion path={path} dur={`${3.5 + (i % 2)}s`} begin={`${i * 0.3 + 2.2}s`} repeatCount="indefinite" />
-                                    </circle>
-                                    {/* Fifth fast burst electron */}
-                                    <circle r="1.8" fill="#16a34a">
-                                        <animateMotion path={path} dur={`${2 + (i % 3)}s`} begin={`${i * 0.5 + 3.5}s`} repeatCount="indefinite" />
                                     </circle>
                                 </React.Fragment>
                             ))}
@@ -171,15 +137,7 @@ const RegisterPage = () => {
 
                         <g>
                             {nodes.map((node, i) => (
-                                <circle
-                                    key={`n-${i}`}
-                                    cx={node.cx}
-                                    cy={node.cy}
-                                    r={node.r}
-                                    fill={nodeColor}
-                                    className="animate-power-surge-green"
-                                    style={{ animationDelay: node.delay }}
-                                />
+                                <circle key={`n-${i}`} cx={node.cx} cy={node.cy} r={node.r} fill={nodeColor} className="animate-power-surge-green" style={{ animationDelay: node.delay }} />
                             ))}
                         </g>
                     </g>
@@ -198,12 +156,11 @@ const RegisterPage = () => {
                 `}</style>
             </div>
         );
-    }, [isAnimateIn, isAnimateOut]);
+    }, [isAnimateIn, isAnimateOut, isDarkMode]);
 
     return (
-        <div className="min-w-[1024px] min-h-screen flex items-center relative overflow-hidden transition-colors duration-300 bg-[#f8fafc]">
+        <div className={`min-w-[1024px] min-h-screen flex items-center relative overflow-hidden transition-colors duration-300 ${isDarkMode ? 'bg-black' : 'bg-slate-50'}`}>
             {ComplexAnimatedCircuitry}
-
             <div className="w-full max-w-7xl mx-auto flex justify-end px-32 z-10">
                 <div className={`transition-all duration-700 ease-in-out w-[448px] shrink-0 ${isAnimateOut ? 'translate-x-full opacity-0' : isAnimateIn ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`}>
                     <RegisterBox
@@ -213,17 +170,12 @@ const RegisterPage = () => {
                         handleSubmit={handleSubmit}
                         handleGoogleSignup={handleGoogleSignup}
                         handleSignInLink={handleSignInLink}
+                        isDarkMode={isDarkMode}
+                        toggleDarkMode={toggleDarkMode}
                     />
                 </div>
             </div>
-
-            <ErrorBox
-                title="Registration Error"
-                errors={combinedErrors}
-                onClose={clearErrors}
-                position="left"
-            />
-
+            <ErrorBox title="Registration Error" errors={combinedErrors} onClose={clearErrors} position="left" />
         </div>
     );
 };

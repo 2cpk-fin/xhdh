@@ -90,14 +90,14 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2 mb-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-bold text-zinc-900">{comment.user.username}</span>
-                            <span className="text-[11px] text-zinc-400">
+                            <span className="text-sm font-bold text-[var(--text-primary)]">{comment.user.username}</span>
+                            <span className="text-[11px] text-[var(--text-primary)] opacity-40">
                                 {new Date(comment.commentDate).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })}
                             </span>
                             {!isEditing && (
                                 <button
                                     onClick={() => onReply(comment)}
-                                    className="opacity-0 group-hover/root:opacity-100 text-[11px] font-semibold text-violet-500 hover:text-violet-700 flex items-center gap-1 transition-opacity"
+                                    className="opacity-0 group-hover/root:opacity-100 text-[11px] font-semibold text-violet-500 hover:text-violet-400 flex items-center gap-1 transition-all"
                                 >
                                     <Reply className="w-3 h-3" /> Reply
                                 </button>
@@ -108,23 +108,23 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
                             <div className="relative">
                                 <button
                                     onClick={() => setShowMenu(true)}
-                                    className="opacity-0 group-hover/root:opacity-100 p-1 text-zinc-400 hover:text-zinc-600 rounded transition-opacity"
+                                    className="opacity-0 group-hover/root:opacity-100 p-1 text-[var(--text-primary)] opacity-40 hover:opacity-100 rounded transition-opacity"
                                 >
                                     <MoreVertical className="w-4 h-4" />
                                 </button>
                                 {showMenu && (
                                     <>
                                         <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-                                        <div className="absolute right-0 mt-1 w-32 bg-white border border-zinc-200 rounded-lg shadow-sm z-20 py-1">
+                                        <div className="absolute right-0 mt-1 w-32 bg-[var(--bg-side)] border border-[var(--border-color)] rounded-lg shadow-xl z-20 py-1">
                                             <button
                                                 onClick={() => { setIsEditing(true); setShowMenu(false); }}
-                                                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-zinc-600 hover:bg-zinc-50 flex items-center gap-2"
+                                                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-[var(--text-primary)] opacity-70 hover:opacity-100 hover:bg-[var(--bg-main)] flex items-center gap-2"
                                             >
                                                 <Pencil className="w-3 h-3" /> Edit
                                             </button>
                                             <button
                                                 onClick={() => { onDelete(comment.id); setShowMenu(false); }}
-                                                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                className="w-full text-left px-3 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-500/10 flex items-center gap-2"
                                             >
                                                 <Trash2 className="w-3 h-3" /> Delete
                                             </button>
@@ -141,34 +141,34 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
                                 disabled={isSaving}
-                                className="w-full p-3 border border-zinc-200 bg-white focus:outline-none focus:border-violet-300 text-sm resize-y text-zinc-800 rounded-xl"
+                                className="w-full p-3 border border-[var(--border-color)] bg-[var(--bg-side)] focus:outline-none focus:border-violet-500/50 text-sm resize-y text-[var(--text-primary)] rounded-xl"
                                 rows={3}
                             />
                             <div className="flex justify-end gap-2 mt-2.5">
                                 <button
                                     onClick={() => { setIsEditing(false); setEditContent(comment.content); }}
                                     disabled={isSaving}
-                                    className="px-4 py-1.5 text-xs font-bold text-zinc-500 hover:text-zinc-700"
+                                    className="px-4 py-1.5 text-xs font-bold text-[var(--text-primary)] opacity-40 hover:opacity-100"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSave}
                                     disabled={isSaving || !editContent.trim()}
-                                    className="px-4 py-1.5 bg-zinc-800 text-white text-xs font-bold rounded-lg hover:bg-zinc-900 disabled:opacity-50"
+                                    className="px-4 py-1.5 bg-[var(--text-primary)] text-[var(--bg-side)] text-xs font-bold rounded-lg hover:opacity-90 disabled:opacity-50"
                                 >
                                     {isSaving ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </div>
                     ) : (
-                        <p className="text-sm text-zinc-700 leading-relaxed break-words">{comment.content}</p>
+                        <p className="text-sm text-[var(--text-primary)] opacity-80 leading-relaxed break-words">{comment.content}</p>
                     )}
 
                     {totalReplies > 0 && (
                         <button
                             onClick={handleToggleReplies}
-                            className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold text-violet-600 hover:text-violet-800"
+                            className="mt-2 flex items-center gap-1.5 text-[12px] font-semibold text-violet-500 hover:text-violet-400"
                         >
                             <ChevronRight className={`w-3.5 h-3.5 transition-transform duration-200 ${showReplies ? 'rotate-90' : ''}`} />
                             {showReplies ? 'Hide replies' : `Show ${totalReplies} ${totalReplies === 1 ? 'reply' : 'replies'}`}
@@ -178,7 +178,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
             </div>
 
             {showReplies && totalReplies > 0 && (
-                <div className="ml-11 pl-4 border-l-2 border-zinc-100">
+                <div className="ml-11 pl-4 border-l-2 border-[var(--border-color)]">
                     {visibleReplies.map(reply => (
                         <ReplyItem
                             key={reply.id}
@@ -192,7 +192,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
                     {hasMore && (
                         <button
                             onClick={handleShowMore}
-                            className="mt-1 mb-2 text-[12px] font-semibold text-zinc-500 hover:text-violet-600 flex items-center gap-1"
+                            className="mt-1 mb-2 text-[12px] font-semibold text-[var(--text-primary)] opacity-40 hover:opacity-100 hover:text-violet-500 flex items-center gap-1"
                         >
                             <ChevronDown className="w-3.5 h-3.5" />
                             Show {Math.min(REPLIES_PAGE_SIZE, totalReplies - visibleCount)} more replies
@@ -201,7 +201,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [], curren
                 </div>
             )}
 
-            <div className="border-b border-zinc-100 last:border-0" />
+            <div className="border-b border-[var(--border-color)] last:border-0" />
         </div>
     );
 };

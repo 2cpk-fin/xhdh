@@ -24,11 +24,8 @@ export default function SearchingUniHelper() {
     useEffect(() => {
         let isMounted = true;
         universityApi.getAllTags()
-            .then(tags => {
-                if (isMounted) setAvailableTags(tags);
-            })
+            .then(tags => { if (isMounted) setAvailableTags(tags); })
             .catch(console.error);
-
         return () => { isMounted = false; };
     }, []);
 
@@ -36,10 +33,7 @@ export default function SearchingUniHelper() {
         setIsLoading(true);
         try {
             const res = await universityApi.getUniversities(
-                targetPage,
-                10,
-                'elo,desc',
-                currentQuery || undefined,
+                targetPage, 10, 'elo,desc', currentQuery || undefined,
                 currentTags.length ? currentTags : undefined
             );
             setUniPageData(res);
@@ -50,10 +44,8 @@ export default function SearchingUniHelper() {
         }
     }, []);
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        fetchUniversities(0, '', []);
-    }, [fetchUniversities]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { fetchUniversities(0, '', []); }, [fetchUniversities]);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,22 +66,24 @@ export default function SearchingUniHelper() {
     };
 
     return (
-        <div className="flex flex-col h-full bg-white rounded-3xl p-6 border border-zinc-200 transition-all">
-            <h3 className="text-lg font-bold text-zinc-800 mb-4 shrink-0">Find University IDs</h3>
+        <div className="flex flex-col h-full rounded-3xl p-6 border transition-all bg-[var(--bg-side)] border-[var(--border-color)]">
+            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-4 shrink-0">Find University IDs</h3>
 
             <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 mb-4 shrink-0">
                 <div className="flex gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)] opacity-40" />
                         <input
                             type="text"
                             placeholder="Search universities..."
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-zinc-200 bg-zinc-50 text-sm focus:ring-2 focus:ring-green-400 outline-none text-zinc-800 transition-all"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-xl border outline-none transition-all text-sm
+                                       bg-[var(--bg-main)] border-[var(--border-color)] text-[var(--text-primary)] 
+                                       focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50"
                         />
                     </div>
-                    <button type="submit" className="px-4 bg-green-500 text-white rounded-xl font-bold text-sm hover:bg-green-600 transition-all hover:scale-105 active:scale-95 shadow-sm">
+                    <button type="submit" className="px-4 bg-green-600 text-white rounded-xl font-bold text-sm hover:bg-green-700 transition-all hover:scale-105 active:scale-95 shadow-sm">
                         Search
                     </button>
                 </div>
@@ -102,8 +96,8 @@ export default function SearchingUniHelper() {
                                 type="button"
                                 onClick={() => toggleTag(tag)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:scale-105 active:scale-95 ${selectedTags.includes(tag)
-                                    ? 'bg-green-500 border-green-500 text-white shadow-sm shadow-green-200'
-                                    : 'bg-white border-zinc-200 text-zinc-500 hover:border-green-300 hover:text-green-600'
+                                        ? 'bg-green-600 border-green-600 text-white shadow-sm'
+                                        : 'bg-[var(--bg-main)] border-[var(--border-color)] text-[var(--text-primary)] opacity-60 hover:border-green-500/50 hover:text-green-500'
                                     }`}
                             >
                                 {formatTag(tag)}
@@ -113,24 +107,24 @@ export default function SearchingUniHelper() {
                 )}
             </form>
 
-            <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pt-2 border-t border-zinc-100">
+            <div className="flex-1 overflow-y-auto no-scrollbar space-y-2 pt-2 border-t border-[var(--border-color)]">
                 {isLoading ? (
                     <div className="flex flex-col gap-2 mt-4">
                         {[...Array(5)].map((_, i) => (
-                            <div key={i} className="h-[68px] rounded-xl bg-zinc-100 animate-pulse border border-zinc-200" />
+                            <div key={i} className="h-[68px] rounded-xl animate-pulse bg-[var(--text-primary)]/5 border border-[var(--border-color)]" />
                         ))}
                     </div>
                 ) : uniPageData && uniPageData.content.length > 0 ? (
                     uniPageData.content.map(uni => <AdminUniItem key={uni.id} uni={uni} />)
                 ) : (
-                    <div className="text-center text-zinc-400 text-sm mt-8 font-medium">
+                    <div className="text-center text-[var(--text-primary)] opacity-40 text-sm mt-8 font-medium">
                         No universities found. Try a different search.
                     </div>
                 )}
             </div>
 
             {uniPageData && uniPageData.totalPages > 1 && (
-                <div className="pt-4 mt-2 border-t border-zinc-100 shrink-0">
+                <div className="pt-4 mt-2 border-t border-[var(--border-color)] shrink-0">
                     <Pagination
                         currentPage={page}
                         totalPages={uniPageData.totalPages}

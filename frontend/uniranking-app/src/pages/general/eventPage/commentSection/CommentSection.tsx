@@ -133,24 +133,24 @@ const CommentSection: React.FC<CommentSectionProps> = ({ matchId }) => {
 
     return (
         <section>
-            <h2 className="text-xl font-black text-zinc-800 tracking-tight mb-5">
+            <h2 className="text-xl font-black text-[var(--text-primary)] tracking-tight mb-5">
                 Discussion
                 {totalCount > 0 && (
-                    <span className="ml-2 text-base font-semibold text-zinc-400">({totalCount})</span>
+                    <span className="ml-2 text-base font-semibold text-[var(--text-primary)] opacity-40">({totalCount})</span>
                 )}
             </h2>
 
             <form onSubmit={handleSubmit} className="mb-8">
                 {replyingTo && (
-                    <div className="flex items-center justify-between bg-violet-50 text-violet-700 px-4 py-2 rounded-t-2xl border border-violet-200 border-b-0 text-sm">
+                    <div className="flex items-center justify-between bg-violet-500/10 text-violet-500 px-4 py-2 rounded-t-2xl border border-violet-500/20 border-b-0 text-sm">
                         <span className="font-bold">
                             Replying to{' '}
-                            <span className="text-violet-900">@{replyingTo.user.username}</span>
+                            <span className="text-violet-500 dark:text-violet-400">@{replyingTo.user.username}</span>
                         </span>
                         <button
                             type="button"
                             onClick={() => setReplyingTo(null)}
-                            className="text-violet-400 hover:text-violet-700 font-bold text-xs px-2 py-1 rounded-md hover:bg-violet-100"
+                            className="text-violet-400 hover:text-violet-500 font-bold text-xs px-2 py-1 rounded-md hover:bg-violet-500/10"
                         >
                             ✕ Cancel
                         </button>
@@ -163,14 +163,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ matchId }) => {
                     placeholder={replyingTo ? 'Write your reply...' : 'Join the discussion...'}
                     disabled={loading}
                     rows={3}
-                    className={`w-full p-4 border border-zinc-200 bg-zinc-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-300 text-sm resize-y text-zinc-800 placeholder:text-zinc-400 ${replyingTo ? 'rounded-b-2xl rounded-t-none border-t-violet-200' : 'rounded-2xl'
+                    className={`w-full p-4 border border-[var(--border-color)] bg-[var(--bg-main)] focus:bg-[var(--bg-side)] focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-sm resize-y text-[var(--text-primary)] placeholder:text-[var(--text-primary)] opacity-40 ${replyingTo ? 'rounded-b-2xl rounded-t-none border-t-violet-500/20' : 'rounded-2xl'
                         }`}
                 />
                 <div className="flex justify-end mt-2.5">
                     <button
                         type="submit"
                         disabled={loading || !newComment.trim()}
-                        className="px-6 py-2 bg-violet-600 text-white text-sm font-bold tracking-wide rounded-xl hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+                        className="px-6 py-2 bg-violet-600 text-white text-sm font-bold tracking-wide rounded-xl hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 transition-all"
                     >
                         {loading ? 'Posting…' : replyingTo ? 'Post Reply' : 'Post Comment'}
                     </button>
@@ -191,8 +191,8 @@ const CommentSection: React.FC<CommentSectionProps> = ({ matchId }) => {
                         />
                     ))
                 ) : (
-                    <div className="bg-zinc-50 border border-zinc-100 rounded-2xl px-6 py-10 text-center">
-                        <p className="text-sm font-bold text-zinc-400">No comments yet.</p>
+                    <div className="bg-[var(--bg-side)] border border-[var(--border-color)] rounded-2xl px-6 py-10 text-center">
+                        <p className="text-sm font-bold text-[var(--text-primary)] opacity-40">No comments yet.</p>
                     </div>
                 )}
             </div>

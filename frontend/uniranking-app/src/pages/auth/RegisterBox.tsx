@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Mail, Lock, UserPlus, ArrowLeft, Loader2, ShieldCheck } from 'lucide-react';
+import { User, Mail, Lock, UserPlus, ArrowLeft, Loader2, ShieldCheck, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { RegisterRequest } from '../../types/auth';
 
@@ -13,89 +13,133 @@ const GoogleIcon = () => (
 );
 
 interface RegisterBoxProps {
-    formData: RegisterRequest;
+    formData: RegisterRequest & { confirmPassword?: string };
     loading: boolean;
     handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     handleSubmit: (e: React.FormEvent) => void;
     handleGoogleSignup: () => void;
     handleSignInLink: (e: React.MouseEvent) => void;
+    isDarkMode: boolean;           // Added prop
+    toggleDarkMode: () => void;    // Added prop
 }
 
-const RegisterBox: React.FC<RegisterBoxProps> = ({ formData, loading, handleChange, handleSubmit, handleGoogleSignup, handleSignInLink }) => {
+const RegisterBox: React.FC<RegisterBoxProps> = ({
+    formData, loading, handleChange, handleSubmit, handleGoogleSignup, handleSignInLink, isDarkMode, toggleDarkMode
+}) => {
+
     return (
-        <div className="w-[448px] shrink-0 rounded-[2.5rem] border border-zinc-200 bg-white/90 backdrop-blur-md p-10 relative">
-            <div className="flex flex-col items-center text-center mb-8">
-                <div className="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mb-4 border border-green-200">
-                    <UserPlus className="w-8 h-8 text-green-500" />
+        <div className={`w-[448px] shrink-0 rounded-[2.5rem] border p-10 relative transition-all duration-300 shadow-xl
+            ${isDarkMode ? 'bg-black border-zinc-800 shadow-2xl backdrop-blur-none' : 'bg-white/90 border-zinc-200 backdrop-blur-md'}`}>
+
+            <button
+                onClick={toggleDarkMode}
+                className={`absolute top-8 right-8 p-2.5 rounded-xl border transition-all active:scale-95
+                           ${isDarkMode ? 'bg-black border-zinc-800 text-green-400 hover:bg-zinc-900' : 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:bg-white'}`}
+            >
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            <div className="flex flex-col items-center text-center mb-8 mt-2">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border
+                                ${isDarkMode ? 'bg-black border-zinc-800' : 'bg-green-50 border-green-200'}`}>
+                    <UserPlus className={`w-8 h-8 ${isDarkMode ? 'text-green-400' : 'text-green-500'}`} />
                 </div>
-                <h2 className="text-4xl font-black tracking-tight text-zinc-900">Create Account</h2>
-                <p className="text-sm font-medium opacity-50 mt-2">Join the academic evaluation community</p>
+                <h2 className={`text-4xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Create Account</h2>
+                <p className={`text-sm font-medium mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Join the academic evaluation community</p>
             </div>
 
-            {/* FIX: disable button while loading to prevent double-clicks during OAuth redirect */}
             <button
                 onClick={handleGoogleSignup}
                 disabled={loading}
-                className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border mb-6 disabled:opacity-50
+                           ${isDarkMode ? 'bg-black border-zinc-800 text-white hover:bg-zinc-900' : 'bg-white border-zinc-200 hover:bg-zinc-50 text-zinc-900'}`}
             >
                 {loading ? <Loader2 className="w-5 h-5 mr-3 animate-spin" /> : <GoogleIcon />}
                 Sign up with Google
             </button>
 
             <div className="relative flex items-center gap-4 mb-8">
-                <div className="flex-1 h-px bg-zinc-500/10" />
-                <span className="text-[10px] font-black uppercase tracking-widest opacity-30">Or manual</span>
-                <div className="flex-1 h-px bg-zinc-500/10" />
+                <div className={`flex-1 h-px ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+                <span className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Or manual</span>
+                <div className={`flex-1 h-px ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative group">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-green-500 transition-all" />
+                    <User className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-all
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-green-400' : 'text-zinc-400 group-focus-within:text-green-500'}`} />
                     <input
                         name="username"
                         type="text"
                         placeholder="Username"
-                        className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200 bg-zinc-50 outline-none focus:border-green-500/50 transition-all font-medium text-zinc-900"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-green-500'
+                                : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white focus:border-green-500'}`}
                         value={formData.username}
                         onChange={handleChange}
                     />
                 </div>
 
                 <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-green-500 transition-all" />
+                    <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-all
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-green-400' : 'text-zinc-400 group-focus-within:text-green-500'}`} />
                     <input
                         name="email"
-                        type="email" // FIX: was type="text" — now enables browser email validation and correct mobile keyboard
+                        type="email"
                         placeholder="Academic Email"
-                        className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200 bg-zinc-50 outline-none focus:border-green-500/50 transition-all font-medium text-zinc-900"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-green-500'
+                                : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white focus:border-green-500'}`}
                         value={formData.email}
                         onChange={handleChange}
                     />
                 </div>
 
                 <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-30 group-focus-within:opacity-100 group-focus-within:text-green-500 transition-all" />
+                    <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-all
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-green-400' : 'text-zinc-400 group-focus-within:text-green-500'}`} />
                     <input
                         name="password"
                         type="password"
                         placeholder="Password"
-                        className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200 bg-zinc-50 outline-none focus:border-green-500/50 transition-all font-medium text-zinc-900"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-green-500'
+                                : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white focus:border-green-500'}`}
                         value={formData.password}
                         onChange={handleChange}
                     />
                 </div>
 
-                <button type="submit" disabled={loading} className="w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 mt-4 uppercase tracking-widest text-xs">
+                <div className="relative group">
+                    <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-all
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-green-400' : 'text-zinc-400 group-focus-within:text-green-500'}`} />
+                    <input
+                        name="confirmPassword"
+                        type="password"
+                        placeholder="Confirm Password"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-green-500'
+                                : 'bg-zinc-50 border-zinc-200 text-zinc-900 focus:bg-white focus:border-green-500'}`}
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                    />
+                </div>
+
+                <button type="submit" disabled={loading} className={`w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 mt-6 uppercase tracking-widest text-xs shadow-lg ${isDarkMode ? 'shadow-green-900/40' : 'shadow-green-500/20'}`}>
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
                     {loading ? "Saving..." : "Register Now"}
                 </button>
             </form>
 
-            <div className="mt-8 pt-8 border-t border-zinc-500/10 text-center">
-                <p className="text-sm font-medium opacity-50">
+            <div className={`mt-8 pt-8 border-t text-center ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                     Already have an account?{' '}
-                    <Link to="/login" onClick={handleSignInLink} className="text-green-600 font-black hover:underline underline-offset-4">
-                        Sign In <ArrowLeft className="w-4 h-4 inline-block ml-1 rotate-180" />
+                    <Link to="/login" onClick={handleSignInLink} className={`font-black hover:underline underline-offset-4 transition-colors ${isDarkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-500'}`}>
+                        Sign In <ArrowLeft size={14} className="inline-block ml-1 rotate-180" />
                     </Link>
                 </p>
             </div>

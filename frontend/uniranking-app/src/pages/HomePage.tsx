@@ -1,10 +1,9 @@
 import { Link } from 'react-router-dom';
-import { Swords, CalendarDays, Trophy, TrendingUp, Users, ArrowRight, Zap } from 'lucide-react';
+import * as Lucide from 'lucide-react';
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { useDarkMode } from '../hooks/useDarkMode';
 
 interface NavBoxProps {
     title: string;
@@ -21,44 +20,49 @@ const NavBox = ({ title, description, to, icon, accent, badge }: NavBoxProps) =>
     return (
         <Link
             to={to}
-            className="group relative flex flex-col gap-4 p-6 bg-white/70 backdrop-blur-sm border border-zinc-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-zinc-300 hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+            className="group relative flex flex-col gap-4 p-6 rounded-2xl transition-all duration-500 overflow-hidden border 
+            bg-[var(--bg-side)] border-[var(--border-color)] backdrop-blur-md"
         >
-            {/* Subtle hover glow */}
+            {/* Pulsing neon glow on hover */}
             <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
-                style={{ background: `radial-gradient(circle at 20% 50%, ${accent}10 0%, transparent 65%)` }}
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                style={{ background: `radial-gradient(circle at 50% 0%, ${accent}20 0%, transparent 70%)` }}
             />
 
-            <div className="flex items-start justify-between">
-                {/* Icon */}
+            <div className="flex items-start justify-between relative z-10">
                 <div
-                    className="w-11 h-11 rounded-xl flex items-center justify-center shadow-sm border"
-                    style={{ background: `${accent}15`, borderColor: `${accent}30`, color: accent }}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-300 group-hover:scale-110
+                    dark:shadow-[0_0_15px_rgba(192,38,211,0.2)]"
+                    style={{
+                        background: `${accent}15`,
+                        borderColor: `${accent}40`,
+                        color: accent,
+                    }}
                 >
                     {icon}
                 </div>
 
                 {badge && (
-                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border"
-                        style={{ color: accent, background: `${accent}10`, borderColor: `${accent}25` }}>
+                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full border animate-pulse"
+                        style={{ color: accent, background: `${accent}15`, borderColor: `${accent}40` }}>
                         {badge}
                     </span>
                 )}
             </div>
 
-            <div className="flex-1">
-                <h3 className="text-base font-black text-zinc-900 mb-1.5 group-hover:text-zinc-700 transition-colors">
+            <div className="flex-1 relative z-10">
+                <h3 className="text-lg font-black tracking-tight mb-1.5 transition-colors text-[var(--text-primary)]">
                     {title}
                 </h3>
-                <p className="text-sm font-medium text-zinc-500 leading-relaxed">
+                <p className="text-sm font-medium leading-relaxed text-[var(--text-primary)] opacity-70">
                     {description}
                 </p>
             </div>
 
-            <div className="flex items-center gap-1 text-xs font-black uppercase tracking-wider transition-all duration-200"
+            <div className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest transition-all duration-300 group-hover:gap-3"
                 style={{ color: accent }}>
-                <span>Go to {title}</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-200" />
+                <span>Enter {title}</span>
+                <Lucide.ArrowRight className="w-4 h-4" />
             </div>
         </Link>
     );
@@ -66,80 +70,93 @@ const NavBox = ({ title, description, to, icon, accent, badge }: NavBoxProps) =>
 
 // ─── Stat Pill ────────────────────────────────────────────────────────────────
 
-const StatPill = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-    <div className="flex items-center gap-3 px-4 py-3 bg-white/70 backdrop-blur-sm border border-zinc-200 rounded-xl shadow-sm">
-        <div className="text-purple-500">{icon}</div>
-        <div>
-            <p className="text-base font-black text-zinc-900 leading-none">{value}</p>
-            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mt-0.5">{label}</p>
+const StatPill = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => {
+    return (
+        <div className="flex items-center gap-4 px-5 py-3 rounded-xl border transition-all duration-300
+            bg-[var(--bg-side)] border-[var(--border-color)] shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
+            <div className="text-[var(--accent-purple)] dark:text-[#d946ef]">{icon}</div>
+            <div>
+                <p className="text-lg font-black leading-none text-[var(--text-primary)]">{value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest mt-1 text-[var(--text-primary)] opacity-50">{label}</p>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 const HomePage = () => {
+    const { isDarkMode } = useDarkMode();
+    const neonPurple = '#c026d3';
+    const neonCyan = '#06b6d4';
+
     return (
-        <div className="flex flex-col min-h-screen bg-zinc-50/80 antialiased">
+        <div className="flex flex-col min-h-screen antialiased transition-colors duration-700 bg-[var(--bg-main)]">
             <Header />
 
             <div className="flex flex-1">
                 <NavBar />
 
                 <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
-                    <div className="flex-grow px-8 py-10 max-w-5xl w-full mx-auto">
+                    <div className="flex-grow px-8 py-12 max-w-6xl w-full mx-auto">
 
-                        {/* ── Hero ─────────────────────────────────────── */}
-                        <div className="mb-10">
-                            {/* Label */}
-                            <div className="flex items-center gap-2 mb-3">
-                                <Zap className="w-4 h-4 text-amber-400" />
-                                <span className="text-xs font-black uppercase tracking-widest text-purple-500">
-                                    Dashboard
+                        {/* Hero */}
+                        <div className="mb-14 relative">
+                            {isDarkMode && (
+                                <div className="absolute -top-20 -left-20 w-64 h-64 bg-purple-600/10 blur-[100px] pointer-events-none" />
+                            )}
+
+                            <div className="flex items-center gap-2 mb-4">
+                                <Lucide.Zap className="w-5 h-5 text-amber-500 dark:text-[#06b6d4]" />
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--accent-purple)] dark:text-[#d946ef]">
+                                    Neural Network Dashboard
                                 </span>
                             </div>
 
-                            <h1 className="text-4xl font-black tracking-tight text-zinc-900 leading-tight mb-3">
+                            <h1 className="text-5xl font-black tracking-tighter leading-none mb-4 text-[var(--text-primary)]">
                                 Welcome to{' '}
-                                <span className="text-purple-600">UniRanking</span>
+                                <span style={{ color: neonPurple, textShadow: isDarkMode ? `0 0 20px ${neonPurple}66` : 'none' }}>
+                                    UniRanking
+                                </span>
                             </h1>
-                            <p className="text-sm font-medium text-zinc-500 max-w-lg leading-relaxed">
+
+                            <p className="text-base font-medium max-w-xl leading-relaxed mb-8 text-[var(--text-primary)] opacity-70">
                                 The competitive platform where universities battle for supremacy. Vote, rank, and watch the global leaderboard shift in real time.
                             </p>
 
-                            {/* Stats row */}
-                            <div className="flex flex-wrap gap-3 mt-6">
-                                <StatPill icon={<Trophy className="w-4 h-4" />} value="2,400+" label="Universities" />
-                                <StatPill icon={<TrendingUp className="w-4 h-4" />} value="18K" label="Matches Played" />
-                                <StatPill icon={<Users className="w-4 h-4" />} value="5.2K" label="Active Voters" />
+                            <div className="flex flex-wrap gap-4">
+                                <StatPill icon={<Lucide.Trophy className="w-5 h-5" />} value="2,400+" label="Universities" />
+                                <StatPill icon={<Lucide.TrendingUp className="w-5 h-5" />} value="18,420" label="Matches Played" />
+                                <StatPill icon={<Lucide.Users className="w-5 h-5" />} value="5,200" label="Active Voters" />
                             </div>
                         </div>
 
-                        {/* ── Divider ───────────────────────────────────── */}
-                        <div className="flex items-center gap-3 mb-6">
-                            <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Quick Access</p>
-                            <div className="flex-1 h-px bg-zinc-200" />
+                        {/* Core Operations Divider */}
+                        <div className="flex items-center gap-4 mb-8">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--text-primary)] opacity-40">
+                                Core Operations
+                            </p>
+                            <div className="flex-1 h-px bg-[var(--border-color)] opacity-50" />
                         </div>
 
-                        {/* ── Feature Grid ─────────────────────────────── */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {/* Feature Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                             <NavBox
                                 to="/solo"
                                 title="Solo Match Arena"
-                                description="Pit two universities against each other in a 1v1 duel and vote for the winner to shift their Elo ratings."
-                                icon={<Swords className="w-5 h-5" />}
-                                accent="#9333ea"
-                                badge="Live"
+                                description="Pit two universities against each other in a high-stakes 1v1 duel. Every vote directly impacts their global Elo rating."
+                                icon={<Lucide.Swords className="w-6 h-6" />}
+                                accent={neonPurple}
+                                badge="Active"
                             />
                             <NavBox
                                 to="/schedule"
-                                title="Schedule Match"
-                                description="Set up voting rounds for multiple universities and manage bracket-style competitions."
-                                icon={<CalendarDays className="w-5 h-5" />}
-                                accent="#0ea5e9"
+                                title="Tournament Hub"
+                                description="Organize large-scale bracket competitions or schedule future voting rounds for your favorite institutions."
+                                icon={<Lucide.CalendarDays className="w-6 h-6" />}
+                                accent={neonCyan}
                             />
                         </div>
-
                     </div>
 
                     <Footer />

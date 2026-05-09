@@ -1,38 +1,34 @@
-import { X, AlertCircle } from 'lucide-react'
+import { X, AlertCircle } from 'lucide-react';
 
-type Props = {
-    message: string
-    onClose: () => void
-}
-
-export default function ServerErrorBox({ message, onClose }: Props) {
+export default function ServerErrorBox({ message, onClose }: { message: string; onClose: () => void }) {
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-3xl shadow-xl border border-zinc-200 p-6 max-w-sm w-full relative animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/25 dark:bg-black/60">
+            <div className="relative w-full max-w-sm rounded-3xl p-6 animate-in fade-in zoom-in-95 duration-200
+                bg-[var(--bg-side)]
+                border border-red-200 dark:border-red-900/30
+                shadow-xl dark:shadow-[0_0_40px_rgba(239,68,68,0.1)]">
+
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1.5 rounded-full text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-all"
+                    className="absolute top-4 right-4 p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-red-500/10 transition-colors"
                 >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                 </button>
 
                 <div className="flex flex-col items-center text-center mt-2">
-                    <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mb-4 border border-red-100">
-                        <AlertCircle className="w-7 h-7 text-red-500" />
+                    <div className="w-14 h-14 rounded-full flex items-center justify-center mb-4 bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20">
+                        <AlertCircle className="w-7 h-7 text-red-500 dark:text-red-400" />
                     </div>
-                    <h3 className="text-xl font-black text-zinc-800 mb-2">Server Error</h3>
-                    <p className="text-sm text-zinc-500 font-medium leading-relaxed">
-                        {message}
-                    </p>
-
+                    <h3 className="text-xl font-black mb-2 text-[var(--text-primary)] dark:text-red-300">Server Error</h3>
+                    <p className="text-sm font-medium text-[var(--text-primary)] opacity-60">{message}</p>
                     <button
                         onClick={onClose}
-                        className="mt-6 w-full py-2.5 rounded-2xl bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-sm font-bold transition-all"
+                        className="mt-6 w-full py-2.5 rounded-2xl text-sm font-bold bg-[var(--text-primary)]/5 dark:bg-red-500/10 text-[var(--text-primary)] dark:text-red-400 hover:bg-[var(--text-primary)]/10 dark:hover:bg-red-500/20 transition-all"
                     >
                         Dismiss
                     </button>
                 </div>
             </div>
         </div>
-    )
+    );
 }

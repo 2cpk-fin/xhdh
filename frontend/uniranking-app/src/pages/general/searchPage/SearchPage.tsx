@@ -71,7 +71,7 @@ export default function SearchPage() {
     }, [])
 
     return (
-        <div className="min-h-screen bg-zinc-50 flex flex-col relative">
+        <div className="min-h-screen bg-[var(--bg-main)] flex flex-col relative transition-colors duration-300">
             <Header />
             <div className="flex flex-1">
                 <NavBar />
@@ -80,18 +80,18 @@ export default function SearchPage() {
                     <div className="flex-1 max-w-5xl w-full mx-auto px-6 py-8 space-y-6">
 
                         <div>
-                            <h1 className="text-3xl font-black text-zinc-800">University Rankings</h1>
-                            <p className="text-sm text-zinc-400 font-medium mt-1">
+                            <h1 className="text-3xl font-black text-[var(--text-primary)]">University Rankings</h1>
+                            <p className="text-sm text-[var(--text-primary)] opacity-40 font-medium mt-1">
                                 Search and filter universities by name, abbreviation, or category
                             </p>
                         </div>
 
-                        <div className="bg-white/70 backdrop-blur-xl border border-zinc-200 rounded-2xl p-4 shadow-sm">
+                        <div className="bg-[var(--bg-side)] backdrop-blur-xl border border-[var(--border-color)] rounded-2xl p-4 shadow-sm">
                             <SearchBox onSearch={handleSearch} />
                         </div>
 
                         {!loading && !error && universities.length > 0 && (
-                            <p className="text-xs font-bold text-zinc-400">
+                            <p className="text-xs font-bold text-[var(--text-primary)] opacity-40">
                                 Showing {universities.length} of {totalElements} universities
                             </p>
                         )}
@@ -99,13 +99,13 @@ export default function SearchPage() {
                         {loading && (
                             <div className="flex flex-col gap-3">
                                 {[...Array(5)].map((_, i) => (
-                                    <div key={i} className="h-16 rounded-2xl bg-zinc-200" />
+                                    <div key={i} className="h-16 rounded-2xl bg-[var(--text-primary)]/5 animate-pulse" />
                                 ))}
                             </div>
                         )}
 
                         {!loading && !error && universities.length === 0 && (
-                            <div className="text-center py-16 text-zinc-400 font-bold text-sm">
+                            <div className="text-center py-16 text-[var(--text-primary)] opacity-40 font-bold text-sm">
                                 No universities found.
                             </div>
                         )}
@@ -128,9 +128,7 @@ export default function SearchPage() {
                             onPageChange={setPage}
                             disabled={loading}
                         />
-
                     </div>
-
                     <Footer />
                 </main>
             </div>

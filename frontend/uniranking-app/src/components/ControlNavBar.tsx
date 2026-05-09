@@ -1,14 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    ArrowLeft,
-    LayoutDashboard,
-    CalendarDays,
-    Users,
-    GraduationCap,
-    PanelLeftClose,
-    PanelLeftOpen
-} from 'lucide-react';
+import * as Lucide from 'lucide-react';
 import NavItem from './NavItem';
 
 const ControlNavBar = () => {
@@ -17,81 +9,53 @@ const ControlNavBar = () => {
 
     return (
         <aside
-            className={`fixed left-0 top-0 h-screen ${isCollapsed ? 'w-20' : 'w-64'
-                } bg-white/70 backdrop-blur-xl border-r border-zinc-200 flex flex-col z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}
+            className={`fixed left-0 top-0 h-screen ${isCollapsed ? 'w-20' : 'w-64'} 
+            flex flex-col z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+            bg-[var(--bg-side)] border-r border-[var(--border-color)] backdrop-blur-xl`}
         >
-            {/* Collapse Toggle Section */}
-            <div className="px-4 h-16 flex items-center shrink-0 overflow-hidden">
+            <div className="px-3 h-16 flex items-center gap-3 shrink-0 overflow-hidden border-b border-[var(--border-color)] opacity-80">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="flex items-center justify-center shrink-0 p-2 -ml-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors duration-200 active:scale-95"
+                    className="flex items-center justify-center shrink-0 w-9 h-9 rounded-xl transition-all duration-200 active:scale-95
+                    bg-transparent dark:bg-[rgba(192,38,211,0.08)]
+                    text-[var(--text-primary)] dark:text-[#e879f9]"
                 >
-                    {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
+                    {isCollapsed ? <Lucide.PanelLeftOpen size={18} /> : <Lucide.PanelLeftClose size={18} />}
                 </button>
 
-                {/* Smooth transition for the title text */}
-                <div
-                    className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
-                        }`}
-                >
-                    <span className="ml-2 font-bold text-zinc-900 truncate">Control Room</span>
+                <div className={`whitespace-nowrap transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'}`}>
+                    <span className="text-sm font-bold tracking-tight text-[var(--text-primary)] dark:shadow-[0_0_16px_rgba(192,38,211,0.45)]">
+                        Control Room
+                    </span>
                 </div>
             </div>
 
-            {/* Navigation Links */}
-            <div className="px-4 flex-1 overflow-y-auto no-scrollbar py-2">
-                <nav className="space-y-2">
-                    <NavItem
-                        to="/control-room"
-                        icon={<LayoutDashboard size={20} />}
-                        label="Dashboard"
-                        end={true}
-                        isCollapsed={isCollapsed}
-                    />
-                    <NavItem
-                        to="/control-room/matches"
-                        icon={<CalendarDays size={20} />}
-                        label="Matches"
-                        isCollapsed={isCollapsed}
-                    />
-                    <NavItem
-                        to="/control-room/universities"
-                        icon={<GraduationCap size={20} />}
-                        label="Universities"
-                        isCollapsed={isCollapsed}
-                    />
-                    <NavItem
-                        to="/control-room/users"
-                        icon={<Users size={20} />}
-                        label="Users"
-                        isCollapsed={isCollapsed}
-                    />
+            <div className="px-3 flex-1 overflow-y-auto no-scrollbar py-3">
+                {!isCollapsed && (
+                    <p className="px-3 mb-2 text-[9px] font-bold tracking-[0.12em] uppercase text-[#a1a1aa] dark:text-[#3f3f46]">
+                        Admin
+                    </p>
+                )}
+                <nav className="space-y-1">
+                    <NavItem to="/control-room" icon={<Lucide.LayoutDashboard size={18} />} label="Dashboard" end={true} isCollapsed={isCollapsed} />
+                    <NavItem to="/control-room/matches" icon={<Lucide.CalendarDays size={18} />} label="Matches" isCollapsed={isCollapsed} />
+                    <NavItem to="/control-room/universities" icon={<Lucide.GraduationCap size={18} />} label="Universities" isCollapsed={isCollapsed} />
+                    <NavItem to="/control-room/users" icon={<Lucide.Users size={18} />} label="Users" isCollapsed={isCollapsed} />
                 </nav>
             </div>
 
-            {/* Bottom Section: Back to App */}
-            <div className="p-4 border-t border-zinc-100 shrink-0">
+            <div className="p-3 shrink-0 border-t border-[var(--border-color)] opacity-80">
                 <button
                     onClick={() => navigate('/home')}
-                    className="group flex items-center h-12 w-full rounded-2xl text-zinc-500 bg-white border border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 transition-all duration-300 shadow-sm active:scale-95 overflow-hidden"
+                    className="group flex items-center h-11 w-full rounded-2xl transition-all duration-200 active:scale-95 overflow-hidden
+                    bg-white dark:bg-[rgba(192,38,211,0.06)] 
+                    border border-[#e4e4e7] dark:border-[rgba(192,38,211,0.3)]
+                    text-[#71717a] dark:text-[#d946ef]"
                 >
-                    {/* Fixed container for the icon ensures perfect centering when collapsed */}
-                    <div className="flex items-center justify-center shrink-0 w-12 h-12">
-                        <ArrowLeft
-                            size={20}
-                            className="group-hover:-translate-x-1 transition-transform duration-300"
-                        />
+                    <div className="flex items-center justify-center shrink-0 w-11 h-11">
+                        <Lucide.ArrowLeft size={17} className="group-hover:-translate-x-0.5 transition-transform" />
                     </div>
-
-                    {/* Text container smoothly transitions width and opacity */}
-                    <div
-                        className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
-                            }`}
-                    >
-                        <span className="text-sm font-bold tracking-wide">
-                            Back to App
-                        </span>
-                    </div>
+                    {!isCollapsed && <span className="text-sm font-bold ml-1">Back to App</span>}
                 </button>
             </div>
         </aside>

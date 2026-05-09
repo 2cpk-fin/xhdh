@@ -26,7 +26,6 @@ const ProfilePage = () => {
                 const data = await userApi.getUserByRefreshToken(token);
                 setUser(data);
             } catch (err) {
-                // Restored your original AxiosError handling here
                 const axiosError = err as AxiosError<{ message: string }>;
                 console.error(axiosError.response?.data?.message || 'Failed to load profile');
                 window.location.href = '/login';
@@ -39,52 +38,48 @@ const ProfilePage = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#f8fafc] dark:bg-[#000000] flex flex-col font-sans antialiased">
+            <div className="min-h-screen bg-[var(--bg-main)] flex flex-col font-sans antialiased transition-colors duration-300">
                 <Header />
-                <NavBar />
-                <main className="flex-grow flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <Loader2 className="w-8 h-8 animate-spin text-purple-600 dark:text-purple-500" />
-                        <span className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
-                            Loading Profile
-                        </span>
-                    </div>
-                </main>
-            </div>
-        );
-    }
-
-    if (!user) {
-        return (
-            <div className="min-h-screen bg-[#f8fafc] dark:bg-[#000000] flex flex-col font-sans antialiased">
-                <Header />
-                <NavBar />
-                <main className="flex-grow flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center border border-red-100 dark:border-red-900/50">
-                            <UserX className="w-8 h-8 text-red-500" />
+                <div className="flex flex-1">
+                    <NavBar />
+                    <main className="flex-grow flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-purple)]" />
+                            <span className="text-xs font-black text-[var(--text-primary)] opacity-40 uppercase tracking-widest">
+                                Loading Profile
+                            </span>
                         </div>
-                        <span className="text-sm font-black text-red-500 uppercase tracking-widest">
-                            Profile Not Found
-                        </span>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#000000] flex flex-col font-sans antialiased text-black dark:text-white">
+        <div className="min-h-screen bg-[var(--bg-main)] flex flex-col font-sans antialiased text-[var(--text-primary)] transition-colors duration-300">
             <Header />
-            <NavBar />
-
-            <main className="flex-grow container mx-auto px-6 py-16">
-                <div className="max-w-4xl mx-auto w-full transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
-                    <ProfileBox user={user} />
-                    <ProfileConfigBox user={user} onUserUpdate={setUser} />
-                </div>
-            </main>
-
+            <div className="flex flex-1">
+                <NavBar />
+                <main className="flex-grow container mx-auto px-6 py-16">
+                    <div className="max-w-4xl mx-auto w-full transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+                        {user ? (
+                            <>
+                                <ProfileBox user={user} />
+                                <ProfileConfigBox user={user} onUserUpdate={setUser} />
+                            </>
+                        ) : (
+                            <div className="flex flex-col items-center gap-4 mt-20">
+                                <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                                    <UserX className="w-8 h-8 text-red-500" />
+                                </div>
+                                <span className="text-sm font-black text-red-500 uppercase tracking-widest">
+                                    Profile Not Found
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                </main>
+            </div>
             <Footer />
         </div>
     );

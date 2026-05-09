@@ -37,36 +37,71 @@ export default function MatchCreatingBox({ onClose, onSuccess }: Props) {
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4">
-            <div className="bg-zinc-100 rounded-[2rem] w-full max-w-5xl h-[600px] flex overflow-hidden shadow-2xl relative">
-                <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-white rounded-full text-zinc-400 hover:text-red-500 shadow-sm z-10 transition-colors">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <div className="bg-[var(--bg-main)] border border-[var(--border-color)] rounded-[2rem] w-full max-w-5xl h-[600px] flex overflow-hidden shadow-2xl relative transition-colors duration-300">
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 bg-[var(--bg-side)] border border-[var(--border-color)] rounded-full text-[var(--text-primary)] opacity-40 hover:opacity-100 hover:text-red-500 shadow-sm z-10 transition-all"
+                >
                     <X size={20} />
                 </button>
 
                 {/* Left Section (2/5): Match Stats */}
-                <div className="w-2/5 bg-white p-8 overflow-y-auto flex flex-col border-r border-zinc-200">
-                    <h2 className="text-2xl font-extrabold text-zinc-900 mb-6">Create Match</h2>
-                    {error && <div className="p-3 mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl">{error}</div>}
+                <div className="w-2/5 bg-[var(--bg-side)] p-8 overflow-y-auto flex flex-col border-r border-[var(--border-color)]">
+                    <h2 className="text-2xl font-extrabold text-[var(--text-primary)] mb-6 tracking-tight">Create Match</h2>
+                    {error && (
+                        <div className="p-3 mb-4 text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-xl">
+                            {error}
+                        </div>
+                    )}
 
                     <form onSubmit={handleCreate} className="space-y-4 flex-1 flex flex-col">
                         <div>
-                            <label className="block text-sm font-bold text-zinc-700 mb-1">Match Title</label>
-                            <input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
+                            <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60 mb-1">Match Title</label>
+                            <input
+                                type="text"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none transition-all"
+                                required
+                            />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-zinc-700 mb-1">University IDs</label>
-                            <input type="text" value={formData.uniIds} onChange={(e) => setFormData({ ...formData, uniIds: e.target.value })} placeholder="e.g., 1, 2" className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
+                            <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60 mb-1">University IDs</label>
+                            <input
+                                type="text"
+                                value={formData.uniIds}
+                                onChange={(e) => setFormData({ ...formData, uniIds: e.target.value })}
+                                placeholder="e.g., 1, 2"
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none transition-all"
+                                required
+                            />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-zinc-700 mb-1">Start Time</label>
-                            <input type="datetime-local" value={formData.startTime} onChange={(e) => setFormData({ ...formData, startTime: e.target.value })} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
+                            <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60 mb-1">Start Time</label>
+                            <input
+                                type="datetime-local"
+                                value={formData.startTime}
+                                onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none transition-all [color-scheme:dark]"
+                                required
+                            />
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-zinc-700 mb-1">End Time</label>
-                            <input type="datetime-local" value={formData.endTime} onChange={(e) => setFormData({ ...formData, endTime: e.target.value })} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none" required />
+                            <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60 mb-1">End Time</label>
+                            <input
+                                type="datetime-local"
+                                value={formData.endTime}
+                                onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none transition-all [color-scheme:dark]"
+                                required
+                            />
                         </div>
                         <div className="mt-auto pt-6">
-                            <button type="submit" className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold hover:bg-purple-700 transition-all shadow-sm">
+                            <button
+                                type="submit"
+                                className="w-full bg-[var(--accent-purple)] text-white py-3 rounded-xl font-bold hover:opacity-90 transition-all shadow-sm active:scale-95"
+                            >
                                 Create Match
                             </button>
                         </div>
@@ -74,7 +109,7 @@ export default function MatchCreatingBox({ onClose, onSuccess }: Props) {
                 </div>
 
                 {/* Right Section (3/5): Searching */}
-                <div className="w-3/5 p-6 bg-zinc-50/50">
+                <div className="w-3/5 p-6 bg-[var(--bg-main)]/50">
                     <AdminUniSearchingBox />
                 </div>
             </div>

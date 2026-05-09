@@ -43,7 +43,7 @@ const SoloMatchPage = () => {
     const handleStartMatch = async () => {
         setLoading(true);
         setError("");
-        setMatchReport(null); // Instantly drops back to the 'finding opponents' screen
+        setMatchReport(null);
         try {
             const data = await soloMatchApi.startSoloMatch();
             setCurrentMatch(data);
@@ -88,7 +88,7 @@ const SoloMatchPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-50 flex flex-col">
+        <div className="min-h-screen bg-[var(--bg-main)] flex flex-col text-[var(--text-primary)] transition-colors duration-300">
             <Header />
 
             <div className="flex flex-1">
@@ -97,42 +97,38 @@ const SoloMatchPage = () => {
                 <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
                     <div className="flex-1 px-8 py-10 max-w-3xl w-full mx-auto">
 
-                        {/* Back Arrow */}
-                        <a href="/home" className="inline-flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-purple-600 transition-all hover:-translate-x-1 w-fit mb-8">
+                        <a href="/home" className="inline-flex items-center gap-2 text-sm font-bold text-[var(--text-primary)] opacity-50 hover:opacity-100 hover:text-[var(--accent-purple)] transition-all hover:-translate-x-1 w-fit mb-8">
                             <ArrowLeft className="w-4 h-4" />
                             Back to Home
                         </a>
 
-                        {/* Page heading */}
                         <div className="mb-8">
                             <div className="flex items-center gap-2 mb-1">
-                                <Swords className="w-5 h-5 text-purple-500" />
-                                <p className="text-xs font-black uppercase tracking-widest text-purple-500">Arena</p>
+                                <Swords className="w-5 h-5 text-[var(--accent-purple)]" />
+                                <p className="text-xs font-black uppercase tracking-widest text-[var(--accent-purple)]">Arena</p>
                             </div>
-                            <h1 className="text-3xl font-black text-zinc-900 tracking-tight">Solo Match</h1>
-                            <p className="text-sm text-zinc-500 font-medium mt-1">
+                            <h1 className="text-3xl font-black tracking-tight">Solo Match</h1>
+                            <p className="text-sm opacity-60 font-medium mt-1">
                                 Vote on university matchups and influence the global Elo rankings.
                             </p>
                         </div>
 
-                        {/* Error banner */}
                         {error && (
-                            <div className="flex items-start gap-3 mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700">
+                            <div className="flex items-start gap-3 mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500">
                                 <span className="text-sm font-bold">{error}</span>
                                 <button
                                     onClick={() => setError("")}
-                                    className="ml-auto text-red-400 hover:text-red-600 font-black text-lg leading-none"
+                                    className="ml-auto opacity-50 hover:opacity-100 font-black text-lg leading-none"
                                 >
                                     ×
                                 </button>
                             </div>
                         )}
 
-                        {/* Card container */}
-                        <div className="rounded-2xl bg-white/70 backdrop-blur-xl border border-zinc-200 shadow-sm overflow-hidden">
+                        <div className="rounded-2xl bg-[var(--bg-side)] border border-[var(--border-color)] shadow-sm overflow-hidden backdrop-blur-xl">
                             {currentMatch && !matchReport && (
-                                <div className="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
-                                    <p className="text-xs font-black uppercase tracking-widest text-zinc-400">
+                                <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+                                    <p className="text-xs font-black uppercase tracking-widest opacity-40">
                                         Match #{currentMatch.publicMatchId}
                                     </p>
                                     <TimerRing timeLeft={timeLeft} total={MATCH_DURATION} />
@@ -154,11 +150,11 @@ const SoloMatchPage = () => {
                                         />
 
                                         <div className="flex sm:flex-col items-center justify-center gap-2 py-2">
-                                            <div className="hidden sm:block w-px flex-1 bg-zinc-200" />
-                                            <div className="w-10 h-10 rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center">
-                                                <span className="text-xs font-black text-zinc-400 uppercase tracking-wider">vs</span>
+                                            <div className="hidden sm:block w-px flex-1 bg-[var(--border-color)] opacity-50" />
+                                            <div className="w-10 h-10 rounded-xl bg-[var(--bg-main)] border border-[var(--border-color)] flex items-center justify-center">
+                                                <span className="text-xs font-black opacity-40 uppercase tracking-wider">vs</span>
                                             </div>
-                                            <div className="hidden sm:block w-px flex-1 bg-zinc-200" />
+                                            <div className="hidden sm:block w-px flex-1 bg-[var(--border-color)] opacity-50" />
                                         </div>
 
                                         <UniversityCard

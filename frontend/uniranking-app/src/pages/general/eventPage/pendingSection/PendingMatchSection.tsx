@@ -42,21 +42,21 @@ export default function PendingMatchSection({ hidden, onToggle }: Props = {}) {
             <div className="animate-fadeUp">
                 <button
                     onClick={handleBack}
-                    className="mb-6 inline-flex items-center gap-1.5 text-sm font-bold text-zinc-400
-                               hover:text-purple-600 transition-colors"
+                    className="mb-6 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--text-primary)] opacity-40
+                               hover:text-[var(--accent-purple)] hover:opacity-100 transition-all"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
-                <div className="mb-8 pb-6 border-b border-zinc-200">
+                <div className="mb-8 pb-6 border-b border-[var(--border-color)]">
                     <div className="flex items-center gap-2 mb-1">
                         <Radio className="w-4 h-4 text-green-500 animate-pulse" />
-                        <span className="text-xs font-black tracking-widest uppercase text-green-600">
+                        <span className="text-xs font-black tracking-widest uppercase text-green-600 dark:text-green-400">
                             Live
                         </span>
                     </div>
-                    <h1 className="text-4xl font-black text-zinc-800 mb-2">{selected.title}</h1>
-                    <div className="flex items-center gap-4 text-sm font-medium text-zinc-400">
+                    <h1 className="text-4xl font-black text-[var(--text-primary)] mb-2">{selected.title}</h1>
+                    <div className="flex items-center gap-4 text-sm font-medium text-[var(--text-primary)] opacity-40">
                         <span className="flex items-center gap-1.5">
                             <PlayCircle className="w-4 h-4" /> {new Date(selected.startTime).toLocaleString()}
                         </span>
@@ -68,9 +68,7 @@ export default function PendingMatchSection({ hidden, onToggle }: Props = {}) {
 
                 <LeaderboardSection publicMatchId={selected.publicMatchId} />
 
-                {/* Comments integrated below Leaderboard */}
-                <div className="mt-10 pt-8 border-t border-zinc-200">
-                    {/* Assuming selected has an 'id' property of type number for CommentSection */}
+                <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
                     <CommentSection matchId={selected.id} />
                 </div>
             </div>
@@ -80,22 +78,21 @@ export default function PendingMatchSection({ hidden, onToggle }: Props = {}) {
     // ── List view ────────────────────────────────────────────────────────────
     return (
         <section>
-            {/* Section heading */}
             <div className="flex items-center gap-2 mb-6">
                 <Radio className="w-6 h-6 text-green-500 animate-pulse" />
-                <h2 className="text-2xl font-black text-zinc-800 tracking-tight">Live Now</h2>
+                <h2 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">Live Now</h2>
             </div>
 
             {loading && (
-                <p className="text-sm font-medium text-zinc-400 py-8">Loading matches…</p>
+                <p className="text-sm font-medium text-[var(--text-primary)] opacity-40 py-8">Loading matches…</p>
             )}
             {error && (
                 <p className="text-sm font-medium text-red-500 py-8">{error}</p>
             )}
             {!loading && !error && matches.length === 0 && (
-                <div className="bg-white border border-zinc-200 rounded-2xl px-6 py-12 text-center shadow-sm">
-                    <p className="text-sm font-bold text-zinc-400">No matches are live right now.</p>
-                    <p className="text-xs text-zinc-300 mt-1">Check back soon!</p>
+                <div className="bg-[var(--bg-side)] border border-[var(--border-color)] rounded-2xl px-6 py-12 text-center shadow-sm">
+                    <p className="text-sm font-bold text-[var(--text-primary)] opacity-40">No matches are live right now.</p>
+                    <p className="text-xs text-[var(--text-primary)] opacity-20 mt-1">Check back soon!</p>
                 </div>
             )}
 

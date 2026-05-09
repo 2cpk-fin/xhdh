@@ -3,6 +3,9 @@ import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import AdminMatchItem from './MatchItem';
 import AdminMatchCreatingBox from './MatchCreatingBox';
 import AdminMatchControllingBox from './MatchControllingBox';
+import Header from '../../../components/Header';
+import NavBar from '../../../components/NavBar';
+import Footer from '../../../components/Footer';
 import { scheduleMatchApi } from '../../../api/scheduleMatchApi';
 import type { ScheduleMatchResponse } from '../../../types/scheduleMatch';
 import type { Page } from '../../../types/general';
@@ -13,7 +16,6 @@ export default function MatchControlPage() {
     const [isCreating, setIsCreating] = useState(false);
     const [selectedMatch, setSelectedMatch] = useState<ScheduleMatchResponse | null>(null);
 
-    // Wrapped in useCallback so it's stable as a dependency
     const fetchMatches = useCallback(async (targetPage: number) => {
         try {
             const data = await scheduleMatchApi.getAllMatches(targetPage, 10);
@@ -23,7 +25,6 @@ export default function MatchControlPage() {
         }
     }, []);
 
-    // Re-fetch whenever the page changes
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchMatches(page);
@@ -32,92 +33,105 @@ export default function MatchControlPage() {
     const handleSuccess = () => {
         setIsCreating(false);
         setSelectedMatch(null);
-        fetchMatches(page); // Reload current page data after an update/create/delete
+        fetchMatches(page);
     };
 
     return (
-        <div className="max-w-6xl mx-auto px-6 py-8">
-            {/* Header & Create Button */}
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-zinc-900 tracking-tight">Matches Control</h1>
-                    <p className="text-zinc-500 mt-1 font-medium">Manage and schedule all university battles.</p>
-                </div>
-                <button
-                    onClick={() => setIsCreating(true)}
-                    className="flex items-center px-5 py-2.5 bg-purple-600 text-white rounded-xl font-bold shadow-sm hover:bg-purple-700 transition-all active:scale-95"
-                >
-                    <Plus size={20} className="mr-2" /> Create Match
-                </button>
-            </div>
+        /* The main div must explicitly use dark:bg-[#030005] to ensure the void color fills the screen */
+        <div className="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-main)] dark:bg-[#030005]">
+            <Header />
+            <div className="flex flex-1">
+                <NavBar />
 
-            {/* Matches List */}
-            <div className="bg-zinc-50/50 border border-zinc-200 rounded-3xl p-6 shadow-sm">
-                {matchesData?.content.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500">No matches found.</div>
-                ) : (
-                    matchesData?.content.map(match => (
-                        <AdminMatchItem
-                            key={match.id}
-                            match={match}
-                            onClick={() => setSelectedMatch(match)}
-                        />
-                    ))
-                )}
+                <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
+                    <div className="flex-1 max-w-6xl w-full mx-auto px-6 py-10 space-y-8">
 
-                {/* --- ADVANCED PAGINATION CONTROLS --- */}
-                {matchesData && matchesData.totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-6 border-t border-zinc-200 gap-4">
-                        <span className="text-sm font-medium text-zinc-500">
-                            Showing page <span className="font-bold text-zinc-900">{matchesData.number + 1}</span> of <span className="font-bold text-zinc-900">{matchesData.totalPages}</span>
-                        </span>
-
-                        <div className="flex gap-2 items-center">
-                            {/* Previous Page Button */}
-                            <button
-                                disabled={matchesData.first}
-                                onClick={() => setPage(p => Math.max(0, p - 1))}
-                                className="p-2.5 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronLeft size={20} className="text-zinc-600" />
-                            </button>
-
-                            {/* Page Numbers */}
-                            <div className="hidden sm:flex gap-1.5">
-                                {Array.from({ length: matchesData.totalPages }, (_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setPage(i)}
-                                        className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${page === i
-                                            ? 'bg-purple-600 text-white shadow-sm'
-                                            : 'bg-white border border-zinc-200 text-zinc-600 hover:bg-zinc-50 hover:border-purple-300'
-                                            }`}
-                                    >
-                                        {i + 1}
-                                    </button>
-                                ))}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">Matches Control</h1>
+                                <p className="text-[var(--text-primary)] opacity-40 mt-1 font-medium">Manage and schedule university battles.</p>
                             </div>
-
-                            {/* Next Page Button */}
                             <button
-                                disabled={matchesData.last}
-                                onClick={() => setPage(p => Math.min(matchesData.totalPages - 1, p + 1))}
-                                className="p-2.5 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                onClick={() => setIsCreating(true)}
+                                className="flex items-center px-6 py-2.5 bg-[var(--accent-purple)] text-white rounded-xl font-bold shadow-lg hover:opacity-90 transition-all active:scale-95"
                             >
-                                <ChevronRight size={20} className="text-zinc-600" />
+                                <Plus size={20} className="mr-2" /> Create Match
                             </button>
                         </div>
+
+                        {/* List Container */}
+                        <div className="bg-[var(--bg-side)] dark:bg-[#0a0a0a] border border-[var(--border-color)] rounded-3xl p-6 shadow-sm">
+                            {!matchesData || matchesData.content.length === 0 ? (
+                                <div className="text-center py-16 text-[var(--text-primary)] opacity-40 font-bold">No matches found.</div>
+                            ) : (
+                                <div className="space-y-1">
+                                    {matchesData.content.map(match => (
+                                        <AdminMatchItem
+                                            key={match.id}
+                                            match={match}
+                                            onClick={() => setSelectedMatch(match)}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Pagination */}
+                            {matchesData && matchesData.totalPages > 1 && (
+                                <div className="flex flex-col sm:flex-row items-center justify-between mt-8 pt-6 border-t border-[var(--border-color)] gap-4">
+                                    <span className="text-xs font-black uppercase tracking-widest text-[var(--text-primary)] opacity-30">
+                                        Page {matchesData.number + 1} of {matchesData.totalPages}
+                                    </span>
+
+                                    <div className="flex gap-2 items-center">
+                                        <button
+                                            disabled={matchesData.first}
+                                            onClick={() => setPage(p => Math.max(0, p - 1))}
+                                            className="p-2.5 bg-[var(--bg-main)] dark:bg-[#030005] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] opacity-60 hover:opacity-100 disabled:opacity-20 transition-colors"
+                                        >
+                                            <ChevronLeft size={20} />
+                                        </button>
+
+                                        <div className="flex gap-1.5">
+                                            {Array.from({ length: matchesData.totalPages }, (_, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => setPage(i)}
+                                                    className={`w-10 h-10 rounded-xl text-sm font-black transition-all ${page === i
+                                                        ? 'bg-[var(--accent-purple)] text-white shadow-md'
+                                                        : 'bg-[var(--bg-main)] dark:bg-[#030005] border border-[var(--border-color)] text-[var(--text-primary)] opacity-60 hover:opacity-100'
+                                                        }`}
+                                                >
+                                                    {i + 1}
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        <button
+                                            disabled={matchesData.last}
+                                            onClick={() => setPage(p => Math.min(matchesData.totalPages - 1, p + 1))}
+                                            className="p-2.5 bg-[var(--bg-main)] dark:bg-[#030005] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] opacity-60 hover:opacity-100 disabled:opacity-20 transition-colors"
+                                        >
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                )}
+                    <Footer />
+                </main>
             </div>
 
-            {/* Modals */}
             {isCreating && (
                 <AdminMatchCreatingBox onClose={() => setIsCreating(false)} onSuccess={handleSuccess} />
             )}
 
             {selectedMatch && (
-                <AdminMatchControllingBox match={selectedMatch} onClose={() => setSelectedMatch(null)} onSuccess={handleSuccess} />
+                <AdminMatchControllingBox
+                    match={selectedMatch}
+                    onClose={() => setSelectedMatch(null)}
+                    onSuccess={handleSuccess}
+                />
             )}
         </div>
     );

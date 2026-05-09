@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Lock, LogIn, UserPlus, ShieldCheck } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, ShieldCheck, Sun, Moon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { LoginRequest } from '../../types/auth';
 
@@ -19,68 +19,92 @@ interface LoginBoxProps {
     handleSubmit: (e: React.FormEvent) => void;
     handleGoogleLogin: () => void;
     handleJoinNow: (e: React.MouseEvent) => void;
+    isDarkMode: boolean;           // Added prop
+    toggleDarkMode: () => void;    // Added prop
 }
 
-const LoginBox: React.FC<LoginBoxProps> = ({ formData, loading, handleChange, handleSubmit, handleGoogleLogin, handleJoinNow }) => {
+const LoginBox: React.FC<LoginBoxProps> = ({
+    formData, loading, handleChange, handleSubmit, handleGoogleLogin, handleJoinNow, isDarkMode, toggleDarkMode
+}) => {
+
     return (
-        <div className="w-[448px] shrink-0 rounded-[2.5rem] border border-white/60 bg-white/70 backdrop-blur-xl p-10 relative">
-            <div className="flex flex-col items-center text-center mb-8">
-                <div className="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mb-4 border border-purple-200">
-                    <ShieldCheck className="w-8 h-8 text-purple-600" />
+        <div className={`w-[448px] shrink-0 rounded-[2.5rem] border p-10 relative transition-all duration-300 shadow-xl
+            ${isDarkMode ? 'bg-black border-zinc-800 shadow-2xl backdrop-blur-none' : 'bg-white/90 border-zinc-200 backdrop-blur-xl'}`}>
+
+            <button
+                onClick={toggleDarkMode}
+                className={`absolute top-8 right-8 p-2.5 rounded-xl border transition-all active:scale-95
+                           ${isDarkMode ? 'bg-black border-zinc-800 text-purple-400 hover:bg-zinc-900' : 'bg-zinc-50 border-zinc-200 text-zinc-500 hover:bg-white'}`}
+            >
+                {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            <div className="flex flex-col items-center text-center mb-8 mt-2">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 border
+                                ${isDarkMode ? 'bg-black border-zinc-800' : 'bg-purple-50 border-purple-200'}`}>
+                    <ShieldCheck className={`w-8 h-8 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                 </div>
-                <h2 className="text-4xl font-black tracking-tight text-zinc-900">Welcome Back</h2>
-                <p className="text-sm font-medium text-zinc-500 mt-2">Sign in to the global university community</p>
+                <h2 className={`text-4xl font-black tracking-tight ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>Welcome Back</h2>
+                <p className={`text-sm font-medium mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>Sign in to the global university community</p>
             </div>
 
-            {/* FIX: disable button while loading to prevent double-clicks */}
             <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border border-zinc-200/80 bg-white hover:bg-zinc-50 hover:border-zinc-300 text-zinc-900 mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`w-full flex items-center justify-center py-4 px-6 rounded-2xl font-bold text-sm transition-all active:scale-[0.98] border mb-6 disabled:opacity-50 disabled:cursor-not-allowed
+                           ${isDarkMode ? 'bg-black border-zinc-800 text-white hover:bg-zinc-900' : 'border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-900'}`}
             >
                 <GoogleIcon /> Continue with Google
             </button>
 
             <div className="relative flex items-center gap-4 mb-8">
-                <div className="flex-1 h-px bg-zinc-200" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Or email</span>
-                <div className="flex-1 h-px bg-zinc-200" />
+                <div className={`flex-1 h-px ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
+                <span className={`text-[10px] font-black uppercase tracking-widest ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>Or email</span>
+                <div className={`flex-1 h-px ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`} />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="relative group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-purple-600 transition-colors" />
+                    <Mail className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-purple-400' : 'text-zinc-400 group-focus-within:text-purple-600'}`} />
                     <input
                         name="email"
-                        type="email" // FIX: was type="text" — now enables browser email validation and correct mobile keyboard
+                        type="email"
                         placeholder="Academic Email"
-                        className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/50 outline-none focus:border-purple-500/50 focus:bg-white transition-all font-medium text-zinc-900 placeholder:text-zinc-400"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-purple-500'
+                                : 'border-zinc-200 bg-zinc-50 text-zinc-900 focus:bg-white focus:border-purple-500'}`}
                         value={formData.email}
                         onChange={handleChange}
                     />
                 </div>
                 <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 group-focus-within:text-purple-600 transition-colors" />
+                    <Lock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors
+                                    ${isDarkMode ? 'text-zinc-500 group-focus-within:text-purple-400' : 'text-zinc-400 group-focus-within:text-purple-600'}`} />
                     <input
                         name="password"
                         type="password"
                         placeholder="Password"
-                        className="w-full py-4 pl-12 pr-4 rounded-2xl border border-zinc-200/80 bg-zinc-50/50 outline-none focus:border-purple-500/50 focus:bg-white transition-all font-medium text-zinc-900 placeholder:text-zinc-400"
+                        className={`w-full py-4 pl-12 pr-4 rounded-2xl border outline-none transition-all font-medium placeholder:text-zinc-400
+                                   ${isDarkMode
+                                ? 'bg-black border-zinc-800 text-white focus:border-purple-500'
+                                : 'border-zinc-200 bg-zinc-50 text-zinc-900 focus:bg-white focus:border-purple-500'}`}
                         value={formData.password}
                         onChange={handleChange}
                     />
                 </div>
 
-                <button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] mt-6 uppercase tracking-widest text-xs disabled:opacity-70 disabled:cursor-not-allowed">
+                <button type="submit" disabled={loading} className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] mt-6 uppercase tracking-widest text-xs disabled:opacity-70 disabled:cursor-not-allowed shadow-lg ${isDarkMode ? 'shadow-purple-900/40' : 'shadow-purple-500/20'}`}>
                     <LogIn className="w-4 h-4" />
                     {loading ? 'Authenticating...' : 'Enter Community'}
                 </button>
             </form>
 
-            <div className="mt-8 pt-8 border-t border-zinc-200/80 text-center">
-                <p className="text-sm font-medium text-zinc-500">
+            <div className={`mt-8 pt-8 border-t text-center ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+                <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                     Don't have an account?{' '}
-                    <Link to="/register" onClick={handleJoinNow} className="text-purple-600 font-black hover:text-purple-500 hover:underline underline-offset-4 transition-colors">
+                    <Link to="/register" onClick={handleJoinNow} className={`font-black hover:underline underline-offset-4 transition-colors ${isDarkMode ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}>
                         Join now <UserPlus className="w-4 h-4 inline-block ml-1" />
                     </Link>
                 </p>

@@ -79,18 +79,18 @@ export default function UniversitySearchingBox({ onSelect }: Props) {
             <form onSubmit={handleSearchSubmit} className="space-y-3">
                 <div className="flex gap-2">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-primary)] opacity-40" />
                         <input
                             type="text"
                             placeholder="Search universities..."
                             value={query}
                             onChange={e => setQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent shadow-sm transition"
+                            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-[var(--border-color)] bg-[var(--bg-main)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-primary)] placeholder:opacity-40 focus:outline-none focus:ring-2 focus:ring-[var(--accent-purple)]/50 focus:border-transparent shadow-sm transition"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
+                        className="px-5 py-2.5 rounded-2xl bg-[var(--accent-purple)] hover:opacity-90 text-white text-sm font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
                     >
                         Search
                     </button>
@@ -104,8 +104,8 @@ export default function UniversitySearchingBox({ onSelect }: Props) {
                                 type="button"
                                 onClick={() => toggleTag(tagName)}
                                 className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:scale-105 active:scale-95 ${selectedTags.includes(tagName)
-                                    ? 'bg-green-500 border-green-500 text-white shadow-sm shadow-green-200'
-                                    : 'bg-white border-zinc-200 text-zinc-500 hover:border-purple-300 hover:text-purple-600'
+                                    ? 'bg-green-600 border-green-600 text-white shadow-sm shadow-green-200/20'
+                                    : 'bg-[var(--bg-main)] border-[var(--border-color)] text-[var(--text-primary)] opacity-60 hover:border-[var(--accent-purple)] hover:text-[var(--accent-purple)]'
                                     }`}
                             >
                                 {formatTag(tagName)}
@@ -117,7 +117,7 @@ export default function UniversitySearchingBox({ onSelect }: Props) {
 
             <div className="space-y-2">
                 {isLoading ? (
-                    <div className="text-center text-zinc-500 text-sm py-10">Loading universities...</div>
+                    <div className="text-center text-[var(--text-primary)] opacity-40 text-sm py-10">Loading universities...</div>
                 ) : uniPageData && uniPageData.content.length > 0 ? (
                     uniPageData.content.map(uni => (
                         <UniversityControlledItem
@@ -127,14 +127,14 @@ export default function UniversitySearchingBox({ onSelect }: Props) {
                         />
                     ))
                 ) : (
-                    <div className="text-center text-zinc-400 text-sm py-10">
+                    <div className="text-center text-[var(--text-primary)] opacity-40 text-sm py-10">
                         No universities found. Try a different search.
                     </div>
                 )}
             </div>
 
             {uniPageData && uniPageData.totalPages > 1 && (
-                <div className="pt-4 border-t border-zinc-200 mt-2">
+                <div className="pt-4 border-t border-[var(--border-color)] mt-2">
                     <Pagination
                         currentPage={page}
                         totalPages={uniPageData.totalPages}

@@ -1,0 +1,175 @@
+/* ============================================
+   Dark Mode Color System
+   CSS Custom Properties for light and dark themes
+   ============================================ */
+
+:root {
+    /* ===== LIGHT MODE (Default) ===== */
+
+    /* === Base Backgrounds === */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8fafc;
+    --color-bg-tertiary: #f1f5f9;
+    --color-bg-overlay: rgba(0, 0, 0, 0.5);
+
+    /* === Surface Layers === */
+    --color-surface-1: #ffffff;
+    --color-surface-2: #f8fafc;
+    --color-surface-3: #f1f5f9;
+    --color-surface-hover: #f0f0f0;
+
+    /* === Text === */
+    --color-text-primary: #0f172a;
+    --color-text-secondary: #64748b;
+    --color-text-tertiary: #94a3b8;
+    --color-text-muted: #cbd5e1;
+    --color-text-on-brand: #ffffff;
+
+    /* === Borders & Dividers === */
+    --color-border-primary: #e2e8f0;
+    --color-border-secondary: #cbd5e1;
+    --color-border-light: #f1f5f9;
+
+    /* === Semantic Brand Colors === */
+    --color-brand-primary: #a855f7;
+    --color-brand-primary-dark: #9333ea;
+    --color-brand-primary-light: #c084fc;
+    --color-brand-primary-lighter: #e9d5ff;
+    --color-brand-primary-bg: #faf5ff;
+
+    /* === Semantic Success (Green) === */
+    --color-success: #16a34a;
+    --color-success-dark: #15803d;
+    --color-success-light: #4ade80;
+    --color-success-lighter: #86efac;
+    --color-success-bg: #f0fdf4;
+
+    /* === Semantic Info (Blue) === */
+    --color-info: #0ea5e9;
+    --color-info-dark: #0284c7;
+    --color-info-light: #38bdf8;
+    --color-info-lighter: #7dd3fc;
+    --color-info-bg: #f0f9ff;
+
+    /* === Semantic Highlight (Amber/Trophy) === */
+    --color-highlight: #d97706;
+    --color-highlight-dark: #b45309;
+    --color-highlight-light: #fbbf24;
+    --color-highlight-lighter: #fcd34d;
+    --color-highlight-bg: #fffbeb;
+
+    /* === Semantic Error (Red) === */
+    --color-error: #dc2626;
+    --color-error-dark: #b91c1c;
+    --color-error-light: #ef4444;
+    --color-error-lighter: #fca5a5;
+    --color-error-bg: #fef2f2;
+
+    /* === Neutral Grays === */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+}
+
+:root.dark {
+    /* ===== DARK MODE ===== */
+
+    /* === Base Backgrounds === */
+    /* Very dark with subtle purple-blue tint instead of pure black */
+    --color-bg-primary: #0f0e1b;
+    --color-bg-secondary: #1a1828;
+    --color-bg-tertiary: #252335;
+    --color-bg-overlay: rgba(0, 0, 0, 0.7);
+
+    /* === Surface Layers (2-3 depth levels) === */
+    /* Layer 1: Deepest, closest to page background */
+    --color-surface-1: #1a1828;
+    /* Layer 2: Mid-tone, for cards and sections */
+    --color-surface-2: #252335;
+    /* Layer 3: Lightest surface, for elevated components */
+    --color-surface-3: #323043;
+    --color-surface-hover: #3a3852;
+
+    /* === Text === */
+    /* Off-white with slight purple tint */
+    --color-text-primary: #e8e6f0;
+    /* Desaturated mid-purple-gray for secondary */
+    --color-text-secondary: #9d99b3;
+    --color-text-tertiary: #7a7687;
+    --color-text-muted: #5a5670;
+    --color-text-on-brand: #ffffff;
+
+    /* === Borders & Dividers (soft, barely visible) === */
+    --color-border-primary: #3a3852;
+    --color-border-secondary: #2f2d42;
+    --color-border-light: #1f1d2b;
+
+    /* === Semantic Brand Colors (Neon Purple - Vivid & Bright) === */
+    --color-brand-primary: #d946ef;
+    --color-brand-primary-dark: #be185d;
+    --color-brand-primary-light: #f025d5;
+    --color-brand-primary-lighter: #f472b6;
+    --color-brand-primary-bg: #3f0f5c;
+
+    /* === Semantic Success (Neon Green - Saturated & Bright) === */
+    --color-success: #10b981;
+    --color-success-dark: #059669;
+    --color-success-light: #34d399;
+    --color-success-lighter: #6ee7b7;
+    --color-success-bg: #064e3b;
+
+    /* === Semantic Info (Neon Blue - Vivid & Electric) === */
+    --color-info: #06b6d4;
+    --color-info-dark: #0891b2;
+    --color-info-light: #22d3ee;
+    --color-info-lighter: #67e8f9;
+    --color-info-bg: #083344;
+
+    /* === Semantic Highlight (Neon Amber/Trophy - Bright & Vivid) === */
+    --color-highlight: #fbbf24;
+    --color-highlight-dark: #f59e0b;
+    --color-highlight-light: #fcd34d;
+    --color-highlight-lighter: #fde68a;
+    --color-highlight-bg: #5a3a0a;
+
+    /* === Semantic Error (Neon Red - Bright & Visible) === */
+    --color-error: #f43f5e;
+    --color-error-dark: #e11d48;
+    --color-error-light: #ff6b7a;
+    --color-error-lighter: #ff9ca3;
+    --color-error-bg: #4c0519;
+
+    /* === Neutral Grays (adjusted for dark mode) === */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #1f1d2b;
+    --color-gray-200: #2f2d42;
+    --color-gray-300: #3a3852;
+    --color-gray-400: #5a5670;
+    --color-gray-500: #7a7687;
+    --color-gray-600: #9d99b3;
+    --color-gray-700: #b8b4c8;
+    --color-gray-800: #d4cfe0;
+    --color-gray-900: #e8e6f0;
+}
+
+/* ============================================
+   Utility Classes for Dark Mode
+   ============================================ */
+
+body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:root.dark body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}

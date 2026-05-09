@@ -17,14 +17,14 @@ export default function UniversityControlledItem({ university, onClick }: Props)
     return (
         <div
             onClick={onClick}
-            className="group flex items-center justify-between px-5 py-4 rounded-2xl bg-white border border-zinc-200 shadow-sm hover:shadow-md hover:border-purple-300 cursor-pointer transition-all"
+            className="group flex items-center justify-between px-5 py-4 rounded-2xl bg-[var(--bg-side)] border border-[var(--border-color)] shadow-sm hover:shadow-md hover:border-[var(--accent-purple)] cursor-pointer transition-all active:scale-[0.99]"
         >
             <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                    <span className="font-black text-zinc-800 text-sm group-hover:text-purple-700 transition-colors truncate">
+                    <span className="font-black text-[var(--text-primary)] text-sm group-hover:text-[var(--accent-purple)] transition-colors truncate">
                         {university.name}
                     </span>
-                    <span className="text-xs font-bold text-zinc-400 shrink-0">
+                    <span className="text-xs font-bold text-[var(--text-primary)] opacity-30 shrink-0">
                         {university.abbreviation}
                     </span>
                 </div>
@@ -32,7 +32,7 @@ export default function UniversityControlledItem({ university, onClick }: Props)
                     {university.tags.map(tag => (
                         <span
                             key={tag}
-                            className="px-2 py-0.5 rounded-lg bg-purple-50 border border-purple-100 text-purple-600 text-xs font-bold"
+                            className="px-2 py-0.5 rounded-lg bg-[var(--accent-purple)]/10 border border-[var(--accent-purple)]/20 text-[var(--accent-purple)] dark:text-[#e879f9] text-xs font-bold"
                         >
                             {formatTag(tag)}
                         </span>
@@ -44,7 +44,7 @@ export default function UniversityControlledItem({ university, onClick }: Props)
                     <Trophy className="w-4 h-4 text-green-500" />
                     <span className="text-lg font-black text-green-600">{university.elo}</span>
                 </div>
-                <div className="p-2 rounded-xl bg-zinc-100 text-zinc-400 group-hover:bg-purple-100 group-hover:text-purple-600 transition-colors">
+                <div className="p-2 rounded-xl bg-[var(--bg-main)] text-[var(--text-primary)] opacity-40 group-hover:bg-[var(--accent-purple)]/10 group-hover:text-[var(--accent-purple)] transition-colors">
                     <Settings size={16} />
                 </div>
             </div>

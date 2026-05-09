@@ -42,19 +42,19 @@ export default function UpcomingMatchSection({ hidden, onToggle }: Props = {}) {
                 <button
                     onClick={handleBack}
                     className="mb-6 inline-flex items-center gap-1.5 text-sm font-bold
-                               text-zinc-400 hover:text-purple-600 transition-colors"
+                               text-[var(--text-primary)] opacity-40 hover:text-[var(--accent-purple)] hover:opacity-100 transition-all"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back
                 </button>
 
-                <div className="mb-8 pb-6 border-b border-zinc-200">
+                <div className="mb-8 pb-6 border-b border-[var(--border-color)]">
                     <div className="flex items-center gap-2 mb-1">
-                        <span className="text-xs font-black tracking-widest uppercase text-purple-500">
+                        <span className="text-xs font-black tracking-widest uppercase text-[var(--accent-purple)] dark:text-[#e879f9]">
                             Upcoming
                         </span>
                     </div>
-                    <h1 className="text-3xl font-black text-zinc-800 mb-2">{selected.title}</h1>
-                    <div className="flex items-center gap-4 text-sm font-medium text-zinc-400">
+                    <h1 className="text-3xl font-black text-[var(--text-primary)] mb-2">{selected.title}</h1>
+                    <div className="flex items-center gap-4 text-sm font-medium text-[var(--text-primary)] opacity-40">
                         <span className="flex items-center gap-1.5">
                             <PlayCircle className="w-4 h-4" /> Starts {new Date(selected.startTime).toLocaleString()}
                         </span>
@@ -66,7 +66,7 @@ export default function UpcomingMatchSection({ hidden, onToggle }: Props = {}) {
 
                 <ParticipantSection matchId={selected.id} mode="upcoming" />
 
-                <div className="mt-10 pt-8 border-t border-zinc-200">
+                <div className="mt-10 pt-8 border-t border-[var(--border-color)]">
                     <CommentSection matchId={selected.id} />
                 </div>
             </div>
@@ -76,15 +76,15 @@ export default function UpcomingMatchSection({ hidden, onToggle }: Props = {}) {
     return (
         <section>
             <div className="flex items-center gap-2 mb-4">
-                <CalendarClock className="w-5 h-5 text-purple-500" />
-                <h2 className="text-lg font-black text-zinc-800 tracking-tight">Upcoming</h2>
+                <CalendarClock className="w-5 h-5 text-[var(--accent-purple)] dark:text-[#e879f9]" />
+                <h2 className="text-lg font-black text-[var(--text-primary)] tracking-tight">Upcoming</h2>
             </div>
 
-            {loading && <p className="text-sm font-medium text-zinc-400 py-4">Loading…</p>}
+            {loading && <p className="text-sm font-medium text-[var(--text-primary)] opacity-40 py-4">Loading…</p>}
             {error && <p className="text-sm font-medium text-red-500 py-4">{error}</p>}
             {!loading && !error && matches.length === 0 && (
-                <div className="bg-white border border-zinc-200 rounded-2xl px-5 py-8 text-center shadow-sm">
-                    <p className="text-sm font-bold text-zinc-400">No upcoming matches.</p>
+                <div className="bg-[var(--bg-side)] border border-[var(--border-color)] rounded-2xl px-5 py-8 text-center shadow-sm">
+                    <p className="text-sm font-bold text-[var(--text-primary)] opacity-40">No upcoming matches.</p>
                 </div>
             )}
 
