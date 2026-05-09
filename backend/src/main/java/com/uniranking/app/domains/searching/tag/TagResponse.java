@@ -1,21 +1,20 @@
 package com.uniranking.app.domains.searching.tag;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonPropertyOrder({"id", "name", "universities"})
+@AllArgsConstructor
+@Builder
+@JsonPropertyOrder({ "id", "publicTagId", "name" })
 public class TagResponse {
-    private UUID id;
+    private long id;
+
+    private UUID publicTagId;
 
     private String name;
-
-    private List<String> universities;
 }

@@ -9,9 +9,9 @@ xhdh.iml
 target/
 **/target/
 .vscode/
+
 # Frontend ignore
-frontend/node_modules/
-frontend/dist/
+frontend/uniranking-app/node_modules/
 
 # Backend ignore
 backend/target/

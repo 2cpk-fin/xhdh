@@ -18,12 +18,9 @@ public class ScheduleMatchRequest {
     @Size(max = 150, message = "Too long!")
     private String title;
 
-    @NotBlank(message = "Tag cannot be empty!")
-    private String tagName;
-
     @NotNull(message = "Participants list cannot be null")
     @Size(min = 2, message = "There must be at least 2 participants")
-    private List<@NotBlank(message = "Participant name cannot be empty") String> participants;
+    private List<Long> uniIds;
 
     @Schema(
             description = "Match start time. Defaults to current hour if empty.",

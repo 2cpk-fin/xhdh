@@ -8,11 +8,13 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// The Custom Swagger
 @Configuration
 public class OpenApiConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
+        // Add the Authorize button in Swagger
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()

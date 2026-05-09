@@ -1,9 +1,18 @@
 package com.uniranking.app.domains.soloMatch;
 
-import java.util.UUID;
+import com.uniranking.app.domains.searching.university.UniversityResponse;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record SoloMatchReport(
-    UUID winnerId,
-    UUID loserId,
-    int eloChange
-) {}
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class SoloMatchReport {
+    UniversityResponse winner;
+    int winnerEloChange;
+    UniversityResponse loser;
+    int loserEloChange;
+}

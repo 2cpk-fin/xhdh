@@ -14,9 +14,11 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonPropertyOrder({ "id", "title", "status", "participants", "startTime", "endTime" })
+@JsonPropertyOrder({ "id", "publicMatchId", "title", "status", "participants", "startTime", "endTime" })
 public class ScheduleMatchResponse {
-    private UUID id;
+    private long id;
+
+    private UUID publicMatchId;
 
     private String title;
 

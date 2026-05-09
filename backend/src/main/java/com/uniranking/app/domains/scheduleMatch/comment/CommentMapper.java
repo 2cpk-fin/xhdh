@@ -1,52 +1,67 @@
 package com.uniranking.app.domains.scheduleMatch.comment;
 
+import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
-import com.uniranking.app.domains.user.UserRepository;
-import org.mapstruct.*;
+import com.uniranking.app.domains.user.User;
+import com.uniranking.app.domains.user.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Mapper(componentModel = "spring")
-public abstract class CommentMapper {
+import java.time.LocalDateTime;
+
+@Component
+public class CommentMapper {
+    @Autowired
+    private ScheduleMatchRepository scheduleMatchRepository;
 
     @Autowired
-    protected UserRepository userRepository;
+    private CommentRepository commentRepository;
 
     @Autowired
-    protected ScheduleMatchRepository scheduleMatchRepository;
+    private UserMapper userMapper;
 
-    @Autowired
-    protected CommentRepository commentRepository;
+    public Comment toComment(CommentRequest request, User authenticatedUser) {
+        if (request == null) return null;
 
-    // Request -> Entity
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "publicCommentId", ignore = true)
-    @Mapping(target = "commentDate", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "likes", constant = "0L")
-    @Mapping(target = "replyCount", constant = "0L")
-    @Mapping(target = "parent", ignore = true)       // Set in AfterMapping
-    @Mapping(target = "children", ignore = true)
-    @Mapping(target = "user", ignore = true)        // Set in AfterMapping
-    @Mapping(target = "scheduleMatch", ignore = true) // Set in AfterMapping
-    public abstract Comment toComment(CommentRequest request);
+        Comment comment = new Comment();
+        comment.setContent(request.getContent());
+        comment.setUser(authenticatedUser);
+        comment.setCommentDate(LocalDateTime.now());
 
-    @AfterMapping
-    protected void linkRelations(CommentRequest request, @MappingTarget Comment comment) {
-        comment.setUser(userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found")));
+        // Resolve Match
+        ScheduleMatch match = scheduleMatchRepository.findById(request.getMatchId())
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+        comment.setScheduleMatch(match);
 
-        comment.setScheduleMatch(scheduleMatchRepository.findById(request.getMatchId())
-                .orElseThrow(() -> new RuntimeException("Match not found")));
-
+        // Parent-Child Logic
         if (request.getParentId() != null) {
-            comment.setParent(commentRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new RuntimeException("Parent comment not found")));
+            Comment parent = commentRepository.findById(request.getParentId())
+                    .orElseThrow(() -> new RuntimeException("Parent comment not found"));
+            if (parent.getParent() != null) {
+                throw new RuntimeException("There should be two layer only");
+            }
+            comment.setParent(parent);
         }
+
+        return comment;
     }
 
-    // Entity -> Response
-    @Mapping(source = "publicCommentId", target = "id")
-    @Mapping(source = "user.username", target = "username")
-    @Mapping(source = "scheduleMatch.publicMatchId", target = "matchId")
-    @Mapping(source = "parent.publicCommentId", target = "parentId")
-    public abstract CommentResponse toCommentResponse(Comment comment);
+    public CommentResponse toCommentResponse(Comment comment) {
+        if (comment == null) return null;
+
+        CommentResponse response = new CommentResponse();
+
+        response.setId(comment.getId());
+        response.setPublicCommentId(comment.getPublicCommentId());
+        response.setCommentDate(comment.getCommentDate());
+        response.setContent(comment.getContent());
+        response.setUser(userMapper.userToResponse(comment.getUser()));
+
+        // Recursive call to map the parent using the same logic
+        if (comment.getParent() != null) {
+            response.setParent(toCommentResponse(comment.getParent()));
+        }
+
+        return response;
+    }
 }

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,25 +18,21 @@ import java.util.List;
 public class UniversityController {
     private final UniversityService universityService;
 
-    @Operation(summary = "Get list of universities")
+    @Operation(summary = "Get universities with optional search and tag filters")
     @Parameters({
             @Parameter(name = "page", description = "Page number", example = "0"),
             @Parameter(name = "size", description = "Items per page", example = "15"),
-            @Parameter(name = "sort", description = "Sorting criteria", example = "elo,desc")
+            @Parameter(name = "sort", description = "Sorting criteria", example = "elo,desc"),
+            @Parameter(name = "input", description = "Search by name or abbreviation", example = "Hanoi"),
+            @Parameter(name = "tagIds", description = "List of Tag IDs to filter by", example = "1,2")
     })
     @GetMapping
-    public ResponseEntity<Page<UniversityResponse>> getUniversityList(
-            @Parameter(hidden = true) Pageable pageable) {
-        return new ResponseEntity<>(universityService.getUniversityList(pageable), HttpStatus.OK);
-    }
+    public ResponseEntity<Page<UniversityResponse>> getUniversities(
+            @Parameter(hidden = true) Pageable pageable,
+            @RequestParam(required = false) String input,
+            @RequestParam(required = false) List<Long> tagIds) {
+        Page<UniversityResponse> results = universityService.getUniversityListByInput(pageable, input, tagIds);
 
-    @GetMapping(path = "/name/{universityName}")
-    public ResponseEntity<UniversityResponse> getUniversityByName(@PathVariable String universityName) {
-        return new ResponseEntity<>(universityService.getUniversityByName(universityName), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/tags/{universityName}")
-    public ResponseEntity<List<String>> showAllTagsInUniversity(@PathVariable String universityName) {
-        return new ResponseEntity<>(universityService.showAllTagsInUniversity(universityName), HttpStatus.OK);
+        return ResponseEntity.ok(results);
     }
 }

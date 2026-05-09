@@ -1,52 +1,74 @@
 package com.uniranking.app.domains.scheduleMatch.comment;
 
-import jakarta.transaction.Transactional;
+import com.uniranking.app.domains.user.User;
+import com.uniranking.app.domains.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CommentService {
     private final CommentRepository commentRepository;
-
     private final CommentMapper commentMapper;
+    private final UserRepository userRepository;
 
-    public Page<CommentResponse> getTopLevelComments(Long matchId, Pageable pageable) {
-        return commentRepository.findAllTopComments(matchId, pageable)
-                .map(commentMapper::toCommentResponse);
+    public Page<CommentResponse> getAllComments(long matchId, Pageable pageable) {
+        return commentRepository.findByMatch(matchId, pageable).map(commentMapper::toCommentResponse);
     }
 
-    public List<CommentResponse> getReplies(Long parentId) {
-        return commentRepository.findByAllSubcommentsByParentId(parentId).stream()
-                .map(commentMapper::toCommentResponse)
-                .toList();
-    }
+    @Transactional
+    public CommentResponse createComment(CommentRequest commentRequest, Authentication authentication) {
+        // Get the user first
+        String email = authentication.getName();
+        Optional<User> currentUser = userRepository.findByEmail(email);
+        User user;
 
-    public CommentResponse createComment(CommentRequest commentRequest) {
-        Comment comment = commentMapper.toComment(commentRequest);
+        // Check if the user is existed or not
+        if (currentUser.isPresent()) {
+            user = currentUser.get();
+        }
+        else {
+            throw new EntityNotFoundException("User is not found");
+        }
+
+        // Save their comments
+        Comment comment = commentMapper.toComment(commentRequest, user);
         Comment savedComment = commentRepository.save(comment);
         return commentMapper.toCommentResponse(savedComment);
     }
 
     @Transactional
-    public void updateLike(Long id) {
-        commentRepository.incrementLikes(id);
-    }
-
-    public CommentResponse updateComment(Long id, String newContent) {
+    public CommentResponse updateComment(Long id, String newContent, Authentication authentication) {
         Comment comment = commentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Comment is not found"));
+
+        if (!comment.getUser().getEmail().equals(authentication.getName())) {
+            throw new AccessDeniedException("You do not have permission to edit this comment");
+        }
+
         comment.setContent(newContent);
-        commentRepository.save(comment);
-        return commentMapper.toCommentResponse(comment);
+        return commentMapper.toCommentResponse(commentRepository.save(comment));
     }
 
-    public String deleteComment(Long id) {
-        commentRepository.deleteById(id);
+    @Transactional
+    public String deleteComment(Long id, Authentication authentication) {
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Comment is not found"));
+
+        if (!comment.getUser().getEmail().equals(authentication.getName())) {
+            throw new AccessDeniedException("You do not have permission to delete this comment");
+        }
+
+        commentRepository.delete(comment);
+
         return "Comment with id " + id + " has been deleted";
     }
 }

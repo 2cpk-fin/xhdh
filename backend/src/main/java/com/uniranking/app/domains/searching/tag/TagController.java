@@ -18,8 +18,8 @@ public class TagController {
         return new ResponseEntity<>(tagService.showAllTags(), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/universities/{tagName}")
-    public ResponseEntity<List<String>> showTagByName(@PathVariable String tagName) {
-        return new ResponseEntity<>(tagService.showAllUniversitiesByTagName(tagName), HttpStatus.OK);
+    @GetMapping(path = "/{universityId}")
+    public ResponseEntity<List<TagResponse>> showAllTagsInUniversity(@PathVariable Long universityId) {
+        return new ResponseEntity<>(tagService.showAllTagsInUniversity(universityId), HttpStatus.OK);
     }
 }

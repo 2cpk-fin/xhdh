@@ -1,23 +1,19 @@
 package com.uniranking.app.domains.soloMatch;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-import com.uniranking.app.domains.scheduleMatch.match.Status;
+import com.uniranking.app.domains.searching.university.UniversityMapper;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
-import com.uniranking.app.domains.user.UserRepository;
+import com.uniranking.app.domains.searching.university.UniversityResponse;
 import jakarta.transaction.Transactional;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import com.uniranking.app.infrastructure.exceptions.NotEnoughUniException;
-import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
-import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
 import com.uniranking.app.domains.searching.university.University;
-import com.uniranking.app.domains.user.User;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,179 +21,83 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SoloMatchService {
     private final UniversityRepository universityRepository;
+    private final UniversityMapper universityMapper;
 
-    private final UserRepository userRepository;
+    private final EloCalculator eloCalc = new EloCalculator();
 
-    private final SoloMatchRepository soloMatchRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private static final String REDIS_PREFIX = "solo_match:";
 
-    @Scheduled(fixedRate = 60000) // Check every minute for expired solo matches
-    @Transactional
-    protected void expireSoloMatches() {
-        Instant now = Instant.now();
-        List<SoloMatch> expiredMatches = soloMatchRepository.findAll().stream()
-                .filter(match -> match.getStatus() == Status.PENDING && match.getEndDate().isBefore(now))
-                .toList();
-
-        for (SoloMatch soloMatch : expiredMatches) {
-            soloMatch.setStatus(Status.FINISHED);
-            soloMatch.setWinner(null);
-            soloMatch.setLoser(null);
-            soloMatch.setEloChange(0);
-            soloMatchRepository.save(soloMatch);
-        }
-    }
-
-    private University selectWeightedOpponent(University uA, List<University> candidates) {
+    private University selectWeightedOpponent(University uni1, List<University> candidates) {
         double totalWeight = 0;
         Map<University, Double> weights = new HashMap<>();
 
-        for (University uB : candidates) {
-            int eloDiff = Math.abs(uA.getElo() - uB.getElo());
+        for (University uni2 : candidates) {
+            int eloDiff = Math.abs(uni1.getElo() - uni2.getElo());
             double weight = Math.max(1.0, 1000.0 - eloDiff);
-            weights.put(uB, weight);
+            weights.put(uni2, weight);
             totalWeight += weight;
         }
 
         double randomVal = Math.random() * totalWeight;
         double currentSum = 0;
-        for (University uB : candidates) {
-            currentSum += weights.get(uB);
-            if (randomVal <= currentSum) return uB;
+        for (University uni2 : candidates) {
+            currentSum += weights.get(uni2);
+            if (randomVal <= currentSum)
+                return uni2;
         }
         return candidates.getFirst();
     }
 
-    /**
-     * Starts a new solo match by generating 2 random universities for the user to choose from.
-     * Creates a SoloMatch entity with PENDING status and 3-minute duration.
-     * Returns MatchResponseDTO with the two universities and ownerUUID.
-     */
-    public MatchResponseDTO startNewDuel(User user) {
+    public SoloMatchResponse startNewDuel() {
         // Generate two random universities
-        University uA = universityRepository.findRandom();
-        List<University> candidates = universityRepository.findAllOpponentsWithSharedTag(uA.getId());
-        candidates.removeIf(u -> u.getId() == uA.getId());
-        
-        if (candidates.isEmpty()) {
-            throw new NotEnoughUniException("Not enough universities to match");
-        }
-
-        University uB = selectWeightedOpponent(uA, candidates);
+        University uni1 = universityRepository.findRandom();
+        List<University> candidates = universityRepository.findAllOpponentsWithSharedTag(uni1.getId());
+        if (candidates.isEmpty()) return null;
+        University uni2 = selectWeightedOpponent(uni1, candidates);
 
         // Create the solo match
-        Instant now = Instant.now();
-        SoloMatch soloMatch = SoloMatch.builder()
-            .ownerUUID(user.publicUserId)
-            .matchUUID(UUID.randomUUID())
-            .universityA(uA)
-            .universityB(uB)
-            .startDate(now)
-            .endDate(now.plusSeconds(3 * 60)) // 3 minutes from start
-            .status(Status.PENDING)
-            .build();
-        
-        soloMatchRepository.save(soloMatch);
+        UUID publicMatchId = UUID.randomUUID();
+        SoloMatch soloMatch = new SoloMatch(publicMatchId, uni1.getId(), uni2.getId(), uni1.getPublicUniversityId(), uni2.getPublicUniversityId());
 
-        return new MatchResponseDTO(
-            soloMatch.getMatchUUID(),
-            uA.getAbbreviation() + " vs " + uB.getAbbreviation(),
-            soloMatch.getStatus(),
-            soloMatch.getStartDate(),
-            soloMatch.getEndDate(),
-            new UniversityDTO(uA.getPublicUniversityId(), uA.getName(), uA.getAbbreviation(), uA.getElo()),
-            new UniversityDTO(uB.getPublicUniversityId(), uB.getName(), uB.getAbbreviation(), uB.getElo()),
-            user.getPublicUserId()
-        );
+        // Save to Redis and set expiry key to 3 minutes
+        redisTemplate.opsForValue().set(REDIS_PREFIX + publicMatchId, soloMatch, 3, TimeUnit.MINUTES);
+
+        // Return the response
+        UniversityResponse uni1Response = universityMapper.mapToResponseWithTags(uni1);
+        UniversityResponse uni2Response = universityMapper.mapToResponseWithTags(uni2);
+        return new SoloMatchResponse(publicMatchId, uni1Response, uni2Response);
     }
 
-    /**
-     * Decides winner and loser based on votes in the match.
-     * Returns SoloMatchReport with winner and loser UUIDs and ELO change amount.
-     * If no clear winner is decided, returns SoloMatchReport with null winnerId/loserId and 0 eloChange.
-     */
-    public SoloMatchReport decideWinnerAndLoser(ScheduleMatch scheduleMatch) {
-        List<ScheduleParticipant> participants = scheduleMatch.getParticipants();
+    @Transactional
+    public SoloMatchReport chooseWinner(UUID publicMatchId, Long winnerId) {
+        // Fetch from Redis
+        SoloMatch soloMatch = (SoloMatch) redisTemplate.opsForValue().get(REDIS_PREFIX + publicMatchId);
+        if (soloMatch == null) throw new RuntimeException("Match expired!");
 
-        if (participants.isEmpty() || participants.size() < 2) {
-            return new SoloMatchReport(null, null, 0);
-        }
+        // Identity Winner and Loser
+        Long loserId = winnerId.equals(soloMatch.getUni1Id()) ? soloMatch.getUni2Id() : soloMatch.getUni1Id();
+        University winner = universityRepository.findById(winnerId).get();
+        University loser = universityRepository.findById(loserId).get();
 
-        // Sort participants by total votes in descending order
-        participants.sort((p1, p2) -> Long.compare(p2.getTotalVotes(), p1.getTotalVotes()));
-
-        ScheduleParticipant first = participants.get(0);
-        ScheduleParticipant second = participants.get(1);
-
-        // If votes are equal or first has no votes, no decision
-        if (first.getTotalVotes() == 0 || first.getTotalVotes() == second.getTotalVotes()) {
-            return new SoloMatchReport(null, null, 0);
-        }
-
-        // Calculate ELO change using EloCalculator
-        EloCalculator eloCalc = new EloCalculator();
-        int winnerNewElo = eloCalc.calculateSoloChange(first.getUniversity().getElo(), second.getUniversity().getElo(), true);
-        int eloChange = winnerNewElo - first.getUniversity().getElo();
-
-        return new SoloMatchReport(
-                first.getUniversity().getPublicUniversityId(),
-                second.getUniversity().getPublicUniversityId(),
-                eloChange
-        );
-    }
-
-    public SoloMatchReport chooseSoloMatch(UUID userUUID, UUID soloMatchUUID, UUID chosenUniversityUUID) {
-        User user = userRepository.findByPublicUserId(userUUID)
-                .orElseThrow(() -> new RuntimeException("User not found with UUID: " + userUUID));
-
-        SoloMatch soloMatch = soloMatchRepository.findByMatchUUID(soloMatchUUID)
-                .orElseThrow(() -> new RuntimeException("Solo match not found with UUID: " + soloMatchUUID));
-
-        if (!soloMatch.getOwnerUUID().equals(user.getPublicUserId())) {
-            throw new RuntimeException("User is not the owner of this solo match");
-        }
-
-        if (soloMatch.getStatus() != Status.PENDING) {
-            throw new RuntimeException("Solo match is not pending");
-        }
-
-        University winner;
-        University loser;
-
-        if (soloMatch.getUniversityA().getPublicUniversityId().equals(chosenUniversityUUID)) {
-            winner = soloMatch.getUniversityA();
-            loser = soloMatch.getUniversityB();
-        } else if (soloMatch.getUniversityB().getPublicUniversityId().equals(chosenUniversityUUID)) {
-            winner = soloMatch.getUniversityB();
-            loser = soloMatch.getUniversityA();
-        } else {
-            throw new RuntimeException("Chosen university is not part of this solo match");
-        }
-
-        EloCalculator eloCalc = new EloCalculator();
+        // Set new elo and update the DB
         int winnerEloNew = eloCalc.calculateSoloChange(winner.getElo(), loser.getElo(), true);
+        int winnerEloChange = winnerEloNew - winner.getElo();
         int loserEloNew = eloCalc.calculateSoloChange(loser.getElo(), winner.getElo(), false);
-
-        int eloChange = winnerEloNew - winner.getElo();
+        int loserEloChange = loser.getElo() - loserEloNew;
 
         winner.setElo(winnerEloNew);
         loser.setElo(loserEloNew);
+
         universityRepository.save(winner);
         universityRepository.save(loser);
 
-        soloMatch.setWinner(winner);
-        soloMatch.setLoser(loser);
-        soloMatch.setEloChange(eloChange);
-        soloMatch.setStatus(Status.FINISHED);
-        soloMatch.setEndDate(Instant.now());
-        soloMatchRepository.save(soloMatch);
+        // Clean up Redis
+        redisTemplate.delete(REDIS_PREFIX + publicMatchId);
 
-        // Auto-create next solo match for user
-        // matchmakingService.startNewDuel(user, false);
-
-        return new SoloMatchReport(
-                winner.getPublicUniversityId(),
-                loser.getPublicUniversityId(),
-                eloChange
-        );
+        // Return the response
+        UniversityResponse winnerResponse = universityMapper.mapToResponseWithTags(winner);
+        UniversityResponse loserResponse = universityMapper.mapToResponseWithTags(loser);
+        return new SoloMatchReport(winnerResponse, winnerEloChange, loserResponse, loserEloChange);
     }
 }

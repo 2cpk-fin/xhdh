@@ -10,8 +10,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class RefreshToken{
-    private UUID userUUID;
-    private String email; 
+    private UUID userId;
+    private String email;
     private String token;
     private Instant expiryDate;
     private String ipAddress;

@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/events/match/leaderboard")
+@RequestMapping(path = "/api/schedule/match/leaderboard")
 @RequiredArgsConstructor
 public class ScheduleMatchLeaderboardController {
     private final ScheduleMatchLeaderboardService scheduleMatchLeaderboardService;
 
-    @GetMapping(path = "/{matchId}")
-    public ResponseEntity<List<ScheduleParticipantResponse>> showLeaderboard(@PathVariable String matchId) {
-        return new ResponseEntity<>(scheduleMatchLeaderboardService.showLeaderboard(matchId), HttpStatus.OK);
+    @GetMapping(path = "/{publicMatchId}")
+    public ResponseEntity<List<ScheduleParticipantResponse>> showLeaderboard(@PathVariable String publicMatchId) {
+        return new ResponseEntity<>(scheduleMatchLeaderboardService.showLeaderboard(publicMatchId), HttpStatus.OK);
     }
 }

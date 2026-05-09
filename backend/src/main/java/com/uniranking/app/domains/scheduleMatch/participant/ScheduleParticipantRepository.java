@@ -10,11 +10,23 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ScheduleParticipantRepository extends JpaRepository<ScheduleParticipant, Long> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Transactional
     @Query("UPDATE ScheduleParticipant mp " +
-            "SET mp.totalVotes = mp.totalVotes + 1 " +
+            "SET mp.totalVotes = :totalVotes " +
             "WHERE mp.university.id = :universityId " +
             "AND mp.scheduleMatch.id = :matchId")
-    void addVoteToUniversity(@Param("universityId") long universityId, @Param("matchId") long matchId);
+    void updateTotalVotes(@Param("universityId") long universityId,
+                          @Param("matchId") long matchId,
+                          @Param("totalVotes") long totalVotes);
+
+    @Modifying(clearAutomatically = true)
+    @Transactional
+    @Query("UPDATE ScheduleParticipant mp " +
+            "SET mp.rank = :rank " +
+            "WHERE mp.university.id = :universityId " +
+            "AND mp.scheduleMatch.id = :matchId")
+    void updateRank(@Param("universityId") long universityId,
+                          @Param("matchId") long matchId,
+                          @Param("rank") int rank);
 }

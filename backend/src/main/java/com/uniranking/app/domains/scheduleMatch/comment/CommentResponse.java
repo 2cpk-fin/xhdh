@@ -1,6 +1,8 @@
 package com.uniranking.app.domains.scheduleMatch.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.uniranking.app.domains.user.UserResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,19 +11,15 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@JsonPropertyOrder({ "id", "username", "matchId", "commentDate", "likes", "parentId", "content" })
+@JsonPropertyOrder({ "id", "publicCommentId", "user", "commentDate", "parent", "content" })
 public class CommentResponse {
-    private UUID id;
+    private Long id;
+    private UUID publicCommentId;
+    private UserResponse user;
 
-    private String username;
-
-    private UUID matchId;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime commentDate;
 
-    private Long likes;
-
-    private UUID parentId;
-
+    private CommentResponse parent;
     private String content;
 }

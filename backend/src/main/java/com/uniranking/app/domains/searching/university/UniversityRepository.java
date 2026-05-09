@@ -12,30 +12,33 @@ import java.util.List;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, Long>{
+    @Query("SELECT DISTINCT u FROM University u " +
+            "LEFT JOIN u.tags t " +
+            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CAST(CONCAT('%', :input, '%') AS text))) " +
+            "AND (:tagIds IS NULL OR t.id IN :tagIds)")
+    Page<University> findByInput(
+            Pageable pageable,
+            @Param("input") String input,
+            @Param("tagIds") List<Long> tagIds
+    );
 
-    @Query("SELECT u FROM University u")
-    Page<University> findUniversityList(Pageable pageable);
-
-    @Query("SELECT u FROM University u WHERE u.name = :universityName OR u.abbreviation = :universityName ")
-    University findByName(@Param("universityName") String universityName);
-
-    @Query("SELECT u FROM University u JOIN FETCH u.tags t WHERE t.name = :tagName")
-    List<University> findAllByTagName(@Param("tagName") String tagName);
-
-    @Query(value = "SELECT * FROM universities u WHERE EXISTS (" +
-                   "  SELECT 1 FROM university_tags ut1 " +
-                   "  JOIN university_tags ut2 ON ut1.tag_id = ut2.tag_id " +
-                   "  WHERE ut1.university_id = u.id AND ut2.university_id <> u.id" +
-                   ") ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+    @Query(nativeQuery = true, value = "SELECT * FROM universities ORDER BY RANDOM() LIMIT 1")
     University findRandom();
 
-    @Query(value = "SELECT DISTINCT u2.* FROM universities u1 " +
-                   "JOIN university_tags ut1 ON u1.id = ut1.university_id " +
-                   "JOIN university_tags ut2 ON ut1.tag_id = ut2.tag_id " +
-                   "JOIN universities u2 ON ut2.university_id = u2.id " +
-                   "WHERE u1.id = :universityId AND u2.id <> :universityId", nativeQuery = true)
-    List<University> findAllOpponentsWithSharedTag(@Param("universityId") long universityId);
-
-
-
+    @Query(nativeQuery = true, value = """
+    WITH TargetTags AS (
+        SELECT tag_id
+        FROM universities_tags
+        WHERE university_id = :universityId
+    ),
+    OpponentIds AS (
+        SELECT ut.university_id
+        FROM universities_tags ut
+        WHERE ut.tag_id IN (SELECT tag_id FROM TargetTags)
+    )
+    SELECT u.* FROM universities u
+    WHERE u.id != :universityId
+    AND u.id IN (SELECT university_id FROM OpponentIds)
+    """)
+    List<University> findAllOpponentsWithSharedTag(@Param("universityId") Long universityId);
 }

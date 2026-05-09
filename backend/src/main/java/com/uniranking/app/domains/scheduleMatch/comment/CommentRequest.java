@@ -9,9 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentRequest {
-    @NotNull(message = "User ID is required")
-    private Long userId;
-
     @NotNull(message = "Match ID is required")
     private Long matchId;
 
