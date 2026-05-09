@@ -1,0 +1,19 @@
+package com.uniranking.app.domains.auth.refreshToken;
+
+import java.time.Instant;
+import java.util.UUID;
+
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class RefreshToken{
+    private UUID userId;
+    private String email;
+    private String token;
+    private Instant expiryDate;
+    private String ipAddress;
+    private String userAgent;
+}

@@ -6,6 +6,7 @@ import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,22 +51,21 @@ public class CommentRepositoryTests {
         user2 = User.builder().username("Tester").email("tester@gmail.com").build();
         user3 = User.builder().username("Phung Thanh Do").email("domixi@120yenlang.com").build();
 
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
+        // Capture managed entities to prevent TransientObjectException
+        user1 = userRepository.save(user1);
+        user2 = userRepository.save(user2);
+        user3 = userRepository.save(user3);
 
         scheduleMatch1 = ScheduleMatch.builder().title("Test Match").build();
         scheduleMatch2 = ScheduleMatch.builder().title("Best kho ga").build();
 
-        scheduleMatchRepository.save(scheduleMatch1);
-        scheduleMatchRepository.save(scheduleMatch2);
+        scheduleMatch1 = scheduleMatchRepository.save(scheduleMatch1);
+        scheduleMatch2 = scheduleMatchRepository.save(scheduleMatch2);
 
-        // Two comments in one match, one reply the other
         comment1 = Comment.builder().user(user1).scheduleMatch(scheduleMatch1).content("LK is here").build();
         comment2 = Comment.builder().user(user2).parent(comment1).scheduleMatch(scheduleMatch1).content("Testing").build();
         comment1.setChildren(List.of(comment2));
 
-        // Another comment in another match
         comment3 = Comment.builder().user(user3).scheduleMatch(scheduleMatch2).content("Ba mia").build();
 
         commentRepository.save(comment1);
@@ -133,5 +133,12 @@ public class CommentRepositoryTests {
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(0, result.getTotalElements());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        commentRepository.deleteAll();
+        scheduleMatchRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }

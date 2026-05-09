@@ -1,1 +1,24 @@
+@import "./styles/dark-mode.css";
 @import "tailwindcss";
+
+:root {
+    --bg-main: rgba(255, 255, 255, 0.82);
+    --bg-side: #ffffff;
+    --text-primary: #18181b;
+    --border-color: #e4e4e7;
+    --accent-purple: #9333ea;
+}
+
+.dark {
+    --bg-main: #0d0b14;
+    --bg-side: rgba(13, 11, 20, 0.85);
+    --text-primary: #ffffff;
+    --border-color: rgba(192, 38, 211, 0.2);
+    --accent-purple: #e879f9;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: background-color 0.3s, color 0.3s;
+}

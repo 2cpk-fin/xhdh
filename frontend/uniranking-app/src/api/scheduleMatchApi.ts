@@ -1,5 +1,6 @@
 import api from './axios'
 import type { ScheduleMatchRequest, ScheduleMatchResponse, ScheduleParticipantResponse } from '../types/scheduleMatch'
+import type { Page } from '../types/general';
 
 export const scheduleMatchApi = {
     getScheduledMatchesNotStarted: async (): Promise<ScheduleMatchResponse[]> => {
@@ -31,6 +32,16 @@ export const scheduleMatchApi = {
 
     vote: async (publicMatchId: string, universityId: number): Promise<void> => {
         await api.patch(`/schedule/match/votes?publicMatchId=${publicMatchId}&universityId=${universityId}`);
+    },
+
+    getAllMatches: async (pageNo: number, size: number): Promise<Page<ScheduleMatchResponse>> => {
+        const response = await api.get<Page<ScheduleMatchResponse>>('/schedule/match/admin/get', {
+            params: {
+                pageNo,
+                size
+            }
+        });
+        return response.data;
     },
 
     createMatch: async (request: ScheduleMatchRequest): Promise<ScheduleMatchResponse> => {

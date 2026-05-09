@@ -8,14 +8,4 @@ public record ErrorResponse(
     String error,
     String message,
     String path
-    /*
-    {
-        "timestamp" : *time*,
-        "status" : 400,
-        "error" : "Conflict",
-        "message" : "This is the explanation of error",
-        "path" : "/api/users/register"
-    }
-    */
-) {   
-}
+) {}

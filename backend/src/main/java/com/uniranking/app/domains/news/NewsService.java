@@ -1,15 +1,21 @@
 package com.uniranking.app.domains.news;
 
+import com.uniranking.app.domains.news.exceptions.ScrapingException;
+import com.uniranking.app.domains.news.exceptions.ScrapingTimeoutException;
+import com.uniranking.app.domains.news.exceptions.SiteUnavailableException;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.rmi.UnknownHostException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Service
 public class NewsService {
@@ -47,34 +53,25 @@ public class NewsService {
     }
 
     private List<Article> fetchTuoiTreNews() {
-        List<Article> articles = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect("https://tuoitre.vn/rss/giao-duc.rss").get();
-            Elements items = doc.select("item");
+        String targetUrl = "https://tuoitre.vn/rss/giao-duc.rss";
 
-            for (Element item : items) {
-                String title = item.select("title").text();
-                String link = item.select("link").text();
-                String pubDate = item.select("pubDate").text();
-
+        return ScraperHelper.execute(targetUrl, doc -> {
+            List<Article> articles = new ArrayList<>();
+            for (Element item : doc.select("item")) {
                 String descriptionHtml = item.select("description").text();
                 Document descDoc = Jsoup.parse(descriptionHtml);
-                String imageUrl = descDoc.select("img").attr("src");
-                String description = descDoc.text();
 
                 articles.add(Article.builder()
-                        .title(title)
-                        .description(description)
-                        .url(link)
-                        .imageUrl(imageUrl)
+                        .title(item.select("title").text())
+                        .description(descDoc.text())
+                        .url(item.select("link").text())
+                        .imageUrl(descDoc.select("img").attr("src"))
                         .source("Tuổi Trẻ")
-                        .publishedAt(pubDate)
+                        .publishedAt(item.select("pubDate").text())
                         .build());
             }
-        } catch (Exception e) {
-            System.err.println("Tuoi tre crawl failed: " + e.getMessage());
-        }
-        return articles;
+            return articles;
+        });
     }
 
     private List<Article> fetchMOETNews() {
@@ -85,57 +82,41 @@ public class NewsService {
         };
 
         for (String url : targetUrls) {
-            try {
-                Document doc = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                        .timeout(15000)
-                        .get();
-
-                String title = doc.title();
-
+            Article article = ScraperHelper.execute(url, doc -> {
                 String imageUrl = doc.select("meta[property=og:image]").attr("content");
                 if (imageUrl.isEmpty()) {
                     imageUrl = doc.select("#main-content img, .article-content img, img").attr("abs:src");
                 }
 
-                articles.add(Article.builder()
-                        .title(title)
+                return Article.builder()
+                        .title(doc.title())
                         .url(url)
                         .imageUrl(imageUrl)
                         .source("MOET")
-                        .build());
-            } catch (Exception e) {
-                System.err.println("MOET crawl failed for " + url + ": " + e.getMessage());
-            }
+                        .build();
+            });
+            articles.add(article);
         }
+
         return articles;
     }
 
     private List<Article> fetchGiaoDucThoiDaiNews() {
-        List<Article> articles = new ArrayList<>();
-        try {
-            Document doc = Jsoup.connect("https://giaoducthoidai.vn/giao-duc/")
-                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    .timeout(15000)
-                    .get();
+        String targetUrl = "https://giaoducthoidai.vn/giao-duc/";
 
-            Elements articleElements = doc.select("article");
+        return ScraperHelper.execute(targetUrl, doc -> {
+            List<Article> articles = new ArrayList<>();
 
-            for (Element articleEl : articleElements) {
-                Element titleEl = articleEl.selectFirst(".story__title a, h2 a, h3 a");
-                if (titleEl == null) {
-                    titleEl = articleEl.selectFirst("a[href]");
-                }
-                if (titleEl == null) continue;
+            for (Element item : doc.select("article")) {
+                Element titleLink = item.selectFirst("a[href]");
+                if (titleLink == null) continue;
 
-                String title = titleEl.text().trim();
-                String url = titleEl.absUrl("href");
-
-                Element imgEl = articleEl.selectFirst("picture img, img");
-                String imageUrl = null;
-                if (imgEl != null) {
-                    imageUrl = imgEl.hasAttr("data-src") ? imgEl.absUrl("data-src") : imgEl.absUrl("src");
-                }
+                String title = titleLink.text().trim();
+                String url = titleLink.absUrl("href");
+                Element img = item.selectFirst("img");
+                String imageUrl = (img != null && img.hasAttr("data-src"))
+                        ? img.absUrl("data-src")
+                        : (img != null ? img.absUrl("src") : null);
 
                 if (!title.isEmpty() && url.contains("giaoducthoidai.vn")) {
                     articles.add(Article.builder()
@@ -146,19 +127,33 @@ public class NewsService {
                             .build());
                 }
             }
+            return articles;
+        });
+    }
+}
 
-            articles = new ArrayList<>(articles.stream()
-                    .collect(Collectors.toMap(
-                            Article::getUrl,
-                            a -> a,
-                            (a, b) -> a,
-                            LinkedHashMap::new
-                    ))
-                    .values());
+class ScraperHelper {
 
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+    private static final int TIMEOUT = 15000;
+
+    public static <T> T execute(String url, Function<Document, T> parser) {
+        try {
+            Document doc = Jsoup.connect(url)
+                    .userAgent(USER_AGENT)
+                    .timeout(TIMEOUT)
+                    .get();
+            return parser.apply(doc);
+        } catch (HttpStatusException e) {
+            throw new SiteUnavailableException("Site error: " + e.getStatusCode());
+        } catch (SocketTimeoutException e) {
+            throw new ScrapingTimeoutException("Timeout reached for " + url);
+        } catch (UnknownHostException e) {
+            throw new ScrapingException("Host unknown: " + url);
+        } catch (IOException e) {
+            throw new ScrapingException("Network error: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Giao Duc Thoi Dai crawl failed: " + e.getMessage());
+            throw new ScrapingException("Parsing error: " + e.getMessage());
         }
-        return articles;
     }
 }

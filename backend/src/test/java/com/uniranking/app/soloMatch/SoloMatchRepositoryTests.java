@@ -1,9 +1,9 @@
 package com.uniranking.app.soloMatch;
 
-import com.uniranking.app.domains.searching.tag.Tag;
-import com.uniranking.app.domains.searching.tag.TagRepository;
+import com.uniranking.app.domains.searching.university.Tag;
 import com.uniranking.app.domains.searching.university.University;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Set;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -21,25 +22,23 @@ public class SoloMatchRepositoryTests {
     @Autowired
     private UniversityRepository universityRepository;
 
-    @Autowired
-    private TagRepository tagRepository;
-
     private University university1, university2, university3, university4;
 
     @BeforeEach
     public void setup() {
-        Tag tag1 = Tag.builder().name("Engineering").build();
-        Tag tag2 = Tag.builder().name("Medical").build();
-
-        tagRepository.saveAll(List.of(tag1, tag2));
+        Tag tag1 = Tag.TECHNOLOGY;
+        Tag tag2 = Tag.MEDICAL;
 
         // uni1 and uni2 share tag1
         // uni3 shares tag2 with nobody relevant
         // uni4 shares tag1 with uni1
-        university1 = University.builder().name("University of Engineering and Technology").abbreviation("UET").tags(List.of(tag1)).build();
-        university2 = University.builder().name("Hanoi University of Science and Technology").abbreviation("HUST").tags(List.of(tag1)).build();
-        university3 = University.builder().name("Hanoi Medical University").abbreviation("HMU").tags(List.of(tag2)).build();
-        university4 = University.builder().name("FPT University").abbreviation("FPT").tags(List.of(tag1)).build();
+        university1 = University.builder().name("University of Engineering and Technology").abbreviation("UET")
+                .tags(Set.of(tag1)).build();
+        university2 = University.builder().name("Hanoi University of Science and Technology").abbreviation("HUST")
+                .tags(Set.of(tag1)).build();
+        university3 = University.builder().name("Hanoi Medical University").abbreviation("HMU").tags(Set.of(tag2))
+                .build();
+        university4 = University.builder().name("FPT University").abbreviation("FPT").tags(Set.of(tag1)).build();
 
         universityRepository.saveAll(List.of(university1, university2, university3, university4));
     }
@@ -88,5 +87,10 @@ public class SoloMatchRepositoryTests {
         List<University> result = universityRepository.findAllOpponentsWithSharedTag(null);
 
         Assertions.assertTrue(result.isEmpty());
+    }
+
+    @AfterEach
+    public void tearDown(){
+        universityRepository.deleteAll();
     }
 }

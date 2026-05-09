@@ -1,26 +1,19 @@
 package com.uniranking.app.domains.searching.university;
 
-import com.uniranking.app.domains.searching.tag.TagService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
-public abstract class UniversityMapper {
-    @Autowired
-    protected TagService tagService;
+public interface UniversityMapper {
 
-    @Mapping(target = "tags", ignore = true)
-    public abstract UniversityResponse toUniversityResponse(University university);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "publicUniversityId", ignore = true)
+    University toUniversity(UniversityRequest request);
 
-    // main
-    public UniversityResponse mapToResponseWithTags(University university) {
-        if (university == null) {
-            return null;
-        }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "publicUniversityId", ignore = true)
+    void updateUniversityFromRequest(UniversityRequest request, @MappingTarget University university);
 
-        UniversityResponse response = toUniversityResponse(university);
-        response.setTags(tagService.showAllTagsInUniversity(university.getId()));
-        return response;
-    }
+    UniversityResponse toUniversityResponse(University university);
 }

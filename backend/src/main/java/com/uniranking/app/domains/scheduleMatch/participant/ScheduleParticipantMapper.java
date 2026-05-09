@@ -1,21 +1,13 @@
 package com.uniranking.app.domains.scheduleMatch.participant;
 
 import com.uniranking.app.domains.searching.university.UniversityMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class ScheduleParticipantMapper {
-    @Autowired
-    private UniversityMapper universityMapper;
+@Mapper(componentModel = "spring", uses = { UniversityMapper.class })
+public interface ScheduleParticipantMapper {
 
-    public ScheduleParticipantResponse toScheduleParticipantResponse(ScheduleParticipant participant) {
-        ScheduleParticipantResponse scheduleParticipantResponse = new ScheduleParticipantResponse();
+    @Mapping(source = "university", target = "universityResponse")
+    ScheduleParticipantResponse toScheduleParticipantResponse(ScheduleParticipant participant);
 
-        scheduleParticipantResponse.setUniversityResponse(universityMapper.mapToResponseWithTags(participant.getUniversity()));
-        scheduleParticipantResponse.setTotalVotes(participant.getTotalVotes());
-        scheduleParticipantResponse.setRank(participant.getRank());
-
-        return scheduleParticipantResponse;
-    }
 }

@@ -9,36 +9,34 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
-public interface UniversityRepository extends JpaRepository<University, Long>{
+public interface UniversityRepository extends JpaRepository<University, Long> {
+
+    @Query("SELECT t FROM University u JOIN u.tags t WHERE u.id = :universityId")
+    Set<Tag> findTagsByUniversityId(@Param("universityId") Long universityId);
+
     @Query("SELECT DISTINCT u FROM University u " +
             "LEFT JOIN u.tags t " +
-            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CAST(CONCAT('%', :input, '%') AS text))) " +
-            "AND (:tagIds IS NULL OR t.id IN :tagIds)")
+            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', CAST(:input AS string), '%'))) " +
+            "AND (:#{#tags == null || #tags.isEmpty()} = true OR t IN :tags)")
     Page<University> findByInput(
             Pageable pageable,
             @Param("input") String input,
-            @Param("tagIds") List<Long> tagIds
+            @Param("tags") List<Tag> tags
     );
 
     @Query(nativeQuery = true, value = "SELECT * FROM universities ORDER BY RANDOM() LIMIT 1")
     University findRandom();
 
-    @Query(nativeQuery = true, value = """
-    WITH TargetTags AS (
-        SELECT tag_id
-        FROM universities_tags
-        WHERE university_id = :universityId
-    ),
-    OpponentIds AS (
-        SELECT ut.university_id
-        FROM universities_tags ut
-        WHERE ut.tag_id IN (SELECT tag_id FROM TargetTags)
-    )
-    SELECT u.* FROM universities u
-    WHERE u.id != :universityId
-    AND u.id IN (SELECT university_id FROM OpponentIds)
-    """)
+    @Query("SELECT DISTINCT opponent FROM University opponent " +
+            "JOIN opponent.tags t " +
+            "WHERE opponent.id != :universityId " +
+            "AND EXISTS (" +
+            "   SELECT target FROM University target " +
+            "   JOIN target.tags t2 " +
+            "   WHERE target.id = :universityId AND t2 = t" +
+            ")")
     List<University> findAllOpponentsWithSharedTag(@Param("universityId") Long universityId);
 }

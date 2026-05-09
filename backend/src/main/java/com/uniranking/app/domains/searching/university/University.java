@@ -1,16 +1,13 @@
 package com.uniranking.app.domains.searching.university;
 
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
-import com.uniranking.app.domains.searching.tag.Tag;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -41,10 +38,15 @@ public class University {
     @Builder.Default
     private int elo = 1200;
 
-    @ManyToMany
-    @JoinTable(name = "universities_tags", joinColumns = @JoinColumn(name = "university_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @ElementCollection(targetClass = Tag.class, fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "university_tags",
+            joinColumns = @JoinColumn(name = "university_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tag")
     @Builder.Default
-    private List<Tag> tags = new ArrayList<>();
+    private Set<Tag> tags = new HashSet<>();
 
     @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

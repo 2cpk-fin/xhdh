@@ -1,26 +1,23 @@
 package com.uniranking.app.domains.user;
 
-import com.uniranking.app.domains.auth.AuthProvider;
+import com.uniranking.app.domains.auth.auth.AuthProvider;
+import com.uniranking.app.domains.auth.auth.RegisterRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
 import java.time.Instant;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring", imports = { UUID.class, Instant.class, AuthProvider.class })
-public abstract class UserMapper {
-    public UserResponse userToResponse(User user) {
-        UserResponse response = new UserResponse();
-        response.setId(user.getId());
-        response.setPublicUserId(user.getPublicUserId());
-        response.setEmail(user.getEmail());
-        response.setUsername(user.getDisplayUsername());
+public interface UserMapper {
 
-        if (user.getProfileImage() != null) {
-            response.setProfileImage(user.getProfileImage());
-        }
+    @Mapping(target = "password", source = "encodedPassword")
+    @Mapping(target = "publicUserId", expression = "java(UUID.randomUUID())")
+    @Mapping(target = "createdAt", expression = "java(Instant.now())")
+    User registerRequestToUser(RegisterRequest registerRequest, String encodedPassword);
 
-        return response;
-    }
+    @Mapping(target = "username", source = "displayUsername")
+    UserResponse userToResponse(User user);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "password", ignore = true)
@@ -30,5 +27,5 @@ public abstract class UserMapper {
     @Mapping(target = "authProvider", expression = "java(AuthProvider.GOOGLE)")
     @Mapping(target = "username", source = "name")
     @Mapping(target = "profileImage", source = "pfp")
-    public abstract User oAuthToUser(String email, String name, String pfp);
+    User oAuthToUser(String email, String name, String pfp);
 }

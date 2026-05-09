@@ -3,6 +3,7 @@ package com.uniranking.app.scheduleMatch.match;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
 import com.uniranking.app.domains.scheduleMatch.match.Status;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,5 +172,10 @@ public class ScheduleMatchRepositoryTests {
 
         Assertions.assertNotNull(result);
         Assertions.assertTrue(result.isEmpty());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        scheduleMatchRepository.deleteAll();
     }
 }
