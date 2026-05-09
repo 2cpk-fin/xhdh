@@ -12,10 +12,10 @@ import java.util.List;
 @RequestMapping(path = "/api/schedule/match/leaderboard")
 @RequiredArgsConstructor
 public class ScheduleMatchLeaderboardController {
-    private final ScheduleMatchLeaderboardService scheduleMatchLeaderboardService;
+    private final ScheduleMatchLeaderboardService scheduleMatchLeaderboardServiceImpl;
 
     @GetMapping(path = "/{publicMatchId}")
     public ResponseEntity<List<ScheduleParticipantResponse>> showLeaderboard(@PathVariable String publicMatchId) {
-        return new ResponseEntity<>(scheduleMatchLeaderboardService.showLeaderboard(publicMatchId), HttpStatus.OK);
+        return new ResponseEntity<>(scheduleMatchLeaderboardServiceImpl.showLeaderboard(publicMatchId), HttpStatus.OK);
     }
 }

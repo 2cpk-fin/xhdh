@@ -11,17 +11,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SoloMatchController {
 
-    private final SoloMatchService soloMatchService;
+    private final SoloMatchService soloMatchServiceImpl;
 
     @PostMapping(path = "/start")
     public ResponseEntity<SoloMatchResponse> startSoloMatch() {
-        return ResponseEntity.ok(soloMatchService.startNewDuel());
+        return ResponseEntity.ok(soloMatchServiceImpl.startNewDuel());
     }
 
     @PostMapping(path = "/choose")
     public ResponseEntity<SoloMatchReport> chooseWinner(
             @RequestParam UUID publicMatchId,
             @RequestParam Long winnerId) {
-        return ResponseEntity.ok(soloMatchService.chooseWinner(publicMatchId, winnerId));
+        return ResponseEntity.ok(soloMatchServiceImpl.chooseWinner(publicMatchId, winnerId));
     }
 }

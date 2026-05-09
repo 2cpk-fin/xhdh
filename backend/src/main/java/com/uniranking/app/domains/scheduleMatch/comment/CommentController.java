@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final CommentService commentService;
+    private final CommentService commentServiceImpl;
 
     @Operation(summary = "Get all the comments in a specific match")
     @Parameters({
@@ -31,14 +31,14 @@ public class CommentController {
     public ResponseEntity<Page<CommentResponse>> getAllComments(
             @PathVariable Long matchId,
             @Parameter(hidden = true) @PageableDefault(size = 20, sort = "commentDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(commentService.getAllComments(matchId, pageable));
+        return ResponseEntity.ok(commentServiceImpl.getAllComments(matchId, pageable));
     }
 
     @PostMapping
     public ResponseEntity<CommentResponse> createComment(
             @Valid @RequestBody CommentRequest request,
             Authentication authentication) {
-        return new ResponseEntity<>(commentService.createComment(request, authentication), HttpStatus.CREATED);
+        return new ResponseEntity<>(commentServiceImpl.createComment(request, authentication), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
@@ -46,13 +46,13 @@ public class CommentController {
             @PathVariable Long id,
             @Valid @RequestBody CommentUpdateRequest request,
             Authentication authentication) {
-        return ResponseEntity.ok(commentService.updateComment(id, request.getContent(), authentication));
+        return ResponseEntity.ok(commentServiceImpl.updateComment(id, request.getContent(), authentication));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteComment(
             @PathVariable Long id,
             Authentication authentication) {
-        return ResponseEntity.ok(commentService.deleteComment(id, authentication));
+        return ResponseEntity.ok(commentServiceImpl.deleteComment(id, authentication));
     }
 }

@@ -7,6 +7,7 @@ import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipant;
 import com.uniranking.app.domains.scheduleMatch.participant.ScheduleParticipantRepository;
 import com.uniranking.app.domains.searching.university.University;
 import com.uniranking.app.domains.searching.university.UniversityRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -150,5 +151,12 @@ public class ScheduleParticipantRepositoryTests {
 
         Assertions.assertNotNull(unchanged);
         Assertions.assertEquals(2, unchanged.getRank());
+    }
+
+    @AfterEach
+    public void tearDown() {
+        scheduleMatchRepository.deleteAll();
+        scheduleParticipantRepository.deleteAll();
+        universityRepository.deleteAll();
     }
 }

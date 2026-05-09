@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/api/universities")
@@ -19,6 +20,18 @@ import java.util.List;
 public class UniversityController {
 
     private final UniversityService universityService;
+
+    @Operation(summary = "Get a list of all available university tags in the system")
+    @GetMapping(path = "/tags")
+    public ResponseEntity<List<String>> getAllTags() {
+        return ResponseEntity.ok(universityService.getAllAvailableTags());
+    }
+
+    @Operation(summary = "Get only the tags associated with a specific university")
+    @GetMapping(path = "/{id}/tags")
+    public ResponseEntity<Set<Tag>> getUniversityTags(@PathVariable Long id) {
+        return ResponseEntity.ok(universityService.getTagsByUniversityId(id));
+    }
 
     @Operation(summary = "Get universities with optional search and tag filters")
     @Parameters({

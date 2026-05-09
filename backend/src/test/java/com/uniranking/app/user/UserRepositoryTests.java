@@ -2,6 +2,7 @@ package com.uniranking.app.user;
 
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ public class UserRepositoryTests {
     @Test
     public void UserRepository_UpdateUsernameWithExistingUser_ReturnInt() {
         String newUsername = "LKLD1909";
-        int result = userRepository.updateUsername(1L, newUsername);
+        int result = userRepository.updateUsername(user1.getId(), newUsername);
 
         Assertions.assertEquals(1, result);
         Assertions.assertEquals("LKLD1909", userRepository.findById(user1.getId()).get().getDisplayUsername());
@@ -126,5 +127,10 @@ public class UserRepositoryTests {
         int result = userRepository.updateProfileImage(67L, newImage);
 
         Assertions.assertEquals(0, result);
+    }
+
+    @AfterEach
+    public void tearDown(){
+        userRepository.deleteAll();
     }
 }

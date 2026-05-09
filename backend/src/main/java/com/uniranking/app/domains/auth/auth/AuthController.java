@@ -13,27 +13,27 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final AuthService authServiceImpl;
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> registerUser(@Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(authService.register(registerRequest, httpRequest));
+        return ResponseEntity.ok(authServiceImpl.register(registerRequest, httpRequest));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginRequest(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest httpRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest, httpRequest));
+        return ResponseEntity.ok(authServiceImpl.login(loginRequest, httpRequest));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<LogoutResponse> logoutRequest(@RequestBody LogoutRequest logoutRequest) {
-        return ResponseEntity.ok(authService.logout(logoutRequest));
+        return ResponseEntity.ok(authServiceImpl.logout(logoutRequest));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody Map<String, String> body, HttpServletRequest httpRequest) {
         String token = body.get("refreshToken");
-        return ResponseEntity.ok(authService.refreshToken(token, httpRequest));
+        return ResponseEntity.ok(authServiceImpl.refreshToken(token, httpRequest));
     }
 }
 

@@ -24,7 +24,7 @@ import java.util.List;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenService refreshTokenServiceImpl;
     private final JwtService jwtService;
 
     @Override
@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7).trim();
 
         // Check if the token is blacklisted
-        if(refreshTokenService.isAccessTokenBlacklisted(jwt)){
+        if(refreshTokenServiceImpl.isAccessTokenBlacklisted(jwt)){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }

@@ -16,30 +16,30 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduleMatchController {
 
-    private final ScheduleMatchService scheduleMatchService;
+    private final ScheduleMatchService scheduleMatchServiceImpl;
 
     // Upcoming matches
     @GetMapping(path = "/all/not-started")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledMatchesNotStarted() {
-        return ResponseEntity.ok(scheduleMatchService.getAllNotStartedMatches());
+        return ResponseEntity.ok(scheduleMatchServiceImpl.getAllNotStartedMatches());
     }
 
     // Current matches
     @GetMapping(path = "/all/pending")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledPendingMatches() {
-        return ResponseEntity.ok(scheduleMatchService.getAllPendingMatches());
+        return ResponseEntity.ok(scheduleMatchServiceImpl.getAllPendingMatches());
     }
 
     // History check (7 days)
     @GetMapping(path = "/all/finished")
     public ResponseEntity<List<ScheduleMatchResponse>> getScheduledFinishedMatches() {
-        return ResponseEntity.ok(scheduleMatchService.getAllFinishedMatches());
+        return ResponseEntity.ok(scheduleMatchServiceImpl.getAllFinishedMatches());
     }
 
     // Get all the participants
     @GetMapping(path = "/{matchId}/participants")
     public ResponseEntity<List<ScheduleParticipantResponse>> getScheduledMatchParticipant(@PathVariable long matchId) {
-        return ResponseEntity.ok(scheduleMatchService.getAllParticipants(matchId));
+        return ResponseEntity.ok(scheduleMatchServiceImpl.getAllParticipants(matchId));
     }
 
     @PatchMapping(path = "/votes")
@@ -48,7 +48,7 @@ public class ScheduleMatchController {
             @RequestParam Long universityId,
             Authentication authentication) {
 
-        scheduleMatchService.vote(universityId, publicMatchId, authentication);
+        scheduleMatchServiceImpl.vote(universityId, publicMatchId, authentication);
         return ResponseEntity.ok().build();
     }
 
@@ -57,14 +57,14 @@ public class ScheduleMatchController {
     public ResponseEntity<Page<ScheduleMatchResponse>> getAllMatches(
             @RequestParam int pageNo,
             @RequestParam int size) {
-        return ResponseEntity.ok(scheduleMatchService.getAllMatches(pageNo, size));
+        return ResponseEntity.ok(scheduleMatchServiceImpl.getAllMatches(pageNo, size));
     }
 
     @PostMapping(path = "/admin/create")
     public ResponseEntity<ScheduleMatchResponse> createScheduledMatch(
             @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(scheduleMatchService.createMatch(scheduleMatchRequest));
+                .body(scheduleMatchServiceImpl.createMatch(scheduleMatchRequest));
     }
 
     // Secret route(for admin only)
@@ -72,12 +72,12 @@ public class ScheduleMatchController {
     public ResponseEntity<ScheduleMatchResponse> updateScheduledMatch(
             @PathVariable long id,
             @Valid @RequestBody ScheduleMatchRequest scheduleMatchRequest) {
-        return ResponseEntity.ok(scheduleMatchService.updateMatchById(id, scheduleMatchRequest));
+        return ResponseEntity.ok(scheduleMatchServiceImpl.updateMatchById(id, scheduleMatchRequest));
     }
 
     // Secret route (for admin only)
     @DeleteMapping(path = "/admin/delete/{id}")
     public ResponseEntity<String> deleteScheduledMatch(@PathVariable long id) {
-        return ResponseEntity.ok(scheduleMatchService.deleteMatchById(id));
+        return ResponseEntity.ok(scheduleMatchServiceImpl.deleteMatchById(id));
     }
 }

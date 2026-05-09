@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.KeyExpirationEventMessageListener;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -20,14 +21,16 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
     private final RedisTemplate<String, Object> redisTemplate;
     private final AfterMatchCalculator afterMatchCalculator;
 
-    private static final String STATUS_PREFIX = "status:match:";
-    private static final String LEADERBOARD_PREFIX = "leaderboard:match:";
+    @Value("${redis.status-prefix:status:match:}")
+    private String statusPrefix;
 
+    @Value("${redis.leaderboard-prefix:leaderboard:match:}")
+    private String leaderboardPrefix;
 
     public MatchExpirationListener(RedisMessageListenerContainer listenerContainer,
-                                   ScheduleMatchRepository scheduleMatchRepository,
-                                   RedisTemplate<String, Object> redisTemplate,
-                                   AfterMatchCalculator afterMatchCalculator) {
+            ScheduleMatchRepository scheduleMatchRepository,
+            RedisTemplate<String, Object> redisTemplate,
+            AfterMatchCalculator afterMatchCalculator) {
         super(listenerContainer);
         this.scheduleMatchRepository = scheduleMatchRepository;
         this.redisTemplate = redisTemplate;
@@ -41,18 +44,20 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
         String expiredKey = message.toString();
 
         // We only care about the status key expiring
-        if (expiredKey.startsWith(STATUS_PREFIX)) {
-            String publicMatchId = expiredKey.replace(STATUS_PREFIX, "");
+        if (expiredKey.startsWith(statusPrefix)) {
+            String publicMatchId = expiredKey.replace(statusPrefix, "");
 
             // Try to atomically claim NOT_STARTED → PENDING
-            int updatedToStart = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId), Status.NOT_STARTED, Status.PENDING);
+            int updatedToStart = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId),
+                    Status.NOT_STARTED, Status.PENDING);
             if (updatedToStart == 1) {
                 startMatch(publicMatchId);
                 return;
             }
 
             // Try to atomically claim PENDING → FINISHED
-            int updatedToFinish = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId), Status.PENDING, Status.FINISHED);
+            int updatedToFinish = scheduleMatchRepository.compareAndUpdateStatus(UUID.fromString(publicMatchId),
+                    Status.PENDING, Status.FINISHED);
             if (updatedToFinish == 1) {
                 syncFinalResults(publicMatchId);
             }
@@ -61,17 +66,18 @@ public class MatchExpirationListener extends KeyExpirationEventMessageListener {
 
     private void startMatch(String publicMatchId) {
         ScheduleMatch match = scheduleMatchRepository.findByPublicMatchId(UUID.fromString(publicMatchId));
-        if (match == null) return;
+        if (match == null)
+            return;
 
         long secondsToEnd = Duration.between(LocalDateTime.now(), match.getEndTime()).getSeconds();
         Duration ttl = Duration.ofSeconds(Math.max(secondsToEnd, 1));
 
-        String statusKey = STATUS_PREFIX + publicMatchId;
+        String statusKey = statusPrefix + publicMatchId;
         redisTemplate.opsForValue().set(statusKey, Status.PENDING.name(), ttl);
     }
 
     protected void syncFinalResults(String publicMatchId) {
-        String leaderboardKey = LEADERBOARD_PREFIX + publicMatchId;
+        String leaderboardKey = leaderboardPrefix + publicMatchId;
 
         // Hand off the entire finalization process to the EloCalculator
         // It handles syncVotesToDatabase, calculateAndApplyGroupElo, and DB save

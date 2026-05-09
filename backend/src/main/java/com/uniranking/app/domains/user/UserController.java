@@ -15,10 +15,6 @@ public class UserController {
 
     private final UserService userService;
 
-    // — refresh tokens must never travel as query params (they appear in server
-    // logs,
-    // browser history, and proxy logs). POST body keeps them out of the URL
-    // entirely.
     @PostMapping("/me")
     public ResponseEntity<?> getUserByRefreshToken(@RequestBody Map<String, String> body) {
         try {
