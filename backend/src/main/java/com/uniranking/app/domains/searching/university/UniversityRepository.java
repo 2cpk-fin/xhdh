@@ -19,8 +19,8 @@ public interface UniversityRepository extends JpaRepository<University, Long> {
 
     @Query("SELECT DISTINCT u FROM University u " +
             "LEFT JOIN u.tags t " +
-            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', :input, '%'))) " +
-            "AND (:tags IS NULL OR t IN :tags)")
+            "WHERE (:input IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', CAST(:input AS string), '%'))) " +
+            "AND (:#{#tags == null || #tags.isEmpty()} = true OR t IN :tags)")
     Page<University> findByInput(
             Pageable pageable,
             @Param("input") String input,
@@ -33,6 +33,10 @@ public interface UniversityRepository extends JpaRepository<University, Long> {
     @Query("SELECT DISTINCT opponent FROM University opponent " +
             "JOIN opponent.tags t " +
             "WHERE opponent.id != :universityId " +
-            "AND t IN (SELECT t2 FROM University target JOIN target.tags t2 WHERE target.id = :universityId)")
+            "AND EXISTS (" +
+            "   SELECT target FROM University target " +
+            "   JOIN target.tags t2 " +
+            "   WHERE target.id = :universityId AND t2 = t" +
+            ")")
     List<University> findAllOpponentsWithSharedTag(@Param("universityId") Long universityId);
 }

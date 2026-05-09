@@ -22,12 +22,12 @@ const NavBar = () => {
 
         try {
             await authApi.logout({ accessToken, refreshToken });
-            navigate('/login');
         } catch (error) {
             console.log(error);
+        } finally {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-            navigate('/login');
+            navigate('/login', { replace: true });
         }
     };
 
@@ -36,7 +36,7 @@ const NavBar = () => {
             <div className="px-4 h-16 flex items-center shrink-0">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="-ml-2 p-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors duration-200"
+                    className="-ml-2 p-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors duration-200 active:scale-95"
                 >
                     {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
                 </button>
@@ -65,12 +65,22 @@ const NavBar = () => {
             <div className="p-4 border-t border-zinc-100 shrink-0">
                 <button
                     onClick={handleLogout}
-                    className={`group flex items-center h-12 w-full rounded-2xl text-red-500 hover:bg-red-50 transition-all duration-300 ease-in-out ${isCollapsed ? 'px-0 justify-center' : 'px-4'}`}
+                    className="group flex items-center h-12 w-full rounded-2xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-300 active:scale-95 overflow-hidden"
                 >
-                    <LogOut size={20} className="shrink-0 group-hover:scale-110 transition-transform duration-300" />
-                    <span className={`ml-4 text-sm font-bold tracking-wide transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-xs opacity-100'}`}>
-                        Logout
-                    </span>
+                    {/* Fixed container for the icon. 
+                        w-12 (48px) exactly fills the remaining width when the sidebar is w-20 (80px) minus the p-4 padding. 
+                        This guarantees it perfectly centers without any snapping CSS logic. */}
+                    <div className="flex items-center justify-center shrink-0 w-12 h-12">
+                        <LogOut size={20} className="group-hover:-translate-x-1 transition-transform duration-300" />
+                    </div>
+
+                    {/* Text container smoothly transitions width and opacity */}
+                    <div
+                        className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
+                            }`}
+                    >
+                        <span className="text-sm font-bold tracking-wide">Logout</span>
+                    </div>
                 </button>
             </div>
         </aside>

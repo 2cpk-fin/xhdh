@@ -1,17 +1,15 @@
-import type { TagResponse } from "./tag";
-
 export type UniversityRequest = {
     name: string;
     abbreviation: string;
     elo: number;
-    tagIds: number[]
+    tags: string[];
 }
 
 export type UniversityResponse = {
-    id: number,
-    publicUniversityId: string,
+    id: number;
+    publicUniversityId: string;
     name: string;
     abbreviation: string;
-    tags: TagResponse[];
+    tags: string[];
     elo: number;
 }

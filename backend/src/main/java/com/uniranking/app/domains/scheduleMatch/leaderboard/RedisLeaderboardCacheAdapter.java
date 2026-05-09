@@ -18,6 +18,6 @@ public class RedisLeaderboardCacheAdapter implements LeaderboardRedisPort {
 
     @Override
     public Set<ZSetOperations.TypedTuple<Object>> getParticipants(String matchId) {
-        return redisTemplate.opsForZSet().rangeWithScores(prefix + matchId, 0, 99);
+        return redisTemplate.opsForZSet().reverseRangeWithScores(prefix + matchId, 0, 99);
     }
 }

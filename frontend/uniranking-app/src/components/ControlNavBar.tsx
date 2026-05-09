@@ -21,16 +21,21 @@ const ControlNavBar = () => {
                 } bg-white/70 backdrop-blur-xl border-r border-zinc-200 flex flex-col z-50 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]`}
         >
             {/* Collapse Toggle Section */}
-            <div className="px-4 h-16 flex items-center shrink-0">
+            <div className="px-4 h-16 flex items-center shrink-0 overflow-hidden">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="-ml-2 p-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors duration-200"
+                    className="flex items-center justify-center shrink-0 p-2 -ml-2 rounded-xl hover:bg-zinc-100 text-zinc-500 transition-colors duration-200 active:scale-95"
                 >
                     {isCollapsed ? <PanelLeftOpen size={20} /> : <PanelLeftClose size={20} />}
                 </button>
-                {!isCollapsed && (
+
+                {/* Smooth transition for the title text */}
+                <div
+                    className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
+                        }`}
+                >
                     <span className="ml-2 font-bold text-zinc-900 truncate">Control Room</span>
-                )}
+                </div>
             </div>
 
             {/* Navigation Links */}
@@ -68,19 +73,25 @@ const ControlNavBar = () => {
             <div className="p-4 border-t border-zinc-100 shrink-0">
                 <button
                     onClick={() => navigate('/home')}
-                    className={`group flex items-center h-12 w-full rounded-2xl text-zinc-500 bg-white border border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 transition-all duration-300 shadow-sm ${isCollapsed ? 'px-0 justify-center' : 'px-4'
-                        }`}
+                    className="group flex items-center h-12 w-full rounded-2xl text-zinc-500 bg-white border border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 transition-all duration-300 shadow-sm active:scale-95 overflow-hidden"
                 >
-                    <ArrowLeft
-                        size={20}
-                        className="shrink-0 group-hover:-translate-x-1 transition-transform duration-300"
-                    />
-                    <span
-                        className={`ml-4 text-sm font-bold tracking-wide transition-all duration-300 ease-in-out overflow-hidden whitespace-nowrap ${isCollapsed ? 'max-w-0 opacity-0' : 'max-w-xs opacity-100'
+                    {/* Fixed container for the icon ensures perfect centering when collapsed */}
+                    <div className="flex items-center justify-center shrink-0 w-12 h-12">
+                        <ArrowLeft
+                            size={20}
+                            className="group-hover:-translate-x-1 transition-transform duration-300"
+                        />
+                    </div>
+
+                    {/* Text container smoothly transitions width and opacity */}
+                    <div
+                        className={`flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${isCollapsed ? 'w-0 opacity-0' : 'w-full opacity-100'
                             }`}
                     >
-                        Back to App
-                    </span>
+                        <span className="text-sm font-bold tracking-wide">
+                            Back to App
+                        </span>
+                    </div>
                 </button>
             </div>
         </aside>

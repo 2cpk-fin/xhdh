@@ -16,6 +16,7 @@ public interface UserMapper {
     @Mapping(target = "createdAt", expression = "java(Instant.now())")
     User registerRequestToUser(RegisterRequest registerRequest, String encodedPassword);
 
+    @Mapping(target = "username", source = "displayUsername")
     UserResponse userToResponse(User user);
 
     @Mapping(target = "id", ignore = true)

@@ -8,17 +8,34 @@ export const universityApi = {
         size: number = 15,
         sort: string = 'elo,desc',
         input?: string,
-        tagIds?: number[]
+        tags?: string[]
     ): Promise<Page<UniversityResponse>> => {
         const { data } = await api.get<Page<UniversityResponse>>('/universities', {
             params: {
                 page,
                 size,
                 sort,
-                ...(input && { input }),
-                ...(tagIds?.length && { tagIds: tagIds.join(',') })
+                input: input?.trim() === '' ? undefined : input,
+                tags: tags?.length ? tags : undefined
+            },
+            paramsSerializer: (params) => {
+                const parts: string[] = []
+                for (const [key, value] of Object.entries(params)) {
+                    if (value === undefined || value === null) continue
+                    if (Array.isArray(value)) {
+                        value.forEach(v => parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`))
+                    } else {
+                        parts.push(`${encodeURIComponent(key)}=${encodeURIComponent(value as string)}`)
+                    }
+                }
+                return parts.join('&')
             }
         });
+        return data;
+    },
+
+    getAllTags: async (): Promise<string[]> => {
+        const { data } = await api.get<string[]>('/universities/tags');
         return data;
     },
 

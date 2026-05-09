@@ -1,21 +1,21 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 import AuthCallback from './pages/AuthCallback';
 import HomePage from './pages/HomePage';
-import ProfilePage from './pages/ProfilePage';
-import NewsPage from './pages/NewsPage';
+import ProfilePage from './pages/general/profilePage/ProfilePage';
+import NewsPage from './pages/general/newsPage/NewsPage';
 import SupportPage from './pages/SupportPage';
-import SearchPage from './pages/SearchPage';
-import SoloMatchPage from './pages/SoloMatchPage';
-import ScheduleMatchPage from './pages/ScheduleMatchPage';
+import SearchPage from './pages/general/searchPage/SearchPage';
+import SoloMatchPage from './pages/general/duelPage/SoloMatchPage';
+import ScheduleMatchPage from './pages/general/eventPage/ScheduleMatchPage';
 import AdminRoute from './components/AdminRoute';
 
 import ControlNavBar from './components/ControlNavBar';
 import ControlPage from './pages/ControlPage';
-import MatchControlPage from './pages/admin/MatchControlPage';
-import UniversityControlPage from './pages/admin/UniversityControlPage';
-import UserControlPage from './pages/admin/UserControlPage';
+import MatchControlPage from './pages/admin/matchPage/MatchControlPage';
+import UniversityControlPage from './pages/admin/universityPage/UniversityControlPage';
+import UserControlPage from './pages/admin/userPage/UserControlPage';
 
 function App() {
     return (
@@ -52,7 +52,6 @@ function App() {
                         <Route path="matches" element={<MatchControlPage />} />
                         <Route path="universities" element={<UniversityControlPage />} />
                         <Route path="users" element={<UserControlPage />} />
-                        {/* <Route path="users" element={<UserControlPage />} /> */}
                     </Route>
 
                 </Route>
