@@ -38,9 +38,6 @@ const ProfileBox = ({ user }: { user: UserResponse }) => {
                             </h2>
                             <ShieldCheck className="w-5 h-5 text-[var(--accent-purple)] shrink-0" />
                         </div>
-                        <p className="text-xs font-bold text-[var(--text-primary)] opacity-40 truncate">
-                            {user.email}
-                        </p>
                     </div>
                 </div>
             </div>

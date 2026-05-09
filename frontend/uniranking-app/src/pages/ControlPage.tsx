@@ -16,17 +16,25 @@ const ControlPage = () => {
         if (!mount) return;
 
         let animId: number;
+
+        // Initial dimensions
         const width = mount.clientWidth || window.innerWidth;
         const height = mount.clientHeight || window.innerHeight;
 
         // Keep alpha: true to allow the CSS background to show through
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
+
+        // Use a consistent pixel ratio to prevent zoom-scaling
+        renderer.setPixelRatio(1);
         renderer.setClearColor(0x000000, 0);
         renderer.setSize(width, height);
         mount.appendChild(renderer.domElement);
 
         const scene = new THREE.Scene();
+
+        // FIXED CAMERA setup
+        // We set the aspect once. By NOT updating the projection matrix during resize,
+        // the objects will stay the exact same size on screen.
         const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
         camera.position.z = 7.0;
 
@@ -268,12 +276,16 @@ const ControlPage = () => {
             prevMouseY = e.clientY;
         };
         const onMouseUp = () => { isDragging = false; mount.style.cursor = 'grab'; };
+
         const onResize = () => {
             const newWidth = mount.clientWidth || window.innerWidth;
             const newHeight = mount.clientHeight || window.innerHeight;
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
+
+            // We update the renderer size so it fills the screen
             renderer.setSize(newWidth, newHeight);
+
+            // CRITICAL: We do NOT update camera.aspect or camera.updateProjectionMatrix()
+            // This keeps the 3D unit scale locked to the viewport regardless of pixel size.
         };
 
         mount.addEventListener('mousedown', onMouseDown);
@@ -343,9 +355,11 @@ const ControlPage = () => {
         <div
             ref={mountRef}
             style={{
-                width: '100%',
-                height: '100%',
-                minHeight: '100vh',
+                width: '100vw',
+                height: '100vh',
+                position: 'fixed',
+                top: 0,
+                left: 0,
                 cursor: 'grab',
                 backgroundColor: isDarkMode ? deepVoid : lightBackground,
                 transition: 'background-color 0.8s ease',

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
-import { X, Edit, Trash2, Tag as TagIcon, GripVertical } from 'lucide-react'
+import { X, Edit, Trash2, Tag as TagIcon, GripVertical, Activity } from 'lucide-react'
 import { universityApi } from '../../../api/universityApi'
 import type { UniversityResponse, UniversityRequest } from '../../../types/university'
 
@@ -120,6 +120,7 @@ export default function UniversityControllingBox({ university, onClose, onSucces
                     )}
 
                     <div className="space-y-4 flex-1 flex flex-col">
+                        {/* Name Field */}
                         <div className="space-y-1">
                             <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60">University Name</label>
                             <input
@@ -130,13 +131,36 @@ export default function UniversityControllingBox({ university, onClose, onSucces
                             />
                         </div>
 
-                        {/* ... Abbreviation & ELO fields (similar styles) ... */}
+                        {/* Abbreviation Field */}
+                        <div className="space-y-1">
+                            <label className="block text-sm font-bold text-[var(--text-primary)] opacity-60">Abbreviation</label>
+                            <input
+                                type="text"
+                                value={formData.abbreviation}
+                                onChange={e => setFormData({ ...formData, abbreviation: e.target.value })}
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none text-sm text-[var(--text-primary)] transition-all"
+                                placeholder="e.g. MIT"
+                            />
+                        </div>
+
+                        {/* ELO Field */}
+                        <div className="space-y-1">
+                            <label className="text-sm font-bold text-[var(--text-primary)] opacity-60 flex items-center gap-1">
+                                <Activity size={14} className="text-[var(--accent-purple)]" /> Elo Rating
+                            </label>
+                            <input
+                                type="number"
+                                value={formData.elo}
+                                onChange={e => setFormData({ ...formData, elo: Number(e.target.value) })}
+                                className="w-full px-4 py-2 bg-[var(--bg-main)] border border-[var(--border-color)] rounded-xl focus:ring-2 focus:ring-[var(--accent-purple)]/50 outline-none text-sm text-[var(--text-primary)] transition-all"
+                            />
+                        </div>
 
                         <div className="flex-1">
                             <label className="text-sm font-bold text-[var(--text-primary)] opacity-60 mb-2 flex items-center gap-1">
                                 <TagIcon size={14} className="text-[var(--accent-purple)]" /> Assigned Tags
                             </label>
-                            <div className={`min-h-[80px] p-3 rounded-xl border-2 border-dashed transition-colors ${isDragOver ? 'border-[var(--accent-purple)] bg-[var(--accent-purple)]/5' : 'border-[var(--border-color)] bg-[var(--bg-main)]/50'}`}>
+                            <div className={`min-h-[120px] p-3 rounded-xl border-2 border-dashed transition-colors ${isDragOver ? 'border-[var(--accent-purple)] bg-[var(--accent-purple)]/5' : 'border-[var(--border-color)] bg-[var(--bg-main)]/50'}`}>
                                 <div className="flex flex-wrap gap-2">
                                     {assignedTags.map(tag => (
                                         <div
