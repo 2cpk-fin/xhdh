@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserRepository;
@@ -26,6 +27,9 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final UserMapper userMapper;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
+    @Value("${callback.url}")
+    private String callbackUrl;
 
     @Override
     public void onAuthenticationSuccess(
@@ -52,7 +56,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         // For local testing: http://localhost:5173/auth/callback?token=%s&refreshToken=%s
         // For production: https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s
         String targetUrl = String.format(
-                "http://localhost:5173/auth/callback?token=%s&refreshToken=%s",
+                callbackUrl,
                 accessToken,
                 refreshToken.getToken()
         );
