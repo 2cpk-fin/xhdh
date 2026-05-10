@@ -102,7 +102,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://xhdh-wine.vercel.app"));
+                "https://xhdh-wine.vercel.app",
+                "https://xhdh-ten.vercel.app",
+                "https://xephangdaihoc.vercel.app"
+            ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         configuration.setAllowCredentials(true);
