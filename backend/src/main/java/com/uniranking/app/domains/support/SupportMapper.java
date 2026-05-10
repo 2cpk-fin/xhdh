@@ -1,8 +1,5 @@
 package com.uniranking.app.domains.support;
 
-import com.uniranking.app.domains.support.Support;
-import com.uniranking.app.domains.support.SupportRequest;
-import com.uniranking.app.domains.support.SupportResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

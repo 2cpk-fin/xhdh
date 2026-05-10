@@ -1,7 +1,6 @@
 package com.uniranking.app.common;
 
 import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
-import com.uniranking.app.infrastructure.security.JwtAuthenticationFilter;
 import com.uniranking.app.infrastructure.security.JwtService;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;

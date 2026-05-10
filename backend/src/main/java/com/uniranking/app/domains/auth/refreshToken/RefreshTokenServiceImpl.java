@@ -13,7 +13,6 @@ import com.uniranking.app.infrastructure.security.JwtService;
 import org.springframework.stereotype.Service;
 
 import com.uniranking.app.domains.user.User;
-import com.uniranking.app.infrastructure.security.JwtServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
