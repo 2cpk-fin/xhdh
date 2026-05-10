@@ -5,7 +5,7 @@ import AuthCallback from './pages/AuthCallback';
 import HomePage from './pages/HomePage';
 import ProfilePage from './pages/general/profilePage/ProfilePage';
 import NewsPage from './pages/general/newsPage/NewsPage';
-import SupportPage from './pages/SupportPage';
+import SupportPage from './pages/general/supportPage/SupportPage';
 import SearchPage from './pages/general/searchPage/SearchPage';
 import SoloMatchPage from './pages/general/duelPage/SoloMatchPage';
 import ScheduleMatchPage from './pages/general/eventPage/ScheduleMatchPage';
@@ -16,6 +16,7 @@ import ControlPage from './pages/ControlPage';
 import MatchControlPage from './pages/admin/matchPage/MatchControlPage';
 import UniversityControlPage from './pages/admin/universityPage/UniversityControlPage';
 import UserControlPage from './pages/admin/userPage/UserControlPage';
+import MessageFromClientsPage from './pages/admin/feedbackPage/MessageFromClientsPage';
 
 function App() {
     return (
@@ -52,6 +53,7 @@ function App() {
                         <Route path="matches" element={<MatchControlPage />} />
                         <Route path="universities" element={<UniversityControlPage />} />
                         <Route path="users" element={<UserControlPage />} />
+                        <Route path="support" element={<MessageFromClientsPage />} />
                     </Route>
 
                 </Route>

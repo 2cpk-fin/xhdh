@@ -75,6 +75,7 @@ const ControlNavBar = () => {
                     <NavItem to="/control-room/matches" icon={<Lucide.CalendarDays size={18} />} label="Matches" isCollapsed={isCollapsed} />
                     <NavItem to="/control-room/universities" icon={<Lucide.GraduationCap size={18} />} label="Universities" isCollapsed={isCollapsed} />
                     <NavItem to="/control-room/users" icon={<Lucide.Users size={18} />} label="Users" isCollapsed={isCollapsed} />
+                    <NavItem to="/control-room/support" icon={<Lucide.LifeBuoy size={18} />} label="Support" isCollapsed={isCollapsed} />
                 </nav>
             </div>
 
