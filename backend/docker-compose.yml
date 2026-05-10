@@ -42,6 +42,8 @@ services:
 
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+
+      OAUTH2_CALLBACK_URL: ${OAUTH2_CALLBACK_URL}
     networks:
       - xhdh-network
     volumes:
