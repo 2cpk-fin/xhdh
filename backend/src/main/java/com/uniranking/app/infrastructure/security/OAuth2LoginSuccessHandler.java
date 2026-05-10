@@ -6,6 +6,7 @@ import com.uniranking.app.domains.auth.refreshToken.RefreshTokenService;
 import com.uniranking.app.domains.user.Role;
 import com.uniranking.app.domains.user.UserMapper;
 import org.jspecify.annotations.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -21,18 +22,21 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
+public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
+    @Value("${app.frontend.url:http://localhost:5173}")  // fallback to localhost if not set
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             Authentication authentication
-    ) throws IOException{
+    ) throws IOException {
         OAuth2User googleUser = (OAuth2User) authentication.getPrincipal();
         assert googleUser != null;
         String email = googleUser.getAttribute("email");
@@ -41,18 +45,17 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    User newuser = userMapper.oAuthToUser(email, name, pfp);
-                    newuser.setRole(Role.USER);
-                    return userRepository.save(newuser);
+                    User newUser = userMapper.oAuthToUser(email, name, pfp);
+                    newUser.setRole(Role.USER);
+                    return userRepository.save(newUser);
                 });
 
         String accessToken = jwtService.generateToken(user);
         var refreshToken = refreshTokenService.createRefreshToken(user, request);
-        // Redirect back to Frontend
-        // For local testing: http://localhost:5173/auth/callback?token=%s&refreshToken=%s
-        // For production: https://xhdh-wine.vercel.app/auth/callback?token=%s&refreshToken=%s
+
         String targetUrl = String.format(
-                "http://localhost:5173/auth/callback?token=%s&refreshToken=%s",
+                "%s/auth/callback?token=%s&refreshToken=%s",
+                frontendUrl,
                 accessToken,
                 refreshToken.getToken()
         );
