@@ -5,6 +5,8 @@ xhdh.iml
 
 # Root ignore
 .env
+agent.md
+ws.md
 .idea/
 *.iml
 target/

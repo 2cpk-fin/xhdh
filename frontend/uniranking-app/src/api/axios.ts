@@ -40,7 +40,8 @@ api.interceptors.response.use(
             const refreshToken = localStorage.getItem('refreshToken');
             if (refreshToken) {
                 try {
-                    const refreshResponse = await axios.post('https://xhdh-api.onrender.com/api/auth/refresh', {
+                    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+                    const refreshResponse = await axios.post(`${baseURL}/auth/refresh`, {
                         refreshToken: refreshToken
                     });
 
