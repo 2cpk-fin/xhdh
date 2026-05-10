@@ -54,7 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/universities/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/schedule/match/admin/**").hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
 
                 // Switch back to .authenticated() when deploy
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -81,8 +81,10 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    // This is the "ID checker" for websites — only one of these should exist in the app.
-    // Spring Security reads this before Spring MVC, so defining it here is the correct place.
+    // This is the "ID checker" for websites — only one of these should exist in the
+    // app.
+    // Spring Security reads this before Spring MVC, so defining it here is the
+    // correct place.
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -108,6 +110,5 @@ public class SecurityConfig {
 
         return source;
     }
-
 
 }

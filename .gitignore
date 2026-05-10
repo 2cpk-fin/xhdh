@@ -4,6 +4,7 @@ README.md
 xhdh.iml
 
 # Root ignore
+.env
 .idea/
 *.iml
 target/
