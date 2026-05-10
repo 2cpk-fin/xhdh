@@ -9,7 +9,7 @@ RUN mvn dependency:go-offline -B
 
 # Copy the src code and packages it into a .jar
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+RUN mvn package -DskipTests -Dmaven.test.skip=true -B
 
 # Starts with image only contains JRE, but not the full JDK
 FROM eclipse-temurin:21-jre-jammy
@@ -22,8 +22,7 @@ RUN groupadd -r spring && useradd -r -g spring spring
 WORKDIR /app
 
 # Copy only the final JAR from the 'build' stage
-COPY --from=build /app/target/*.jar app.jar
-RUN chown spring:spring app.jar
+COPY --chown=spring:spring --from=build /app/target/*.jar app.jar
 
 # Switch to the restricted user
 USER spring:spring
