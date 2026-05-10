@@ -6,8 +6,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-agent.md
-ws.md
 
 node_modules
 dist
@@ -24,7 +22,3 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-
-frontend/node_modules/
-frontend/dist/
-frontend/.env.local
