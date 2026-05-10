@@ -63,8 +63,15 @@ const SoloMatchPage = () => {
     const handleChooseWinner = async (winnerId: number) => {
         if (!currentMatch) return;
         setLoading(true);
+
+        // Determine who the loser is based on the winnerId
+        const loserId = currentMatch.university1.id === winnerId
+            ? currentMatch.university2.id
+            : currentMatch.university1.id;
+
         try {
-            const report = await soloMatchApi.chooseWinner(currentMatch.publicMatchId, winnerId);
+            // Pass both winnerId and loserId to the API
+            const report = await soloMatchApi.chooseWinner(winnerId, loserId);
             setMatchReport(report);
             setTimerActive(false);
             setCurrentMatch(null);
@@ -128,8 +135,9 @@ const SoloMatchPage = () => {
                         <div className="rounded-2xl bg-[var(--bg-side)] border border-[var(--border-color)] shadow-sm overflow-hidden backdrop-blur-xl">
                             {currentMatch && !matchReport && (
                                 <div className="px-6 py-4 border-b border-[var(--border-color)] flex items-center justify-between">
+                                    {/* Replaced publicMatchId with a generic status, or you could use currentMatch.id.slice(0,8) */}
                                     <p className="text-xs font-black uppercase tracking-widest opacity-40">
-                                        Match #{currentMatch.publicMatchId}
+                                        Match In Progress
                                     </p>
                                     <TimerRing timeLeft={timeLeft} total={MATCH_DURATION} />
                                 </div>

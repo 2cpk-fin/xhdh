@@ -9,9 +9,11 @@ import java.util.Set;
 public interface UniversityService {
     List<String> getAllAvailableTags();
     Set<Tag> getTagsByUniversityId(Long id);
+    List<UniversityResponse> getAllUniversities();
     Page<UniversityResponse> getUniversityListByInput(Pageable pageable, String input, List<Tag> tags);
     UniversityResponse getUniversityById(Long id);
     UniversityResponse createUniversity(UniversityRequest universityRequest);
     UniversityResponse updateUniversityById(Long id, UniversityRequest universityRequest);
     String deleteUniversityById(Long id);
+    UniversityResponse cacheUniversity(UniversityResponse universityResponse);
 }

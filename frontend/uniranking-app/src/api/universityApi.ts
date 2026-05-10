@@ -3,6 +3,23 @@ import type { Page } from '../types/general'
 import type { UniversityRequest, UniversityResponse } from '../types/university'
 
 export const universityApi = {
+    getAllUniversities: async (): Promise<UniversityResponse[]> => {
+        const CACHE_KEY = 'universities';
+        const CACHE_TTL = 5 * 60 * 1000;
+
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data, cachedAt } = JSON.parse(cached);
+            if (Date.now() - cachedAt < CACHE_TTL) {
+                return data;
+            }
+        }
+
+        const { data } = await api.get<UniversityResponse[]>('/universities/all');
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data, cachedAt: Date.now() }));
+        return data;
+    },
+
     getUniversities: async (
         page: number = 0,
         size: number = 15,
@@ -35,7 +52,19 @@ export const universityApi = {
     },
 
     getAllTags: async (): Promise<string[]> => {
+        const CACHE_KEY = 'university_tags';
+        const CACHE_TTL = 24 * 60 * 60 * 1000;
+
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+            const { data, cachedAt } = JSON.parse(cached);
+            if (Date.now() - cachedAt < CACHE_TTL) {
+                return data;
+            }
+        }
+
         const { data } = await api.get<string[]>('/universities/tags');
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ data, cachedAt: Date.now() }));
         return data;
     },
 

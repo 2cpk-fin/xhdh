@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+// TODO: Write tests for new uni and solo domains
 @Service
 @RequiredArgsConstructor
 public class UniversityServiceImpl implements UniversityService {
@@ -34,6 +35,13 @@ public class UniversityServiceImpl implements UniversityService {
             throw new UniversityNotFoundException("University not found with ID: " + id);
         }
         return universityRepository.findTagsByUniversityId(id);
+    }
+
+    @Override
+    public List<UniversityResponse> getAllUniversities() {
+        return universityRepository.findAll().stream()
+                .map(universityMapper::toUniversityResponse)
+                .toList();
     }
 
     @Override
@@ -76,5 +84,10 @@ public class UniversityServiceImpl implements UniversityService {
         }
         universityRepository.deleteById(id);
         return "Deleted successfully!";
+    }
+
+    @CachePut(value = "universities", key = "#response.id")
+    public UniversityResponse cacheUniversity(UniversityResponse response) {
+        return response;
     }
 }

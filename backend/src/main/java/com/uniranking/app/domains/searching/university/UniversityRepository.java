@@ -27,16 +27,4 @@ public interface UniversityRepository extends JpaRepository<University, Long> {
             @Param("tags") List<Tag> tags
     );
 
-    @Query(nativeQuery = true, value = "SELECT * FROM universities ORDER BY RANDOM() LIMIT 1")
-    University findRandom();
-
-    @Query("SELECT DISTINCT opponent FROM University opponent " +
-            "JOIN opponent.tags t " +
-            "WHERE opponent.id != :universityId " +
-            "AND EXISTS (" +
-            "   SELECT target FROM University target " +
-            "   JOIN target.tags t2 " +
-            "   WHERE target.id = :universityId AND t2 = t" +
-            ")")
-    List<University> findAllOpponentsWithSharedTag(@Param("universityId") Long universityId);
 }

@@ -33,6 +33,11 @@ public class UniversityController {
         return ResponseEntity.ok(universityService.getTagsByUniversityId(id));
     }
 
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<UniversityResponse>> getAllUniversities() {
+        return ResponseEntity.ok(universityService.getAllUniversities());
+    }
+
     @Operation(summary = "Get universities with optional search and tag filters")
     @Parameters({
             @Parameter(name = "page", description = "Page number", example = "0"),
