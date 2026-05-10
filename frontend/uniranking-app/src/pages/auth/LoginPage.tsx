@@ -40,7 +40,10 @@ const LoginPage = () => {
     };
 
     const handleGoogleLogin = () => {
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        var baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        if(baseUrl.endsWith('/api')) {
+            baseUrl = baseUrl.slice(0, -4); // Remove '/api' if it exists at the end
+        }
         window.location.href = `${baseUrl}/oauth2/authorization/google`;
     };
 
