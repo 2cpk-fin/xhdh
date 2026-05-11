@@ -1,15 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react';
 import userApi from '../../../api/userApi';
 import { Loader2, UserX, LayoutDashboard, History, MessageSquare, Settings } from 'lucide-react';
 import type { UserResponse } from '../../../types/user';
-
-import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import NavBar from '../../../components/NavBar';
 import ProfileBox from './ProfileBox';
 import ProfileConfigBox from './ProfileConfigBox';
 
-// Mock data placeholders for your upcoming features
 const MOCK_STATS = { totalVotes: 1240, rank: 42, points: 8900 };
 
 const ProfilePage = () => {
@@ -24,6 +22,7 @@ const ProfilePage = () => {
             try {
                 const data = await userApi.getUserByRefreshToken(token);
                 setUser(data);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (err) { window.location.href = '/login'; } finally { setLoading(false); }
         };
         loadProfile();
@@ -31,10 +30,9 @@ const ProfilePage = () => {
 
     if (loading) return (
         <div className="min-h-screen bg-[var(--bg-main)] flex flex-col transition-colors duration-300">
-            <Header />
             <div className="flex flex-1">
                 <NavBar />
-                <main className="flex-grow flex items-center justify-center">
+                <main className="flex-grow flex items-center justify-center pt-14">
                     <Loader2 className="w-8 h-8 animate-spin text-[var(--accent-purple)]" />
                 </main>
             </div>
@@ -43,26 +41,19 @@ const ProfilePage = () => {
 
     return (
         <div className="min-h-screen bg-[var(--bg-main)] flex flex-col font-sans antialiased text-[var(--text-primary)] transition-colors duration-300">
-            <Header />
             <div className="flex flex-1">
                 <NavBar />
-                <main className="flex-grow ml-64 p-8">
-                    <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-
+                <main className="flex-grow ml-64 p-8 pt-14">
+                    <div className="max-w-5xl mx-auto pt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {user ? (
                             <>
-                                {/* Public Header */}
                                 <ProfileBox user={user} />
-
-                                {/* Tab Navigation */}
                                 <div className="flex items-center gap-2 p-1 bg-[var(--bg-side)] border border-[var(--border-color)] rounded-2xl w-fit">
                                     <TabBtn active={activeTab === 'overview'} onClick={() => setActiveTab('overview')} icon={<LayoutDashboard size={18} />} label="Overview" />
                                     <TabBtn active={activeTab === 'history'} onClick={() => setActiveTab('history')} icon={<History size={18} />} label="Voting History" />
                                     <TabBtn active={activeTab === 'comments'} onClick={() => setActiveTab('comments')} icon={<MessageSquare size={18} />} label="Comments" />
                                     <TabBtn active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} icon={<Settings size={18} />} label="Settings" />
                                 </div>
-
-                                {/* Content Area */}
                                 <div className="min-h-[400px]">
                                     {activeTab === 'overview' && (
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -74,7 +65,6 @@ const ProfilePage = () => {
                                             </div>
                                         </div>
                                     )}
-
                                     {activeTab === 'history' && (
                                         <div className="space-y-4">
                                             <h3 className="text-xl font-black">Recent Matches</h3>
@@ -83,7 +73,6 @@ const ProfilePage = () => {
                                             </div>
                                         </div>
                                     )}
-
                                     {activeTab === 'comments' && (
                                         <div className="space-y-4">
                                             <h3 className="text-xl font-black">Comment Thread</h3>
@@ -92,7 +81,6 @@ const ProfilePage = () => {
                                             </div>
                                         </div>
                                     )}
-
                                     {activeTab === 'settings' && (
                                         <ProfileConfigBox user={user} onUserUpdate={setUser} />
                                     )}
@@ -109,7 +97,6 @@ const ProfilePage = () => {
     );
 };
 
-// Sub-components for a cleaner layout
 const TabBtn = ({ active, onClick, icon, label }: any) => (
     <button onClick={onClick} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${active ? 'bg-[var(--text-primary)] text-[var(--bg-main)] shadow-lg' : 'hover:bg-[var(--text-primary)]/5 opacity-50 hover:opacity-100'}`}>
         {icon} <span>{label}</span>

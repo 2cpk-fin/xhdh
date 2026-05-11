@@ -1,20 +1,39 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import NavItem from './NavItem';
 import authApi from '../api/authApi';
-import { Home, Search, Newspaper, UserCircle, LogOut, PanelLeftClose, PanelLeftOpen, ShieldAlert, Sun, Moon } from 'lucide-react';
+import {
+    Home, Search, Newspaper, UserCircle, LogOut,
+    ShieldAlert, Sun, Moon, Trophy, Gamepad2
+} from 'lucide-react';
 import { isAdmin } from '../utils/jwt-decode';
 import { useDarkMode } from '../hooks/useDarkMode';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { cn } from '@/lib/utils';
 
 const NavBar = () => {
-    const [isCollapsed, setIsCollapsed] = useState(false);
     const [adminStatus, setAdminStatus] = useState(false);
+    const [isHidden, setIsHidden] = useState(false);
     const { isDarkMode, toggleDarkMode } = useDarkMode();
     const navigate = useNavigate();
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setAdminStatus(isAdmin());
+    }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsHidden(prev => !prev);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, []);
 
     const handleLogout = async () => {
@@ -32,80 +51,88 @@ const NavBar = () => {
     };
 
     return (
-        <aside
-            className={`fixed left-0 top-16 h-[calc(100vh-64px)] ${isCollapsed ? 'w-20' : 'w-64'} 
-            flex flex-col z-40 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
-            bg-[var(--bg-side)] border-r border-[var(--border-color)] backdrop-blur-xl will-change-[width]`}
-        >
-            {/* Collapse Toggle Section */}
-            <div className="px-3 h-16 flex items-center shrink-0 border-b border-[var(--border-color)] opacity-80 relative overflow-hidden">
-                <button
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="flex items-center justify-center shrink-0 w-9 h-9 rounded-xl transition-all duration-200 active:scale-95
-                    bg-transparent dark:bg-[rgba(192,38,211,0.08)]
-                    text-[var(--text-primary)] dark:text-[var(--accent-purple)] z-10"
-                >
-                    {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-                </button>
-            </div>
+        <TooltipProvider>
+            <header
+                className={cn(
+                    "fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-4 gap-4",
+                    "bg-[var(--bg-side)] border-b border-[var(--border-color)] backdrop-blur-xl",
+                    "transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]",
+                    isHidden ? "-translate-y-full" : "translate-y-0"
+                )}
+            >
+                <Link to="/home" className="flex items-center justify-center w-8 h-8 shrink-0 group mr-2">
+                    <Trophy
+                        size={20}
+                        className="transition-transform duration-300 group-hover:scale-110
+                            text-[#eab308] dark:text-[#facc15]
+                            dark:drop-shadow-[0_0_8px_rgba(250,204,21,0.55)]"
+                    />
+                </Link>
 
-            {/* Navigation Section */}
-            <div className="px-3 flex-1 overflow-y-auto no-scrollbar py-3 overflow-x-hidden relative">
-                <div className={`h-6 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
-                    ${isCollapsed ? 'opacity-0 -translate-y-1' : 'opacity-100 translate-y-0'}`}>
-                    <p className="px-3 mb-2 text-[9px] font-bold tracking-[0.12em] uppercase text-[#a1a1aa] dark:text-[#3f3f46] whitespace-nowrap">
-                        Menu
-                    </p>
-                </div>
+                <Separator orientation="vertical" className="h-5 opacity-30" />
 
-                <nav className="space-y-1">
-                    <NavItem to="/home" icon={<Home size={18} />} label="Home" isCollapsed={isCollapsed} />
-                    <NavItem to="/search" icon={<Search size={18} />} label="Search" isCollapsed={isCollapsed} />
-                    <NavItem to="/news" icon={<Newspaper size={18} />} label="News" isCollapsed={isCollapsed} />
+                <nav className="flex items-center gap-1 flex-1">
+                    <NavItem to="/home" icon={<Home size={16} />} label="Home" end />
+                    <NavItem to="/search" icon={<Search size={16} />} label="Search" />
+                    <NavItem to="/news" icon={<Newspaper size={16} />} label="News" />
                     {adminStatus && (
-                        <NavItem to="/control-room" icon={<ShieldAlert size={18} />} label="Admin" isCollapsed={isCollapsed} />
+                        <NavItem to="/control-room" icon={<ShieldAlert size={16} />} label="Admin" />
                     )}
-                    <NavItem to="/profile" icon={<UserCircle size={18} />} label="Profile" isCollapsed={isCollapsed} />
+                    <NavItem to="/playground" icon={<Gamepad2 size={16} />} label="Playground" />
+                    <NavItem to="/profile" icon={<UserCircle size={16} />} label="Profile" />
                 </nav>
-            </div>
 
-            {/* Bottom Actions */}
-            <div className="p-3 shrink-0 space-y-1 border-t border-[var(--border-color)] opacity-80 overflow-hidden">
-                {/* Theme Toggle */}
-                <button
-                    onClick={toggleDarkMode}
-                    className="group relative flex items-center h-11 w-full rounded-2xl transition-all duration-300 active:scale-95
-                    text-[var(--text-primary)] hover:bg-[rgba(0,0,0,0.04)] dark:hover:bg-[rgba(255,255,255,0.04)]"
-                >
-                    <div className="flex items-center justify-center shrink-0 w-11 h-11 z-10">
-                        {isDarkMode ? <Sun size={17} /> : <Moon size={17} />}
-                    </div>
-
-                    <div className={`absolute left-11 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
-                        ${isCollapsed ? 'opacity-0 -translate-x-2 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                        <span className="text-sm font-bold whitespace-nowrap ml-1">
+                <div className="flex items-center gap-1 shrink-0">
+                    <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={toggleDarkMode}
+                                className={cn(
+                                    'w-9 h-9 rounded-xl',
+                                    'text-[var(--text-primary)]/60 hover:text-[var(--text-primary)]',
+                                    'hover:bg-[var(--text-primary)]/5'
+                                )}
+                            >
+                                <AnimatePresence mode="wait" initial={false}>
+                                    <motion.span
+                                        key={isDarkMode ? 'sun' : 'moon'}
+                                        initial={{ rotate: -30, opacity: 0, scale: 0.8 }}
+                                        animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                                        exit={{ rotate: 30, opacity: 0, scale: 0.8 }}
+                                        transition={{ duration: 0.18 }}
+                                    >
+                                        {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
+                                    </motion.span>
+                                </AnimatePresence>
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="font-semibold">
                             {isDarkMode ? 'Light mode' : 'Dark mode'}
-                        </span>
-                    </div>
-                </button>
+                        </TooltipContent>
+                    </Tooltip>
 
-                {/* Logout Button */}
-                <button
-                    onClick={handleLogout}
-                    className="group relative flex items-center h-11 w-full rounded-2xl transition-all duration-300 active:scale-95
-                    text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
-                >
-                    <div className="flex items-center justify-center shrink-0 w-11 h-11 z-10">
-                        <LogOut size={17} />
-                    </div>
+                    <Separator orientation="vertical" className="h-5 opacity-30 mx-1" />
 
-                    <div className={`absolute left-11 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
-                        ${isCollapsed ? 'opacity-0 -translate-x-2 pointer-events-none' : 'opacity-100 translate-x-0'}`}>
-                        <span className="text-sm font-bold whitespace-nowrap ml-1">Logout</span>
-                    </div>
-                </button>
-            </div>
-        </aside>
+                    <Tooltip delayDuration={100}>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleLogout}
+                                className="w-9 h-9 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/10"
+                            >
+                                <LogOut size={16} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="font-semibold text-red-500">
+                            Logout
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </header>
+        </TooltipProvider>
     );
 };
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -55,6 +56,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         try {
             return new ResponseEntity<>(userService.deleteUser(id), HttpStatus.OK);
@@ -73,6 +75,7 @@ public class UserController {
     }
 
     @GetMapping("/admin/get-all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<UserResponse>> getAllUsers(@RequestParam int pageNo, @RequestParam int size) {
         return ResponseEntity.ok(userService.getAllUsers(pageNo, size));
     }

@@ -40,8 +40,8 @@ const LoginPage = () => {
     };
 
     const handleGoogleLogin = () => {
-        var baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-        if(baseUrl.endsWith('/api')) {
+        let baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+        if (baseUrl.endsWith('/api')) {
             baseUrl = baseUrl.slice(0, -4); // Remove '/api' if it exists at the end
         }
         window.location.href = `${baseUrl}/oauth2/authorization/google`;
@@ -64,6 +64,7 @@ const LoginPage = () => {
         setLoading(true);
         try {
             await authApi.login(formData);
+            sessionStorage.setItem('playIntro', 'true');
             navigate('/home');
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;

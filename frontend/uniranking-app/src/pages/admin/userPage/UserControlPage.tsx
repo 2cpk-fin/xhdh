@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import UserSearchingBox from './UserSearchingBox'
 import UserControllingBox from './UserControllingBox'
-import Header from '../../../components/Header'
-import NavBar from '../../../components/NavBar'
-import Footer from '../../../components/Footer'
+import ControlNavBar from '../../../components/ControlNavBar'
 import type { UserResponse } from '../../../types/user'
 
 export default function UserControlPage() {
@@ -17,26 +15,23 @@ export default function UserControlPage() {
 
     return (
         <div className="min-h-screen flex flex-col transition-colors duration-300 bg-[var(--bg-main)] dark:bg-[#030005]">
-            <Header />
-            <div className="flex flex-1">
-                <NavBar />
-                <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
-                    <div className="flex-1 max-w-6xl w-full mx-auto px-8 py-10 space-y-10">
-                        <div>
-                            <h1 className="text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">User Control</h1>
-                            <p className="text-[var(--text-primary)] opacity-40 mt-1 font-medium italic">Review and moderate user accounts.</p>
-                        </div>
+            <ControlNavBar />
 
-                        <div className="bg-[var(--bg-side)] dark:bg-[#0a0a0a] border border-[var(--border-color)] rounded-3xl p-6 shadow-sm">
-                            <UserSearchingBox
-                                key={refreshKey}
-                                onSelect={setSelectedUser}
-                            />
-                        </div>
+            <main className="flex-1 flex flex-col pt-14">
+                <div className="flex-1 max-w-6xl w-full mx-auto px-8 py-10 space-y-10">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">User Control</h1>
+                        <p className="text-[var(--text-primary)] opacity-40 mt-1 font-medium italic">Review and moderate user accounts.</p>
                     </div>
-                    <Footer />
-                </main>
-            </div>
+
+                    <div className="bg-[var(--bg-side)] dark:bg-[#0a0a0a] border border-[var(--border-color)] rounded-3xl p-6 shadow-sm">
+                        <UserSearchingBox
+                            key={refreshKey}
+                            onSelect={setSelectedUser}
+                        />
+                    </div>
+                </div>
+            </main>
 
             {selectedUser && (
                 <UserControllingBox

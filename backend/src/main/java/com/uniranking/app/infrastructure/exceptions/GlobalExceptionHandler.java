@@ -25,10 +25,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionHandler {
 
     // General exception
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
-        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<ErrorResponse> handleOther(Exception ex,HttpServletRequest request) {
+//        return buildErrorResponse(ex, HttpStatus.INTERNAL_SERVER_ERROR, request);
+//    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,HttpServletRequest request) {

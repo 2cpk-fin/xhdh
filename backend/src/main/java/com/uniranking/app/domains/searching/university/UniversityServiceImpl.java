@@ -39,7 +39,7 @@ public class UniversityServiceImpl implements UniversityService {
 
     @Override
     public List<UniversityResponse> getAllUniversities() {
-        return universityRepository.findAll().stream()
+        return universityRepository.findAllWithTags().stream()
                 .map(universityMapper::toUniversityResponse)
                 .toList();
     }

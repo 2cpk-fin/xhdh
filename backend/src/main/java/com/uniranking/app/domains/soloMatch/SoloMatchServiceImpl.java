@@ -25,7 +25,7 @@ public class SoloMatchServiceImpl implements SoloMatchService {
     @Transactional
     public SoloMatchReport chooseWinner(Long winnerId, Long loserId) {
 
-        List<University> universities = universityRepository.findAllById(List.of(winnerId, loserId));
+        List<University> universities = universityRepository.findForEloUpdate(List.of(winnerId, loserId));
 
         Map<Long, University> uniMap = universities.stream()
                 .collect(Collectors.toMap(University::getId, u -> u));
@@ -33,11 +33,8 @@ public class SoloMatchServiceImpl implements SoloMatchService {
         University winner = uniMap.get(winnerId);
         University loser = uniMap.get(loserId);
 
-        if (winner == null) {
-            throw new UniversityNotFoundException("Winning university not found with ID: " + winnerId);
-        }
-        if (loser == null) {
-            throw new UniversityNotFoundException("Losing university not found with ID: " + loserId);
+        if (winner == null || loser == null) {
+            throw new UniversityNotFoundException("University not found for Elo calculation");
         }
 
         int winnerEloNew = eloCalc.calculateSoloChange(winner.getElo(), loser.getElo(), true);
@@ -46,10 +43,11 @@ public class SoloMatchServiceImpl implements SoloMatchService {
         int loserEloNew = eloCalc.calculateSoloChange(loser.getElo(), winner.getElo(), false);
         int loserEloChange = loser.getElo() - loserEloNew;
 
+        universityRepository.updateElo(winnerId, winnerEloNew);
+        universityRepository.updateElo(loserId, loserEloNew);
+
         winner.setElo(winnerEloNew);
         loser.setElo(loserEloNew);
-
-        universityRepository.saveAll(List.of(winner, loser));
 
         UniversityResponse winnerResponse = universityMapper.toUniversityResponse(winner);
         UniversityResponse loserResponse = universityMapper.toUniversityResponse(loser);

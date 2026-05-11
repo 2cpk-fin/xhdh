@@ -66,6 +66,7 @@ const RegisterPage = () => {
         setLoading(true);
         try {
             await authApi.register(formData);
+            sessionStorage.setItem('playIntro', 'true');
             navigate('/login');
         } catch (err) {
             const axiosError = err as AxiosError<{ message: string }>;

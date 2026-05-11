@@ -38,7 +38,7 @@ public class University {
     @Builder.Default
     private int elo = 1200;
 
-    @ElementCollection(targetClass = Tag.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = Tag.class, fetch = FetchType.LAZY)
     @CollectionTable(
             name = "university_tags",
             joinColumns = @JoinColumn(name = "university_id")

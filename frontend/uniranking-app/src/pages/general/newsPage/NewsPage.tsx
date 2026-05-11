@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import newsApi from '../../../api/newsApi';
 import NewsItem from './NewsItem';
-import Header from '../../../components/Header';
 import NavBar from '../../../components/NavBar';
 import Footer from '../../../components/Footer';
-import Pagination from '../../../components/Pagination'; //
+import Pagination from '../../../components/Pagination';
 import type { NewsResponse } from '../../../types/news';
 import { Loader2 } from 'lucide-react';
 
@@ -51,14 +50,12 @@ const NewsPage = () => {
     return (
         <div className="min-h-screen bg-[var(--bg-main)] flex flex-col font-sans antialiased text-[var(--text-primary)] transition-colors duration-300">
             <style dangerouslySetInnerHTML={{ __html: KEYFRAMES }} />
-            <Header />
 
             <div className="flex flex-1">
                 <NavBar />
 
-                <main className="flex-1 ml-64 flex flex-col min-h-[calc(100vh-64px)]">
+                <main className="flex-1 ml-64 flex flex-col pt-14 min-h-screen">
                     <div className="max-w-4xl mx-auto w-full px-6 pb-24">
-                        {/* Header Section */}
                         <div className="pt-12 pb-8 border-b-2 border-[var(--text-primary)] mb-10">
                             <div className="flex items-end justify-between gap-4 flex-wrap">
                                 <div>
@@ -140,7 +137,6 @@ const NewsPage = () => {
                             </>
                         )}
 
-                        {/* Pagination Component Integration */}
                         {data && data.totalPages > 1 && (
                             <div className="mt-16 pt-8 border-t-2 border-[var(--text-primary)]">
                                 <Pagination

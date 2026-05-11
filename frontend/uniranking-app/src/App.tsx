@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import AuthCallback from './pages/AuthCallback';
-import HomePage from './pages/HomePage';
+import HomePage from './pages/general/homePage/HomePage';
 import ProfilePage from './pages/general/profilePage/ProfilePage';
 import NewsPage from './pages/general/newsPage/NewsPage';
 import SupportPage from './pages/general/supportPage/SupportPage';
@@ -10,25 +10,26 @@ import SearchPage from './pages/general/searchPage/SearchPage';
 import SoloMatchPage from './pages/general/duelPage/SoloMatchPage';
 import ScheduleMatchPage from './pages/general/eventPage/ScheduleMatchPage';
 import AdminRoute from './components/AdminRoute';
-
 import ControlNavBar from './components/ControlNavBar';
 import ControlPage from './pages/ControlPage';
 import MatchControlPage from './pages/admin/matchPage/MatchControlPage';
 import UniversityControlPage from './pages/admin/universityPage/UniversityControlPage';
 import UserControlPage from './pages/admin/userPage/UserControlPage';
 import MessageFromClientsPage from './pages/admin/feedbackPage/MessageFromClientsPage';
+import PlaygroundPage from './pages/general/playgroundPage/PlaygroundPage';
+import EnergyCorePage from './pages/general/playgroundPage/EnergyCorePage';
+import ElectronPage from './pages/general/playgroundPage/ElectronPage';
+import ElectricCircuitPage from './pages/general/playgroundPage/ElectricCircuitPage';
+import PaintPage from './pages/general/playgroundPage/PaintPage';
 
 function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Navigate to="/login" />} />
-
-                {/* --- Public / User Routes --- */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
-
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/solo" element={<SoloMatchPage />} />
                 <Route path="/schedule" element={<ScheduleMatchPage />} />
@@ -36,10 +37,12 @@ function App() {
                 <Route path="/news" element={<NewsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/support" element={<SupportPage />} />
-
-                {/* --- Protected Admin Routes --- */}
+                <Route path="/playground" element={<PlaygroundPage />} />
+                <Route path="/energy-core" element={<EnergyCorePage />} />
+                <Route path="/electron-field" element={<ElectronPage />} />
+                <Route path="/electric-circuit" element={<ElectricCircuitPage />} />
+                <Route path="/paint-field" element={<PaintPage />} />
                 <Route element={<AdminRoute />}>
-
                     <Route
                         path="/control-room"
                         element={
@@ -55,7 +58,6 @@ function App() {
                         <Route path="users" element={<UserControlPage />} />
                         <Route path="support" element={<MessageFromClientsPage />} />
                     </Route>
-
                 </Route>
             </Routes>
         </Router>

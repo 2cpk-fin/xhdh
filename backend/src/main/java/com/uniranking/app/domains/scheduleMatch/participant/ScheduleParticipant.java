@@ -28,7 +28,7 @@ public class ScheduleParticipant {
     @ColumnDefault("1")
     private int rank = 1;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "match_id", nullable = false)
     @JsonIgnoreProperties("participants")
     private ScheduleMatch scheduleMatch;
