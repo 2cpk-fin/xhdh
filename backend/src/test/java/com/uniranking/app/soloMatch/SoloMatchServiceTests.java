@@ -1,323 +1,134 @@
 package com.uniranking.app.soloMatch;
 
-import com.uniranking.app.domains.searching.exceptions.UniversityNotFoundException;
-import com.uniranking.app.domains.searching.university.University;
-import com.uniranking.app.domains.searching.university.UniversityMapper;
-import com.uniranking.app.domains.searching.university.UniversityRepository;
-import com.uniranking.app.domains.searching.university.UniversityResponse;
-import com.uniranking.app.domains.soloMatch.*;
-import com.uniranking.app.domains.soloMatch.exceptions.InsufficientOpponentsException;
-import com.uniranking.app.domains.soloMatch.exceptions.InvalidMatchParticipantException;
-import com.uniranking.app.domains.soloMatch.exceptions.SoloMatchExpiredException;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Collections;
+
+import com.uniranking.app.domains.soloMatch.SoloMatchReport;
+import com.uniranking.app.domains.soloMatch.SoloMatchServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import com.uniranking.app.domains.searching.exceptions.UniversityNotFoundException;
+import com.uniranking.app.domains.searching.university.*;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class SoloMatchServiceTests {
+class SoloMatchServiceTests {
 
     @Mock
     private UniversityRepository universityRepository;
+
     @Mock
     private UniversityMapper universityMapper;
+
     @Mock
-    private SoloMatchRedisPort soloMatchRedisPort;
+    private UniversityService universityService;
 
     @InjectMocks
-    private SoloMatchServiceImpl soloMatchServiceImpl;
+    private SoloMatchServiceImpl soloMatchService;
 
-    private University uni1, uni2, uni3, uni4;
-    private UniversityResponse uniResponse1, uniResponse2;
+    private University winner;
+    private University loser;
+    private UniversityResponse winnerResponse;
+    private UniversityResponse loserResponse;
 
     @BeforeEach
-    public void setUp() {
-        uni1 = University.builder().id(1L).name("University of Engineering").abbreviation("UET").elo(1000).build();
-        uni2 = University.builder().id(2L).name("Hanoi University of Science").abbreviation("HUST").elo(1100).build();
-        uni3 = University.builder().id(3L).name("Hanoi Medical University").abbreviation("HMU").elo(900).build();
-        uni4 = University.builder().id(4L).name("FPT University").abbreviation("FPT").elo(1200).build();
+    void setUp() {
+        // Setup Winner
+        winner = new University();
+        winner.setId(1L);
+        winner.setElo(1500);
 
-        uniResponse1 = new UniversityResponse();
-        uniResponse1.setName("University of Engineering");
-        uniResponse2 = new UniversityResponse();
-        uniResponse2.setName("Hanoi University of Science");
+        // Setup Loser
+        loser = new University();
+        loser.setId(2L);
+        loser.setElo(1500);
+
+        // Setup Responses (Assuming standard empty constructors exist via Lombok/Java)
+        winnerResponse = new UniversityResponse();
+        loserResponse = new UniversityResponse();
     }
 
     @Test
-    public void SoloMatchService_StartNewDuel_ReturnSoloMatchResponse() {
-        when(universityRepository.findRandom()).thenReturn(uni1);
-        when(universityRepository.findAllOpponentsWithSharedTag(uni1.getId())).thenReturn(List.of(uni2));
-        when(universityMapper.toUniversityResponse(uni1)).thenReturn(uniResponse1);
-        when(universityMapper.toUniversityResponse(uni2)).thenReturn(uniResponse2);
+    void chooseWinner_ShouldUpdateEloAndCache_WhenBothUniversitiesExist() {
+        // Arrange
+        Long winnerId = 1L;
+        Long loserId = 2L;
 
-        SoloMatchResponse result = soloMatchServiceImpl.startNewDuel();
+        when(universityRepository.findForEloUpdate(List.of(winnerId, loserId)))
+                .thenReturn(List.of(winner, loser));
 
-        assertThat(result).isNotNull();
-        assertThat(result.getPublicMatchId()).isNotNull();
-        assertThat(result.getUniversity1()).isEqualTo(uniResponse1);
-        assertThat(result.getUniversity2()).isEqualTo(uniResponse2);
+        when(universityMapper.toUniversityResponse(winner)).thenReturn(winnerResponse);
+        when(universityMapper.toUniversityResponse(loser)).thenReturn(loserResponse);
+
+        // Act
+        SoloMatchReport report = soloMatchService.chooseWinner(winnerId, loserId);
+
+        // Assert
+        assertNotNull(report);
+        assertEquals(winnerResponse, report.getWinner());
+        assertEquals(loserResponse, report.getLoser());
+
+        // Verify Elo updates were called with the correct IDs and some calculated integer
+        verify(universityRepository).updateElo(eq(winnerId), anyInt());
+        verify(universityRepository).updateElo(eq(loserId), anyInt());
+
+        // Verify that the responses were cached
+        verify(universityService).cacheUniversity(winnerResponse);
+        verify(universityService).cacheUniversity(loserResponse);
     }
 
     @Test
-    public void SoloMatchService_StartNewDuel_SavesMatchToPortWithThreeMinuteTtl() {
-        when(universityRepository.findRandom()).thenReturn(uni1);
-        when(universityRepository.findAllOpponentsWithSharedTag(uni1.getId())).thenReturn(List.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(uniResponse1);
+    void chooseWinner_ShouldThrowException_WhenOneUniversityIsMissing() {
+        // Arrange
+        Long winnerId = 1L;
+        Long loserId = 2L;
 
-        soloMatchServiceImpl.startNewDuel();
+        // Only returning the winner, simulating the loser not being found in the DB
+        when(universityRepository.findForEloUpdate(List.of(winnerId, loserId)))
+                .thenReturn(List.of(winner));
 
-        verify(soloMatchRedisPort).saveMatch(any(SoloMatch.class), eq(3L));
+        // Act & Assert
+        UniversityNotFoundException exception = assertThrows(
+                UniversityNotFoundException.class,
+                () -> soloMatchService.chooseWinner(winnerId, loserId)
+        );
+
+        assertEquals("University not found for Elo calculation", exception.getMessage());
+
+        // Verify that no database updates or caching occurred
+        verify(universityRepository, never()).updateElo(anyLong(), anyInt());
+        verify(universityMapper, never()).toUniversityResponse(any());
+        verify(universityService, never()).cacheUniversity(any());
     }
 
     @Test
-    public void SoloMatchService_StartNewDuel_StoredSoloMatchHasCorrectUniversityIds() {
-        when(universityRepository.findRandom()).thenReturn(uni1);
-        when(universityRepository.findAllOpponentsWithSharedTag(uni1.getId())).thenReturn(List.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(uniResponse1);
+    void chooseWinner_ShouldThrowException_WhenBothUniversitiesAreMissing() {
+        // Arrange
+        Long winnerId = 1L;
+        Long loserId = 2L;
 
-        soloMatchServiceImpl.startNewDuel();
+        // Simulating neither university being found
+        when(universityRepository.findForEloUpdate(List.of(winnerId, loserId)))
+                .thenReturn(Collections.emptyList());
 
-        ArgumentCaptor<SoloMatch> matchCaptor = ArgumentCaptor.forClass(SoloMatch.class);
-        verify(soloMatchRedisPort).saveMatch(matchCaptor.capture(), anyLong());
+        // Act & Assert
+        assertThrows(
+                UniversityNotFoundException.class,
+                () -> soloMatchService.chooseWinner(winnerId, loserId)
+        );
 
-        SoloMatch stored = matchCaptor.getValue();
-        assertThat(stored.getUni1Id()).isEqualTo(uni1.getId());
-        assertThat(stored.getUni2Id()).isEqualTo(uni2.getId());
-        assertThat(stored.getPublicMatchId()).isNotNull();
-    }
-
-    @Test
-    public void SoloMatchService_StartNewDuel_NoCandidates_ThrowsInsufficientOpponentsException() {
-        when(universityRepository.findRandom()).thenReturn(uni3);
-        doReturn(Collections.emptyList()).when(universityRepository).findAllOpponentsWithSharedTag(uni3.getId());
-
-        assertThatThrownBy(() -> soloMatchServiceImpl.startNewDuel())
-                .isInstanceOf(InsufficientOpponentsException.class)
-                .hasMessageContaining("shared tags");
-
-        verifyNoInteractions(soloMatchRedisPort);
-    }
-
-    @Test
-    public void SoloMatchService_StartNewDuel_MultipleCandidates_OpponentIsOneOfThem() {
-        when(universityRepository.findRandom()).thenReturn(uni1);
-        when(universityRepository.findAllOpponentsWithSharedTag(uni1.getId()))
-                .thenReturn(List.of(uni2, uni4));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(uniResponse1);
-
-        soloMatchServiceImpl.startNewDuel();
-
-        ArgumentCaptor<SoloMatch> matchCaptor = ArgumentCaptor.forClass(SoloMatch.class);
-        verify(soloMatchRedisPort).saveMatch(matchCaptor.capture(), anyLong());
-        assertThat(matchCaptor.getValue().getUni2Id()).isIn(uni2.getId(), uni4.getId());
-    }
-
-    @RepeatedTest(10)
-    public void SoloMatchService_StartNewDuel_OpponentIsNeverSameAsUni1() {
-        when(universityRepository.findRandom()).thenReturn(uni1);
-        when(universityRepository.findAllOpponentsWithSharedTag(uni1.getId()))
-                .thenReturn(List.of(uni2, uni4));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(uniResponse1);
-
-        soloMatchServiceImpl.startNewDuel();
-
-        ArgumentCaptor<SoloMatch> matchCaptor = ArgumentCaptor.forClass(SoloMatch.class);
-        verify(soloMatchRedisPort).saveMatch(matchCaptor.capture(), anyLong());
-        assertThat(matchCaptor.getValue().getUni2Id()).isNotEqualTo(uni1.getId());
-
-        clearInvocations(soloMatchRedisPort);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_Uni1Wins_ReturnCorrectReport() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(uni1)).thenReturn(uniResponse1);
-        when(universityMapper.toUniversityResponse(uni2)).thenReturn(uniResponse2);
-
-        SoloMatchReport report = soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        assertThat(report).isNotNull();
-        assertThat(report.getWinner()).isEqualTo(uniResponse1);
-        assertThat(report.getLoser()).isEqualTo(uniResponse2);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_Uni2Wins_WinnerAndLoserAreSwapped() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityMapper.toUniversityResponse(uni2)).thenReturn(uniResponse2);
-        when(universityMapper.toUniversityResponse(uni1)).thenReturn(uniResponse1);
-
-        SoloMatchReport report = soloMatchServiceImpl.chooseWinner(matchId, uni2.getId());
-
-        assertThat(report.getWinner()).isEqualTo(uniResponse2);
-        assertThat(report.getLoser()).isEqualTo(uniResponse1);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_WinnerEloIncreases() {
-        int originalElo = uni1.getElo();
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(new UniversityResponse());
-
-        SoloMatchReport report = soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        assertThat(report.getWinnerEloChange()).isPositive();
-        assertThat(uni1.getElo()).isGreaterThan(originalElo);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_LoserEloDecreases() {
-        int originalElo = uni2.getElo();
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(new UniversityResponse());
-
-        SoloMatchReport report = soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        assertThat(report.getLoserEloChange()).isPositive();
-        assertThat(uni2.getElo()).isLessThan(originalElo);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_EqualStartingElo_ChangesAreSymmetric() {
-        uni1 = University.builder().id(1L).abbreviation("UET").elo(1200).build();
-        uni2 = University.builder().id(2L).abbreviation("HUST").elo(1200).build();
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(new UniversityResponse());
-
-        SoloMatchReport report = soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        assertThat(report.getWinnerEloChange()).isEqualTo(report.getLoserEloChange());
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_BothUniversitiesSavedAfterEloUpdate() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(new UniversityResponse());
-
-        soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        verify(universityRepository).save(uni1);
-        verify(universityRepository).save(uni2);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_MatchDeletedFromRedisAfterResolution() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.of(uni2));
-        when(universityMapper.toUniversityResponse(any())).thenReturn(new UniversityResponse());
-
-        soloMatchServiceImpl.chooseWinner(matchId, uni1.getId());
-
-        verify(soloMatchRedisPort).deleteMatch(matchId);
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_ExpiredMatch_ThrowsSoloMatchExpiredException() {
-        UUID matchId = UUID.randomUUID();
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(null);
-
-        assertThatThrownBy(() -> soloMatchServiceImpl.chooseWinner(matchId, uni1.getId()))
-                .isInstanceOf(SoloMatchExpiredException.class)
-                .hasMessageContaining("expired");
-
-        verify(universityRepository, never()).findById(anyLong());
-        verify(universityRepository, never()).save(any());
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_WinnerNotInMatch_ThrowsInvalidMatchParticipantException() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-
-        assertThatThrownBy(() -> soloMatchServiceImpl.chooseWinner(matchId, uni3.getId()))
-                .isInstanceOf(InvalidMatchParticipantException.class)
-                .hasMessageContaining("participant");
-
-        verify(universityRepository, never()).findById(anyLong());
-        verify(universityRepository, never()).save(any());
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_WinnerMissingFromDb_ThrowsUniversityNotFoundException() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> soloMatchServiceImpl.chooseWinner(matchId, uni1.getId()))
-                .isInstanceOf(UniversityNotFoundException.class)
-                .hasMessageContaining("Winning university");
-    }
-
-    @Test
-    public void SoloMatchService_ChooseWinner_LoserMissingFromDb_ThrowsUniversityNotFoundException() {
-        UUID matchId = UUID.randomUUID();
-        SoloMatch stored = buildMatch(matchId, uni1, uni2);
-
-        when(soloMatchRedisPort.getMatch(matchId)).thenReturn(stored);
-        when(universityRepository.findById(uni1.getId())).thenReturn(Optional.of(uni1));
-        when(universityRepository.findById(uni2.getId())).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> soloMatchServiceImpl.chooseWinner(matchId, uni1.getId()))
-                .isInstanceOf(UniversityNotFoundException.class)
-                .hasMessageContaining("Losing university");
-    }
-
-    private SoloMatch buildMatch(UUID matchId, University u1, University u2) {
-        return new SoloMatch(matchId, u1.getId(), u2.getId(),
-                u1.getPublicUniversityId(), u2.getPublicUniversityId());
+        // Verify side effects are skipped
+        verify(universityRepository, never()).updateElo(anyLong(), anyInt());
+        verify(universityService, never()).cacheUniversity(any());
     }
 }

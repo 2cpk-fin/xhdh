@@ -3,6 +3,7 @@ package com.uniranking.app;
 import com.uniranking.app.domains.auth.refreshToken.RefreshTokenRedisPort;
 import com.uniranking.app.domains.scheduleMatch.match.MatchExpirationListener;
 import com.uniranking.app.infrastructure.security.JwtService;
+import com.uniranking.app.infrastructure.security.OAuth2LoginSuccessHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
@@ -30,21 +31,18 @@ class UniversityRankingApplicationTests {
 
 	@MockitoBean
 	private RefreshTokenRedisPort refreshTokenRedisPort;
-
 	@MockitoBean
 	private JwtService jwtService;
-
 	@MockitoBean
 	private RedisConnectionFactory redisConnectionFactory;
-
 	@MockitoBean
 	private RedisTemplate<String, Object> redisTemplate;
-
 	@MockitoBean
 	private ClientRegistrationRepository clientRegistrationRepository;
-
 	@MockitoBean
 	private MatchExpirationListener matchExpirationListener;
+	@MockitoBean
+	private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
 	@Test
 	void contextLoads() {

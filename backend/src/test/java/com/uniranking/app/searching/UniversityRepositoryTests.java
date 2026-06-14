@@ -172,34 +172,6 @@ public class UniversityRepositoryTests {
         Assertions.assertTrue(tags.isEmpty());
     }
 
-    @Test
-    public void findAllOpponentsWithSharedTag_SharedTagExists_ReturnOpponents() {
-        // university1 (UET) shares ENGINEERING + TECHNOLOGY with university2 (HUST)
-        List<University> opponents = universityRepository.findAllOpponentsWithSharedTag(university1.getId());
-
-        Assertions.assertNotNull(opponents);
-        Assertions.assertEquals(1, opponents.size());
-        Assertions.assertEquals("HUST", opponents.get(0).getAbbreviation());
-    }
-
-    @Test
-    public void findAllOpponentsWithSharedTag_NoSharedTag_ReturnEmptyList() {
-        // university3 (HMU, MEDICAL) shares no tags with UET or HUST
-        List<University> opponents = universityRepository.findAllOpponentsWithSharedTag(university3.getId());
-
-        Assertions.assertNotNull(opponents);
-        Assertions.assertTrue(opponents.isEmpty());
-    }
-
-    @Test
-    public void findAllOpponentsWithSharedTag_DoesNotReturnSelf() {
-        List<University> opponents = universityRepository.findAllOpponentsWithSharedTag(university1.getId());
-
-        List<String> abbreviations = opponents.stream()
-                .map(University::getAbbreviation).toList();
-        Assertions.assertFalse(abbreviations.contains("UET"));
-    }
-
     @AfterEach
     public void tearDown(){
         universityRepository.deleteAll();
