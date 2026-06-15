@@ -1,16 +1,16 @@
 name: CD Pipeline
 
 on:
-  push:
-    branches: [ main ]
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
@@ -18,7 +18,6 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            cd ~/xhdh-app
-            git pull origin main
+            cd ~/xhdh
             docker compose pull
             docker compose up -d
