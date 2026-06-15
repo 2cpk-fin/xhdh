@@ -5,6 +5,7 @@ services:
     build:
       image: 2cpk/xhdh-backend:latest
     container_name: xhdh-backend
+    env_file: .env
     expose:
       - "8000"
     environment:
@@ -45,6 +46,8 @@ services:
     container_name: xhdh-frontend
     ports:
       - "80:80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
     depends_on:
       backend:
         condition: service_healthy
