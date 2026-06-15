@@ -104,7 +104,10 @@ public class SecurityConfig {
                 "http://localhost:5173",
                 "https://xhdh-wine.vercel.app",
                 "https://xhdh-ten.vercel.app",
-                "https://xephangdaihoc.vercel.app"
+                "https://xephangdaihoc.vercel.app",
+                "http://localhost:80",
+                "localhost"
+                
             ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));

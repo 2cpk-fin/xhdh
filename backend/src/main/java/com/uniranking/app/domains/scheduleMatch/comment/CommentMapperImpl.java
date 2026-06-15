@@ -4,6 +4,9 @@ import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatch;
 import com.uniranking.app.domains.scheduleMatch.match.ScheduleMatchRepository;
 import com.uniranking.app.domains.user.User;
 import com.uniranking.app.domains.user.UserMapper;
+
+import lombok.RequiredArgsConstructor;
+
 // Import the custom exceptions
 import com.uniranking.app.domains.scheduleMatch.exceptions.MatchNotFoundException;
 import com.uniranking.app.domains.scheduleMatch.exceptions.CommentNotFoundException;
@@ -15,14 +18,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 
 @Component
+@RequiredArgsConstructor
 public class CommentMapperImpl implements CommentMapper {
-    @Autowired
     private ScheduleMatchRepository scheduleMatchRepository;
-
-    @Autowired
     private CommentRepository commentRepository;
-
-    @Autowired
     private UserMapper userMapper;
 
     public Comment toComment(CommentRequest request, User authenticatedUser) {

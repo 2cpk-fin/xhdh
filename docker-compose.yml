@@ -3,11 +3,10 @@ services:
   # ── Backend (Spring Boot) ──────────────────────────────────────────
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      image: 2cpk/xhdh-backend:latest
     container_name: xhdh-backend
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       # Database
